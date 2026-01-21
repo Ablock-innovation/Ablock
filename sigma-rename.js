@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Simple safe-ish renamer to move Sigma Block branding toward "A Block".
+// Simple safe-ish renamer to move A Block branding toward "A Block".
 // Defaults to DRY RUN. Use `--apply` to actually write/rename.
 // It will:
 // - Rename filenames containing "ublock" -> "ablock".
@@ -52,18 +52,18 @@ const TEXT_FILE_EXTS = new Set([
 // String replacements inside file contents.
 // Order matters: longer/more specific first.
 const contentReplacements = [
-  { from: 'Sigma Block', to: 'A Block' },
-  { from: 'Sigma Block', to: 'A Block' },
-  { from: 'Sigma Block', to: 'A Block' },
-  { from: 'my-sigmablock-static-filters_', to: 'my-ablock-static-filters_' },
-  { from: 'my-sigmablock-dynamic-rules_', to: 'my-ablock-dynamic-rules_' },
-  { from: 'my-sigmablock-trusted-sites_', to: 'my-ablock-trusted-sites_' }
+  { from: 'A Block', to: 'A Block' },
+  { from: 'A Block', to: 'A Block' },
+  { from: 'A Block', to: 'A Block' },
+  { from: 'my-ablock-static-filters_', to: 'my-ablock-static-filters_' },
+  { from: 'my-ablock-dynamic-rules_', to: 'my-ablock-dynamic-rules_' },
+  { from: 'my-ablock-trusted-sites_', to: 'my-ablock-trusted-sites_' }
 ];
 
 // Filename replacements.
 const nameReplacements = [
   { from: 'ublock', to: 'ablock' },
-  { from: 'Sigma Block', to: 'ABlock' }
+  { from: 'A Block', to: 'ABlock' }
 ];
 
 // New ad sources to add
@@ -550,12 +550,12 @@ function showWhatItDoes() {
   console.log('');
   console.log('✅ FILE RENAMING:');
   console.log('   • Renames files containing "ublock" to "ablock"');
-  console.log('   • Renames files containing "Sigma Block" to "ABlock"');
+  console.log('   • Renames files containing "A Block" to "ABlock"');
   console.log('');
   console.log('✅ CONTENT REPLACEMENT:');
-  console.log('   • Replaces "Sigma Block" with "A Block"');
-  console.log('   • Replaces "Sigma Block" with "A Block"');
-  console.log('   • Replaces "Sigma Block" with "A Block"');
+  console.log('   • Replaces "A Block" with "A Block"');
+  console.log('   • Replaces "A Block" with "A Block"');
+  console.log('   • Replaces "A Block" with "A Block"');
   console.log('   • Updates filter names and identifiers');
   console.log('');
   console.log('⚡ SAFETY FEATURES:');
