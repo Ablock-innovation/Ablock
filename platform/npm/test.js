@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* globals process */
@@ -34,17 +34,17 @@ async function spawnMocha() {
 
     const options = [];
 
-    if ( process.argv[3] === '--full-battery' ) {
+    if (process.argv[3] === '--full-battery') {
         files.push('tests/request-data.js');
 
         options.push('--reporter', 'progress');
     }
 
-    await promisify(spawn)('mocha', [ '--experimental-vm-modules', '--no-warnings', ...files, ...options ], { stdio: [ 'inherit', 'inherit', 'inherit' ] });
+    await promisify(spawn)('mocha', ['--experimental-vm-modules', '--no-warnings', ...files, ...options], { stdio: ['inherit', 'inherit', 'inherit'] });
 }
 
 async function main() {
-    if ( process.argv[2] === '--mocha' ) {
+    if (process.argv[2] === '--mocha') {
         await spawnMocha();
     }
 }

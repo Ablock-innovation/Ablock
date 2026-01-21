@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import fs from 'fs';
@@ -26,4 +26,4 @@ import { pslInit } from './index.js';
 
 fs.mkdirSync('./build', { recursive: true });
 fs.writeFileSync('./build/publicsuffixlist.json',
-                 JSON.stringify(pslInit().toSelfie()));
+    JSON.stringify(pslInit().toSelfie()));

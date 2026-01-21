@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /*******************************************************************************
@@ -96,105 +96,105 @@ const SAFECHARS = "&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abc
 const NUMSAFECHARS = SAFECHARS.length;
 const BITS_PER_SAFECHARS = Math.log2(NUMSAFECHARS);
 
-const { intToChar, intToCharCode, charCodeToInt } = (( ) => {
+const { intToChar, intToCharCode, charCodeToInt } = (() => {
     const intToChar = [];
     const intToCharCode = [];
     const charCodeToInt = [];
-    for ( let i = 0; i < NUMSAFECHARS; i++ ) {
+    for (let i = 0; i < NUMSAFECHARS; i++) {
         intToChar[i] = SAFECHARS.charAt(i);
         intToCharCode[i] = SAFECHARS.charCodeAt(i);
         charCodeToInt[i] = 0;
     }
-    for ( let i = NUMSAFECHARS; i < 128; i++ ) {
+    for (let i = NUMSAFECHARS; i < 128; i++) {
         intToChar[i] = '';
         intToCharCode[i] = 0;
         charCodeToInt[i] = 0;
     }
-    for ( let i = 0; i < SAFECHARS.length; i++ ) {
+    for (let i = 0; i < SAFECHARS.length; i++) {
         charCodeToInt[SAFECHARS.charCodeAt(i)] = i;
     }
     return { intToChar, intToCharCode, charCodeToInt };
 })();
 
 let iota = 1;
-const I_STRING_SMALL      = iota++;
-const I_STRING_LARGE      = iota++;
-const I_ZERO              = iota++;
+const I_STRING_SMALL = iota++;
+const I_STRING_LARGE = iota++;
+const I_ZERO = iota++;
 const I_INTEGER_SMALL_POS = iota++;
 const I_INTEGER_SMALL_NEG = iota++;
 const I_INTEGER_LARGE_POS = iota++;
 const I_INTEGER_LARGE_NEG = iota++;
-const I_BOOL_FALSE        = iota++;
-const I_BOOL_TRUE         = iota++;
-const I_NULL              = iota++;
-const I_UNDEFINED         = iota++;
-const I_FLOAT             = iota++;
-const I_REGEXP            = iota++;
-const I_DATE              = iota++;
-const I_REFERENCE         = iota++;
-const I_OBJECT_SMALL      = iota++;
-const I_OBJECT_LARGE      = iota++;
-const I_ARRAY_SMALL       = iota++;
-const I_ARRAY_LARGE       = iota++;
-const I_SET_SMALL         = iota++;
-const I_SET_LARGE         = iota++;
-const I_MAP_SMALL         = iota++;
-const I_MAP_LARGE         = iota++;
-const I_ARRAYBUFFER       = iota++;
-const I_INT8ARRAY         = iota++;
-const I_UINT8ARRAY        = iota++;
+const I_BOOL_FALSE = iota++;
+const I_BOOL_TRUE = iota++;
+const I_NULL = iota++;
+const I_UNDEFINED = iota++;
+const I_FLOAT = iota++;
+const I_REGEXP = iota++;
+const I_DATE = iota++;
+const I_REFERENCE = iota++;
+const I_OBJECT_SMALL = iota++;
+const I_OBJECT_LARGE = iota++;
+const I_ARRAY_SMALL = iota++;
+const I_ARRAY_LARGE = iota++;
+const I_SET_SMALL = iota++;
+const I_SET_LARGE = iota++;
+const I_MAP_SMALL = iota++;
+const I_MAP_LARGE = iota++;
+const I_ARRAYBUFFER = iota++;
+const I_INT8ARRAY = iota++;
+const I_UINT8ARRAY = iota++;
 const I_UINT8CLAMPEDARRAY = iota++;
-const I_INT16ARRAY        = iota++;
-const I_UINT16ARRAY       = iota++;
-const I_INT32ARRAY        = iota++;
-const I_UINT32ARRAY       = iota++;
-const I_FLOAT32ARRAY      = iota++;
-const I_FLOAT64ARRAY      = iota++;
-const I_DATAVIEW          = iota++;
+const I_INT16ARRAY = iota++;
+const I_UINT16ARRAY = iota++;
+const I_INT32ARRAY = iota++;
+const I_UINT32ARRAY = iota++;
+const I_FLOAT32ARRAY = iota++;
+const I_FLOAT64ARRAY = iota++;
+const I_DATAVIEW = iota++;
 
-const C_STRING_SMALL      = intToChar[I_STRING_SMALL];
-const C_STRING_LARGE      = intToChar[I_STRING_LARGE];
-const C_ZERO              = intToChar[I_ZERO];
+const C_STRING_SMALL = intToChar[I_STRING_SMALL];
+const C_STRING_LARGE = intToChar[I_STRING_LARGE];
+const C_ZERO = intToChar[I_ZERO];
 const C_INTEGER_SMALL_POS = intToChar[I_INTEGER_SMALL_POS];
 const C_INTEGER_SMALL_NEG = intToChar[I_INTEGER_SMALL_NEG];
 const C_INTEGER_LARGE_POS = intToChar[I_INTEGER_LARGE_POS];
 const C_INTEGER_LARGE_NEG = intToChar[I_INTEGER_LARGE_NEG];
-const C_BOOL_FALSE        = intToChar[I_BOOL_FALSE];
-const C_BOOL_TRUE         = intToChar[I_BOOL_TRUE];
-const C_NULL              = intToChar[I_NULL];
-const C_UNDEFINED         = intToChar[I_UNDEFINED];
-const C_FLOAT             = intToChar[I_FLOAT];
-const C_REGEXP            = intToChar[I_REGEXP];
-const C_DATE              = intToChar[I_DATE];
-const C_REFERENCE         = intToChar[I_REFERENCE];
-const C_OBJECT_SMALL      = intToChar[I_OBJECT_SMALL];
-const C_OBJECT_LARGE      = intToChar[I_OBJECT_LARGE];
-const C_ARRAY_SMALL       = intToChar[I_ARRAY_SMALL];
-const C_ARRAY_LARGE       = intToChar[I_ARRAY_LARGE];
-const C_SET_SMALL         = intToChar[I_SET_SMALL];
-const C_SET_LARGE         = intToChar[I_SET_LARGE];
-const C_MAP_SMALL         = intToChar[I_MAP_SMALL];
-const C_MAP_LARGE         = intToChar[I_MAP_LARGE];
-const C_ARRAYBUFFER       = intToChar[I_ARRAYBUFFER];
-const C_INT8ARRAY         = intToChar[I_INT8ARRAY];
-const C_UINT8ARRAY        = intToChar[I_UINT8ARRAY];
+const C_BOOL_FALSE = intToChar[I_BOOL_FALSE];
+const C_BOOL_TRUE = intToChar[I_BOOL_TRUE];
+const C_NULL = intToChar[I_NULL];
+const C_UNDEFINED = intToChar[I_UNDEFINED];
+const C_FLOAT = intToChar[I_FLOAT];
+const C_REGEXP = intToChar[I_REGEXP];
+const C_DATE = intToChar[I_DATE];
+const C_REFERENCE = intToChar[I_REFERENCE];
+const C_OBJECT_SMALL = intToChar[I_OBJECT_SMALL];
+const C_OBJECT_LARGE = intToChar[I_OBJECT_LARGE];
+const C_ARRAY_SMALL = intToChar[I_ARRAY_SMALL];
+const C_ARRAY_LARGE = intToChar[I_ARRAY_LARGE];
+const C_SET_SMALL = intToChar[I_SET_SMALL];
+const C_SET_LARGE = intToChar[I_SET_LARGE];
+const C_MAP_SMALL = intToChar[I_MAP_SMALL];
+const C_MAP_LARGE = intToChar[I_MAP_LARGE];
+const C_ARRAYBUFFER = intToChar[I_ARRAYBUFFER];
+const C_INT8ARRAY = intToChar[I_INT8ARRAY];
+const C_UINT8ARRAY = intToChar[I_UINT8ARRAY];
 const C_UINT8CLAMPEDARRAY = intToChar[I_UINT8CLAMPEDARRAY];
-const C_INT16ARRAY        = intToChar[I_INT16ARRAY];
-const C_UINT16ARRAY       = intToChar[I_UINT16ARRAY];
-const C_INT32ARRAY        = intToChar[I_INT32ARRAY];
-const C_UINT32ARRAY       = intToChar[I_UINT32ARRAY];
-const C_FLOAT32ARRAY      = intToChar[I_FLOAT32ARRAY];
-const C_FLOAT64ARRAY      = intToChar[I_FLOAT64ARRAY];
-const C_DATAVIEW          = intToChar[I_DATAVIEW];
+const C_INT16ARRAY = intToChar[I_INT16ARRAY];
+const C_UINT16ARRAY = intToChar[I_UINT16ARRAY];
+const C_INT32ARRAY = intToChar[I_INT32ARRAY];
+const C_UINT32ARRAY = intToChar[I_UINT32ARRAY];
+const C_FLOAT32ARRAY = intToChar[I_FLOAT32ARRAY];
+const C_FLOAT64ARRAY = intToChar[I_FLOAT64ARRAY];
+const C_DATAVIEW = intToChar[I_DATAVIEW];
 
 // Just reuse already defined constants, we just need distinct values
-const I_STRING            = I_STRING_SMALL;
-const I_NUMBER            = I_FLOAT;
-const I_BOOL              = I_BOOL_FALSE;
-const I_OBJECT            = I_OBJECT_SMALL;
-const I_ARRAY             = I_ARRAY_SMALL;
-const I_SET               = I_SET_SMALL;
-const I_MAP               = I_MAP_SMALL;
+const I_STRING = I_STRING_SMALL;
+const I_NUMBER = I_FLOAT;
+const I_BOOL = I_BOOL_FALSE;
+const I_OBJECT = I_OBJECT_SMALL;
+const I_ARRAY = I_ARRAY_SMALL;
+const I_SET = I_SET_SMALL;
+const I_MAP = I_MAP_SMALL;
 
 const typeToSerializedInt = {
     'string': I_STRING,
@@ -253,19 +253,19 @@ const textCodec = {
     decoder: null,
     encoder: null,
     decode(...args) {
-        if ( this.decoder === null ) {
+        if (this.decoder === null) {
             this.decoder = new globalThis.TextDecoder();
         }
         return this.decoder.decode(...args);
     },
     encode(...args) {
-        if ( this.encoder === null ) {
+        if (this.encoder === null) {
             this.encoder = new globalThis.TextEncoder();
         }
         return this.encoder.encode(...args);
     },
     encodeInto(...args) {
-        if ( this.encoder === null ) {
+        if (this.encoder === null) {
             this.encoder = new globalThis.TextEncoder();
         }
         return this.encoder.encodeInto(...args);
@@ -287,7 +287,7 @@ let refCounter = 1;
 let uint8Input = null;
 
 const uint8InputFromAsciiStr = s => {
-    if ( uint8Input === null || uint8Input.length < s.length ) {
+    if (uint8Input === null || uint8Input.length < s.length) {
         uint8Input = new Uint8Array(s.length + 0x03FF & ~0x03FF);
     }
     textCodec.encodeInto(s, uint8Input);
@@ -316,21 +316,21 @@ const shouldCompress = (s, options) =>
 
 const strFromLargeUint = i => {
     let r = 0, s = '';
-    for (;;) {
+    for (; ;) {
         r = i % NUMSAFECHARS;
         s += intToChar[r];
         i -= r;
-        if ( i === 0 ) { break; }
+        if (i === 0) { break; }
         i /= NUMSAFECHARS;
     }
     return s + SEPARATORCHAR;
 };
 
-const deserializeLargeUint = ( ) => {
+const deserializeLargeUint = () => {
     let c = readStr.charCodeAt(readPtr++);
     let n = charCodeToInt[c];
     let m = 1;
-    while ( (c = readStr.charCodeAt(readPtr++)) !== SEPARATORCHARCODE ) {
+    while ((c = readStr.charCodeAt(readPtr++)) !== SEPARATORCHARCODE) {
         m *= NUMSAFECHARS;
         n += m * charCodeToInt[c];
     }
@@ -357,8 +357,8 @@ const analyzeArrayBuffer = arrbuf => {
     const uint32len = byteLength >>> 2;
     const uint32arr = new Uint32Array(arrbuf, 0, uint32len);
     let notzeroCount = 0;
-    for ( let i = uint32len-1; i >= 0; i-- ) {
-        if ( uint32arr[i] === 0 ) { continue; }
+    for (let i = uint32len - 1; i >= 0; i--) {
+        if (uint32arr[i] === 0) { continue; }
         notzeroCount = i + 1;
         break;
     }
@@ -367,16 +367,16 @@ const analyzeArrayBuffer = arrbuf => {
     const remUint8 = end & 0b11;
     const denseSize = endUint32 * 5 + (remUint8 ? remUint8 + 1 : 0);
     let sparseSize = 0;
-    for ( let i = 0; i < endUint32; i++ ) {
+    for (let i = 0; i < endUint32; i++) {
         sparseSize += sparseValueLen(uint32arr[i]);
-        if ( sparseSize > denseSize ) {
+        if (sparseSize > denseSize) {
             return { end, dense: true, denseSize };
         }
     }
-    if ( remUint8 !== 0 ) {
+    if (remUint8 !== 0) {
         sparseSize += 1; // sentinel
         const uint8arr = new Uint8Array(arrbuf, endUint32 << 2);
-        for ( let i = 0; i < remUint8; i++ ) {
+        for (let i = 0; i < remUint8; i++) {
             sparseSize += sparseValueLen(uint8arr[i]);
         }
     }
@@ -391,37 +391,37 @@ const denseArrayBufferToStr = (arrbuf, details) => {
     const uint32arr = new Uint32Array(arrbuf, 0, uin32len);
     const output = new Uint8Array(details.denseSize);
     let j = 0, v = 0;
-    for ( let i = 0; i < uin32len; i++ ) {
+    for (let i = 0; i < uin32len; i++) {
         v = uint32arr[i];
-        output[j+0] = intToCharCode[v % NUMSAFECHARS];
+        output[j + 0] = intToCharCode[v % NUMSAFECHARS];
         v = v / NUMSAFECHARS | 0;
-        output[j+1] = intToCharCode[v % NUMSAFECHARS];
+        output[j + 1] = intToCharCode[v % NUMSAFECHARS];
         v = v / NUMSAFECHARS | 0;
-        output[j+2] = intToCharCode[v % NUMSAFECHARS];
+        output[j + 2] = intToCharCode[v % NUMSAFECHARS];
         v = v / NUMSAFECHARS | 0;
-        output[j+3] = intToCharCode[v % NUMSAFECHARS];
+        output[j + 3] = intToCharCode[v % NUMSAFECHARS];
         v = v / NUMSAFECHARS | 0;
-        output[j+4] = intToCharCode[v];
+        output[j + 4] = intToCharCode[v];
         j += 5;
     }
-    if ( m !== 0 ) {
+    if (m !== 0) {
         const uint8arr = new Uint8Array(arrbuf, n);
         v = uint8arr[0];
-        if ( m > 1 ) {
+        if (m > 1) {
             v += uint8arr[1] << 8;
-            if ( m > 2 ) {
+            if (m > 2) {
                 v += uint8arr[2] << 16;
             }
         }
-        output[j+0] = intToCharCode[v % NUMSAFECHARS];
+        output[j + 0] = intToCharCode[v % NUMSAFECHARS];
         v = v / NUMSAFECHARS | 0;
-        output[j+1] = intToCharCode[v % NUMSAFECHARS];
-        if ( m > 1 ) {
+        output[j + 1] = intToCharCode[v % NUMSAFECHARS];
+        if (m > 1) {
             v = v / NUMSAFECHARS | 0;
-            output[j+2] = intToCharCode[v % NUMSAFECHARS];
-            if ( m > 2 ) {
+            output[j + 2] = intToCharCode[v % NUMSAFECHARS];
+            if (m > 2) {
                 v = v / NUMSAFECHARS | 0;
-                output[j+3] = intToCharCode[v % NUMSAFECHARS];
+                output[j + 3] = intToCharCode[v % NUMSAFECHARS];
             }
         }
     }
@@ -441,29 +441,29 @@ const denseArrayBufferFromStr = (denseStr, arrbuf) => {
     const uin32len = n / 5 * 4 >>> 2;
     const uint32arr = new Uint32Array(arrbuf, 0, uin32len);
     let j = 0, v = 0;
-    for ( let i = 0; i < n; i += 5 ) {
-        v  = charCodeToInt[input[i+0]];
-        v += charCodeToInt[input[i+1]] * BASE88_POW1;
-        v += charCodeToInt[input[i+2]] * BASE88_POW2;
-        v += charCodeToInt[input[i+3]] * BASE88_POW3;
-        v += charCodeToInt[input[i+4]] * BASE88_POW4;
+    for (let i = 0; i < n; i += 5) {
+        v = charCodeToInt[input[i + 0]];
+        v += charCodeToInt[input[i + 1]] * BASE88_POW1;
+        v += charCodeToInt[input[i + 2]] * BASE88_POW2;
+        v += charCodeToInt[input[i + 3]] * BASE88_POW3;
+        v += charCodeToInt[input[i + 4]] * BASE88_POW4;
         uint32arr[j++] = v;
     }
-    if ( m === 0 ) { return; }
-    v  = charCodeToInt[input[n+0]] +
-         charCodeToInt[input[n+1]] * BASE88_POW1;
-    if ( m > 2 ) {
-        v += charCodeToInt[input[n+2]] * BASE88_POW2;
-        if ( m > 3 ) {
-            v += charCodeToInt[input[n+3]] * BASE88_POW3;
+    if (m === 0) { return; }
+    v = charCodeToInt[input[n + 0]] +
+        charCodeToInt[input[n + 1]] * BASE88_POW1;
+    if (m > 2) {
+        v += charCodeToInt[input[n + 2]] * BASE88_POW2;
+        if (m > 3) {
+            v += charCodeToInt[input[n + 3]] * BASE88_POW3;
         }
     }
     const uint8arr = new Uint8Array(arrbuf, j << 2);
     uint8arr[0] = v & 255;
-    if ( v !== 0 ) {
+    if (v !== 0) {
         v >>>= 8;
         uint8arr[1] = v & 255;
-        if ( v !== 0 ) {
+        if (v !== 0) {
             v >>>= 8;
             uint8arr[2] = v & 255;
         }
@@ -476,31 +476,31 @@ const sparseArrayBufferToStr = (arrbuf, details) => {
     const uint32len = end >>> 2;
     const uint32arr = new Uint32Array(arrbuf, 0, uint32len);
     let j = 0, n = 0, r = 0;
-    for ( let i = 0; i < uint32len; i++ ) {
+    for (let i = 0; i < uint32len; i++) {
         n = uint32arr[i];
-        if ( n !== 0 ) {
-            for (;;) {
+        if (n !== 0) {
+            for (; ;) {
                 r = n % NUMSAFECHARS;
                 uint8out[j++] = intToCharCode[r];
                 n -= r;
-                if ( n === 0 ) { break; }
+                if (n === 0) { break; }
                 n /= NUMSAFECHARS;
             }
         }
         uint8out[j++] = SEPARATORCHARCODE;
     }
     const uint8rem = end & 0b11;
-    if ( uint8rem !== 0 ) {
+    if (uint8rem !== 0) {
         uint8out[j++] = SENTINELCHARCODE;
         const uint8arr = new Uint8Array(arrbuf, end - uint8rem, uint8rem);
-        for ( let i = 0; i < uint8rem; i++ ) {
+        for (let i = 0; i < uint8rem; i++) {
             n = uint8arr[i];
-            if ( n !== 0 ) {
-                for (;;) {
+            if (n !== 0) {
+                for (; ;) {
                     r = n % NUMSAFECHARS;
                     uint8out[j++] = intToCharCode[r];
                     n -= r;
-                    if ( n === 0 ) { break; }
+                    if (n === 0) { break; }
                     n /= NUMSAFECHARS;
                 }
             }
@@ -517,31 +517,31 @@ const sparseArrayBufferFromStr = (sparseStr, arrbuf) => {
     const uint32len = end >>> 2;
     const uint32arr = new Uint32Array(arrbuf, 0, uint32len);
     let i = 0, j = 0, c = 0, n = 0, m = 0;
-    for ( ; j < sparseLen; i++ ) {
+    for (; j < sparseLen; i++) {
         c = input[j++];
-        if ( c === SEPARATORCHARCODE ) { continue; }
-        if ( c === SENTINELCHARCODE ) { break; }
+        if (c === SEPARATORCHARCODE) { continue; }
+        if (c === SENTINELCHARCODE) { break; }
         n = charCodeToInt[c];
         m = 1;
-        for (;;) {
+        for (; ;) {
             c = input[j++];
-            if ( c === SEPARATORCHARCODE ) { break; }
+            if (c === SEPARATORCHARCODE) { break; }
             m *= NUMSAFECHARS;
             n += m * charCodeToInt[c];
         }
         uint32arr[i] = n;
     }
-    if ( c === SENTINELCHARCODE ) {
+    if (c === SENTINELCHARCODE) {
         i <<= 2;
         const uint8arr = new Uint8Array(arrbuf, i);
-        for ( ; j < sparseLen; i++ ) {
+        for (; j < sparseLen; i++) {
             c = input[j++];
-            if ( c === SEPARATORCHARCODE ) { continue; }
+            if (c === SEPARATORCHARCODE) { continue; }
             n = charCodeToInt[c];
             m = 1;
-            for (;;) {
+            for (; ;) {
                 c = input[j++];
-                if ( c === SEPARATORCHARCODE ) { break; }
+                if (c === SEPARATORCHARCODE) { break; }
                 m *= NUMSAFECHARS;
                 n += m * charCodeToInt[c];
             }
@@ -554,309 +554,309 @@ const sparseArrayBufferFromStr = (sparseStr, arrbuf) => {
 
 const _serialize = data => {
     // Primitive types
-    if ( data === 0 ) {
+    if (data === 0) {
         writeBuffer.push(C_ZERO);
         return;
     }
-    if ( data === null ) {
+    if (data === null) {
         writeBuffer.push(C_NULL);
         return;
     }
-    if ( data === undefined ) {
+    if (data === undefined) {
         writeBuffer.push(C_UNDEFINED);
         return;
     }
     // Type name
-    switch ( typeToSerializedInt[typeof data] ) {
-    case I_STRING: {
-        const length = data.length;
-        if ( length < NUMSAFECHARS ) {
-            writeBuffer.push(C_STRING_SMALL + intToChar[length], data);
-        } else {
-            writeBuffer.push(C_STRING_LARGE + strFromLargeUint(length), data);
-        }
-        return;
-    }
-    case I_NUMBER:
-        if ( isInteger(data) ) {
-            if ( data >= NUMSAFECHARS ) {
-                writeBuffer.push(C_INTEGER_LARGE_POS + strFromLargeUint(data));
-            } else if ( data > 0 ) {
-                writeBuffer.push(C_INTEGER_SMALL_POS + intToChar[data]);
-            } else if ( data > -NUMSAFECHARS ) {
-                writeBuffer.push(C_INTEGER_SMALL_NEG + intToChar[-data]);
+    switch (typeToSerializedInt[typeof data]) {
+        case I_STRING: {
+            const length = data.length;
+            if (length < NUMSAFECHARS) {
+                writeBuffer.push(C_STRING_SMALL + intToChar[length], data);
             } else {
-                writeBuffer.push(C_INTEGER_LARGE_NEG + strFromLargeUint(-data));
+                writeBuffer.push(C_STRING_LARGE + strFromLargeUint(length), data);
             }
-        } else {
-            const s = `${data}`;
-            writeBuffer.push(C_FLOAT + strFromLargeUint(s.length) + s);
+            return;
         }
-        return;
-    case I_BOOL:
-        writeBuffer.push(data ? C_BOOL_TRUE : C_BOOL_FALSE);
-        return;
-    case I_OBJECT:
-        break;
-    default:
-        return;
+        case I_NUMBER:
+            if (isInteger(data)) {
+                if (data >= NUMSAFECHARS) {
+                    writeBuffer.push(C_INTEGER_LARGE_POS + strFromLargeUint(data));
+                } else if (data > 0) {
+                    writeBuffer.push(C_INTEGER_SMALL_POS + intToChar[data]);
+                } else if (data > -NUMSAFECHARS) {
+                    writeBuffer.push(C_INTEGER_SMALL_NEG + intToChar[-data]);
+                } else {
+                    writeBuffer.push(C_INTEGER_LARGE_NEG + strFromLargeUint(-data));
+                }
+            } else {
+                const s = `${data}`;
+                writeBuffer.push(C_FLOAT + strFromLargeUint(s.length) + s);
+            }
+            return;
+        case I_BOOL:
+            writeBuffer.push(data ? C_BOOL_TRUE : C_BOOL_FALSE);
+            return;
+        case I_OBJECT:
+            break;
+        default:
+            return;
     }
     const xtypeName = Object.prototype.toString.call(data);
     const xtypeInt = xtypeToSerializedInt[xtypeName];
-    if ( xtypeInt === I_REGEXP ) {
+    if (xtypeInt === I_REGEXP) {
         writeBuffer.push(C_REGEXP);
         _serialize(data.source);
         _serialize(data.flags);
         return;
     }
-    if ( xtypeInt === I_DATE ) {
+    if (xtypeInt === I_DATE) {
         writeBuffer.push(C_DATE);
         _serialize(data.getTime());
         return;
     }
     // Reference to composite types
     const ref = writeRefs.get(data);
-    if ( ref !== undefined ) {
+    if (ref !== undefined) {
         writeBuffer.push(C_REFERENCE + strFromLargeUint(ref));
         return;
     }
     // Remember reference
     writeRefs.set(data, refCounter++);
     // Extended type name
-    switch ( xtypeInt ) {
-    case I_ARRAY: {
-        const size = data.length;
-        if ( size < NUMSAFECHARS ) {
-            writeBuffer.push(C_ARRAY_SMALL + intToChar[size]);
-        } else {
-            writeBuffer.push(C_ARRAY_LARGE + strFromLargeUint(size));
+    switch (xtypeInt) {
+        case I_ARRAY: {
+            const size = data.length;
+            if (size < NUMSAFECHARS) {
+                writeBuffer.push(C_ARRAY_SMALL + intToChar[size]);
+            } else {
+                writeBuffer.push(C_ARRAY_LARGE + strFromLargeUint(size));
+            }
+            for (const v of data) {
+                _serialize(v);
+            }
+            return;
         }
-        for ( const v of data ) {
-            _serialize(v);
+        case I_SET: {
+            const size = data.size;
+            if (size < NUMSAFECHARS) {
+                writeBuffer.push(C_SET_SMALL + intToChar[size]);
+            } else {
+                writeBuffer.push(C_SET_LARGE + strFromLargeUint(size));
+            }
+            for (const v of data) {
+                _serialize(v);
+            }
+            return;
         }
-        return;
-    }
-    case I_SET: {
-        const size = data.size;
-        if ( size < NUMSAFECHARS ) {
-            writeBuffer.push(C_SET_SMALL + intToChar[size]);
-        } else {
-            writeBuffer.push(C_SET_LARGE + strFromLargeUint(size));
+        case I_MAP: {
+            const size = data.size;
+            if (size < NUMSAFECHARS) {
+                writeBuffer.push(C_MAP_SMALL + intToChar[size]);
+            } else {
+                writeBuffer.push(C_MAP_LARGE + strFromLargeUint(size));
+            }
+            for (const [k, v] of data) {
+                _serialize(k);
+                _serialize(v);
+            }
+            return;
         }
-        for ( const v of data ) {
-            _serialize(v);
+        case I_ARRAYBUFFER: {
+            const byteLength = data.byteLength;
+            writeBuffer.push(C_ARRAYBUFFER + strFromLargeUint(byteLength));
+            _serialize(data.maxByteLength);
+            const arrbuffDetails = analyzeArrayBuffer(data);
+            _serialize(arrbuffDetails.dense);
+            const str = arrbuffDetails.dense
+                ? denseArrayBufferToStr(data, arrbuffDetails)
+                : sparseArrayBufferToStr(data, arrbuffDetails);
+            _serialize(str);
+            //console.log(`arrbuf size=${byteLength} content size=${arrbuffDetails.end} dense=${arrbuffDetails.dense} array size=${arrbuffDetails.dense ? arrbuffDetails.denseSize : arrbuffDetails.sparseSize} serialized size=${str.length}`);
+            return;
         }
-        return;
-    }
-    case I_MAP: {
-        const size = data.size;
-        if ( size < NUMSAFECHARS ) {
-            writeBuffer.push(C_MAP_SMALL + intToChar[size]);
-        } else {
-            writeBuffer.push(C_MAP_LARGE + strFromLargeUint(size));
+        case I_INT8ARRAY:
+        case I_UINT8ARRAY:
+        case I_UINT8CLAMPEDARRAY:
+        case I_INT16ARRAY:
+        case I_UINT16ARRAY:
+        case I_INT32ARRAY:
+        case I_UINT32ARRAY:
+        case I_FLOAT32ARRAY:
+        case I_FLOAT64ARRAY:
+            writeBuffer.push(
+                xtypeToSerializedChar[xtypeName],
+                strFromLargeUint(data.byteOffset),
+                strFromLargeUint(data.length)
+            );
+            _serialize(data.buffer);
+            return;
+        case I_DATAVIEW:
+            writeBuffer.push(C_DATAVIEW, strFromLargeUint(data.byteOffset), strFromLargeUint(data.byteLength));
+            _serialize(data.buffer);
+            return;
+        default: {
+            const keys = Object.keys(data);
+            const size = keys.length;
+            if (size < NUMSAFECHARS) {
+                writeBuffer.push(C_OBJECT_SMALL + intToChar[size]);
+            } else {
+                writeBuffer.push(C_OBJECT_LARGE + strFromLargeUint(size));
+            }
+            for (const key of keys) {
+                _serialize(key);
+                _serialize(data[key]);
+            }
+            break;
         }
-        for ( const [ k, v ] of data ) {
-            _serialize(k);
-            _serialize(v);
-        }
-        return;
-    }
-    case I_ARRAYBUFFER: {
-        const byteLength = data.byteLength;
-        writeBuffer.push(C_ARRAYBUFFER + strFromLargeUint(byteLength));
-        _serialize(data.maxByteLength);
-        const arrbuffDetails = analyzeArrayBuffer(data);
-        _serialize(arrbuffDetails.dense);
-        const str = arrbuffDetails.dense
-            ? denseArrayBufferToStr(data, arrbuffDetails)
-            : sparseArrayBufferToStr(data, arrbuffDetails);
-        _serialize(str);
-        //console.log(`arrbuf size=${byteLength} content size=${arrbuffDetails.end} dense=${arrbuffDetails.dense} array size=${arrbuffDetails.dense ? arrbuffDetails.denseSize : arrbuffDetails.sparseSize} serialized size=${str.length}`);
-        return;
-    }
-    case I_INT8ARRAY:
-    case I_UINT8ARRAY:
-    case I_UINT8CLAMPEDARRAY:
-    case I_INT16ARRAY:
-    case I_UINT16ARRAY:
-    case I_INT32ARRAY:
-    case I_UINT32ARRAY:
-    case I_FLOAT32ARRAY:
-    case I_FLOAT64ARRAY:
-        writeBuffer.push(
-            xtypeToSerializedChar[xtypeName],
-            strFromLargeUint(data.byteOffset),
-            strFromLargeUint(data.length)
-        );
-        _serialize(data.buffer);
-        return;
-    case I_DATAVIEW:
-        writeBuffer.push(C_DATAVIEW, strFromLargeUint(data.byteOffset), strFromLargeUint(data.byteLength));
-        _serialize(data.buffer);
-        return;
-    default: {
-        const keys = Object.keys(data);
-        const size = keys.length;
-        if ( size < NUMSAFECHARS ) {
-            writeBuffer.push(C_OBJECT_SMALL + intToChar[size]);
-        } else {
-            writeBuffer.push(C_OBJECT_LARGE + strFromLargeUint(size));
-        }
-        for ( const key of keys ) {
-            _serialize(key);
-            _serialize(data[key]);
-        }
-        break;
-    }
     }
 };
 
 /******************************************************************************/
 
-const _deserialize = ( ) => {
-    if ( readPtr >= readEnd ) { return; }
+const _deserialize = () => {
+    if (readPtr >= readEnd) { return; }
     const type = charCodeToInt[readStr.charCodeAt(readPtr++)];
-    switch ( type ) {
-    // Primitive types
-    case I_STRING_SMALL:
-    case I_STRING_LARGE: {
-        const size = type === I_STRING_SMALL
-            ? charCodeToInt[readStr.charCodeAt(readPtr++)]
-            : deserializeLargeUint();
-        const beg = readPtr;
-        readPtr += size;
-        return readStr.slice(beg, readPtr);
-    }
-    case I_ZERO:
-        return 0;
-    case I_INTEGER_SMALL_POS:
-        return charCodeToInt[readStr.charCodeAt(readPtr++)];
-    case I_INTEGER_SMALL_NEG:
-        return -charCodeToInt[readStr.charCodeAt(readPtr++)];
-    case I_INTEGER_LARGE_POS:
-        return deserializeLargeUint();
-    case I_INTEGER_LARGE_NEG:
-        return -deserializeLargeUint();
-    case I_BOOL_FALSE:
-        return false;
-    case I_BOOL_TRUE:
-        return true;
-    case I_NULL:
-        return null;
-    case I_UNDEFINED:
-        return;
-    case I_FLOAT: {
-        const size = deserializeLargeUint();
-        const beg = readPtr;
-        readPtr += size;
-        return parseFloat(readStr.slice(beg, readPtr));
-    }
-    case I_REGEXP: {
-        const source = _deserialize();
-        const flags = _deserialize();
-        return new RegExp(source, flags);
-    }
-    case I_DATE: {
-        const time = _deserialize();
-        return new Date(time);
-    }
-    case I_REFERENCE: {
-        const ref = deserializeLargeUint();
-        return readRefs.get(ref);
-    }
-    case I_OBJECT_SMALL:
-    case I_OBJECT_LARGE: {
-        const out = {};
-        readRefs.set(refCounter++, out);
-        const entries = [];
-        const size = type === I_OBJECT_SMALL
-            ? charCodeToInt[readStr.charCodeAt(readPtr++)]
-            : deserializeLargeUint();
-        for ( let i = 0; i < size; i++ ) {
-            const k = _deserialize();
-            const v = _deserialize();
-            entries.push([ k, v ]);
+    switch (type) {
+        // Primitive types
+        case I_STRING_SMALL:
+        case I_STRING_LARGE: {
+            const size = type === I_STRING_SMALL
+                ? charCodeToInt[readStr.charCodeAt(readPtr++)]
+                : deserializeLargeUint();
+            const beg = readPtr;
+            readPtr += size;
+            return readStr.slice(beg, readPtr);
         }
-        Object.assign(out, Object.fromEntries(entries));
-        return out;
-    }
-    case I_ARRAY_SMALL:
-    case I_ARRAY_LARGE: {
-        const out = [];
-        readRefs.set(refCounter++, out);
-        const size = type === I_ARRAY_SMALL
-            ? charCodeToInt[readStr.charCodeAt(readPtr++)]
-            : deserializeLargeUint();
-        for ( let i = 0; i < size; i++ ) {
-            out.push(_deserialize());
+        case I_ZERO:
+            return 0;
+        case I_INTEGER_SMALL_POS:
+            return charCodeToInt[readStr.charCodeAt(readPtr++)];
+        case I_INTEGER_SMALL_NEG:
+            return -charCodeToInt[readStr.charCodeAt(readPtr++)];
+        case I_INTEGER_LARGE_POS:
+            return deserializeLargeUint();
+        case I_INTEGER_LARGE_NEG:
+            return -deserializeLargeUint();
+        case I_BOOL_FALSE:
+            return false;
+        case I_BOOL_TRUE:
+            return true;
+        case I_NULL:
+            return null;
+        case I_UNDEFINED:
+            return;
+        case I_FLOAT: {
+            const size = deserializeLargeUint();
+            const beg = readPtr;
+            readPtr += size;
+            return parseFloat(readStr.slice(beg, readPtr));
         }
-        return out;
-    }
-    case I_SET_SMALL:
-    case I_SET_LARGE: {
-        const out = new Set();
-        readRefs.set(refCounter++, out);
-        const size = type === I_SET_SMALL
-            ? charCodeToInt[readStr.charCodeAt(readPtr++)]
-            : deserializeLargeUint();
-        for ( let i = 0; i < size; i++ ) {
-            out.add(_deserialize());
+        case I_REGEXP: {
+            const source = _deserialize();
+            const flags = _deserialize();
+            return new RegExp(source, flags);
         }
-        return out;
-    }
-    case I_MAP_SMALL:
-    case I_MAP_LARGE: {
-        const out = new Map();
-        readRefs.set(refCounter++, out);
-        const size = type === I_MAP_SMALL
-            ? charCodeToInt[readStr.charCodeAt(readPtr++)]
-            : deserializeLargeUint();
-        for ( let i = 0; i < size; i++ ) {
-            const k = _deserialize();
-            const v = _deserialize();
-            out.set(k, v);
+        case I_DATE: {
+            const time = _deserialize();
+            return new Date(time);
         }
-        return out;
-    }
-    case I_ARRAYBUFFER: {
-        const byteLength = deserializeLargeUint();
-        const maxByteLength = _deserialize();
-        let options;
-        if ( maxByteLength !== 0 && maxByteLength !== byteLength ) {
-            options = { maxByteLength };
+        case I_REFERENCE: {
+            const ref = deserializeLargeUint();
+            return readRefs.get(ref);
         }
-        const arrbuf = new ArrayBuffer(byteLength, options);
-        const dense = _deserialize();
-        const str = _deserialize();
-        if ( dense ) {
-            denseArrayBufferFromStr(str, arrbuf);
-        } else {
-            sparseArrayBufferFromStr(str, arrbuf);
+        case I_OBJECT_SMALL:
+        case I_OBJECT_LARGE: {
+            const out = {};
+            readRefs.set(refCounter++, out);
+            const entries = [];
+            const size = type === I_OBJECT_SMALL
+                ? charCodeToInt[readStr.charCodeAt(readPtr++)]
+                : deserializeLargeUint();
+            for (let i = 0; i < size; i++) {
+                const k = _deserialize();
+                const v = _deserialize();
+                entries.push([k, v]);
+            }
+            Object.assign(out, Object.fromEntries(entries));
+            return out;
         }
-        readRefs.set(refCounter++, arrbuf);
-        return arrbuf;
-    }
-    case I_INT8ARRAY:
-    case I_UINT8ARRAY:
-    case I_UINT8CLAMPEDARRAY:
-    case I_INT16ARRAY:
-    case I_UINT16ARRAY:
-    case I_INT32ARRAY:
-    case I_UINT32ARRAY:
-    case I_FLOAT32ARRAY:
-    case I_FLOAT64ARRAY:
-    case I_DATAVIEW: {
-        const byteOffset = deserializeLargeUint();
-        const length = deserializeLargeUint();
-        const ref = refCounter++;
-        const arrayBuffer = _deserialize();
-        const ctor = toArrayBufferViewConstructor[`${type}`];
-        const out = new ctor(arrayBuffer, byteOffset, length);
-        readRefs.set(ref, out);
-        return out;
-    }
-    default:
-        break;
+        case I_ARRAY_SMALL:
+        case I_ARRAY_LARGE: {
+            const out = [];
+            readRefs.set(refCounter++, out);
+            const size = type === I_ARRAY_SMALL
+                ? charCodeToInt[readStr.charCodeAt(readPtr++)]
+                : deserializeLargeUint();
+            for (let i = 0; i < size; i++) {
+                out.push(_deserialize());
+            }
+            return out;
+        }
+        case I_SET_SMALL:
+        case I_SET_LARGE: {
+            const out = new Set();
+            readRefs.set(refCounter++, out);
+            const size = type === I_SET_SMALL
+                ? charCodeToInt[readStr.charCodeAt(readPtr++)]
+                : deserializeLargeUint();
+            for (let i = 0; i < size; i++) {
+                out.add(_deserialize());
+            }
+            return out;
+        }
+        case I_MAP_SMALL:
+        case I_MAP_LARGE: {
+            const out = new Map();
+            readRefs.set(refCounter++, out);
+            const size = type === I_MAP_SMALL
+                ? charCodeToInt[readStr.charCodeAt(readPtr++)]
+                : deserializeLargeUint();
+            for (let i = 0; i < size; i++) {
+                const k = _deserialize();
+                const v = _deserialize();
+                out.set(k, v);
+            }
+            return out;
+        }
+        case I_ARRAYBUFFER: {
+            const byteLength = deserializeLargeUint();
+            const maxByteLength = _deserialize();
+            let options;
+            if (maxByteLength !== 0 && maxByteLength !== byteLength) {
+                options = { maxByteLength };
+            }
+            const arrbuf = new ArrayBuffer(byteLength, options);
+            const dense = _deserialize();
+            const str = _deserialize();
+            if (dense) {
+                denseArrayBufferFromStr(str, arrbuf);
+            } else {
+                sparseArrayBufferFromStr(str, arrbuf);
+            }
+            readRefs.set(refCounter++, arrbuf);
+            return arrbuf;
+        }
+        case I_INT8ARRAY:
+        case I_UINT8ARRAY:
+        case I_UINT8CLAMPEDARRAY:
+        case I_INT16ARRAY:
+        case I_UINT16ARRAY:
+        case I_INT32ARRAY:
+        case I_UINT32ARRAY:
+        case I_FLOAT32ARRAY:
+        case I_FLOAT64ARRAY:
+        case I_DATAVIEW: {
+            const byteOffset = deserializeLargeUint();
+            const length = deserializeLargeUint();
+            const ref = refCounter++;
+            const arrayBuffer = _deserialize();
+            const ctor = toArrayBufferViewConstructor[`${type}`];
+            const out = new ctor(arrayBuffer, byteOffset, length);
+            readRefs.set(ref, out);
+            return out;
+        }
+        default:
+            break;
     }
     readPtr = FAILMARK;
 };
@@ -872,7 +872,7 @@ const _deserialize = ( ) => {
  * spinning off the serializer as a standalone utility for all to use.
  * 
  * */
- 
+
 class LZ4BlockJS {
     constructor() {
         this.hashTable = undefined;
@@ -883,8 +883,8 @@ class LZ4BlockJS {
         this.outputBuffer = undefined;
     }
     growOutputBuffer(size) {
-        if ( this.outputBuffer !== undefined ) {
-            if ( this.outputBuffer.byteLength >= size ) { return; }
+        if (this.outputBuffer !== undefined) {
+            if (this.outputBuffer.byteLength >= size) { return; }
         }
         this.outputBuffer = new ArrayBuffer(size + 0xFFFF & 0x7FFF0000);
     }
@@ -893,16 +893,16 @@ class LZ4BlockJS {
     }
     encodeBlock(iBuf, oOffset) {
         const iLen = iBuf.byteLength;
-        if ( iLen >= 0x7E000000 ) { throw new RangeError(); }
+        if (iLen >= 0x7E000000) { throw new RangeError(); }
         // "The last match must start at least 12 bytes before end of block"
         const lastMatchPos = iLen - 12;
         // "The last 5 bytes are always literals"
         const lastLiteralPos = iLen - 5;
-        if ( this.hashTable === undefined ) {
+        if (this.hashTable === undefined) {
             this.hashTable = new Int32Array(65536);
         }
         this.hashTable.fill(-65536);
-        if ( isInstanceOf(iBuf, 'ArrayBuffer') ) {
+        if (isInstanceOf(iBuf, 'ArrayBuffer')) {
             iBuf = new Uint8Array(iBuf);
         }
         const oLen = oOffset + this.encodeBound(iLen);
@@ -912,44 +912,44 @@ class LZ4BlockJS {
         let oPos = oOffset;
         let anchorPos = 0;
         // sequence-finding loop
-        for (;;) {
+        for (; ;) {
             let refPos;
             let mOffset;
-            let sequence = iBuf[iPos] << 8 | iBuf[iPos+1] << 16 | iBuf[iPos+2] << 24;
+            let sequence = iBuf[iPos] << 8 | iBuf[iPos + 1] << 16 | iBuf[iPos + 2] << 24;
             // match-finding loop
-            while ( iPos <= lastMatchPos ) {
-                sequence = sequence >>> 8 | iBuf[iPos+3] << 24;
+            while (iPos <= lastMatchPos) {
+                sequence = sequence >>> 8 | iBuf[iPos + 3] << 24;
                 const hash = (sequence * 0x9E37 & 0xFFFF) + (sequence * 0x79B1 >>> 16) & 0xFFFF;
                 refPos = this.hashTable[hash];
                 this.hashTable[hash] = iPos;
                 mOffset = iPos - refPos;
                 if (
                     mOffset < 65536 &&
-                    iBuf[refPos+0] === ((sequence       ) & 0xFF) &&
-                    iBuf[refPos+1] === ((sequence >>>  8) & 0xFF) &&
-                    iBuf[refPos+2] === ((sequence >>> 16) & 0xFF) &&
-                    iBuf[refPos+3] === ((sequence >>> 24) & 0xFF)
+                    iBuf[refPos + 0] === ((sequence) & 0xFF) &&
+                    iBuf[refPos + 1] === ((sequence >>> 8) & 0xFF) &&
+                    iBuf[refPos + 2] === ((sequence >>> 16) & 0xFF) &&
+                    iBuf[refPos + 3] === ((sequence >>> 24) & 0xFF)
                 ) {
                     break;
                 }
                 iPos += 1;
             }
             // no match found
-            if ( iPos > lastMatchPos ) { break; }
+            if (iPos > lastMatchPos) { break; }
             // match found
             let lLen = iPos - anchorPos;
             let mLen = iPos;
             iPos += 4; refPos += 4;
-            while ( iPos < lastLiteralPos && iBuf[iPos] === iBuf[refPos] ) {
+            while (iPos < lastLiteralPos && iBuf[iPos] === iBuf[refPos]) {
                 iPos += 1; refPos += 1;
             }
             mLen = iPos - mLen;
             const token = mLen < 19 ? mLen - 4 : 15;
             // write token, length of literals if needed
-            if ( lLen >= 15 ) {
+            if (lLen >= 15) {
                 oBuf[oPos++] = 0xF0 | token;
                 let l = lLen - 15;
-                while ( l >= 255 ) {
+                while (l >= 255) {
                     oBuf[oPos++] = 255;
                     l -= 255;
                 }
@@ -958,18 +958,18 @@ class LZ4BlockJS {
                 oBuf[oPos++] = (lLen << 4) | token;
             }
             // write literals
-            while ( lLen-- ) {
+            while (lLen--) {
                 oBuf[oPos++] = iBuf[anchorPos++];
             }
-            if ( mLen === 0 ) { break; }
+            if (mLen === 0) { break; }
             // write offset of match
-            oBuf[oPos+0] = mOffset;
-            oBuf[oPos+1] = mOffset >>> 8;
+            oBuf[oPos + 0] = mOffset;
+            oBuf[oPos + 1] = mOffset >>> 8;
             oPos += 2;
             // write length of match if needed
-            if ( mLen >= 19 ) {
+            if (mLen >= 19) {
                 let l = mLen - 19;
-                while ( l >= 255 ) {
+                while (l >= 255) {
                     oBuf[oPos++] = 255;
                     l -= 255;
                 }
@@ -979,10 +979,10 @@ class LZ4BlockJS {
         }
         // last sequence is literals only
         let lLen = iLen - anchorPos;
-        if ( lLen >= 15 ) {
+        if (lLen >= 15) {
             oBuf[oPos++] = 0xF0;
             let l = lLen - 15;
-            while ( l >= 255 ) {
+            while (l >= 255) {
                 oBuf[oPos++] = 255;
                 l -= 255;
             }
@@ -990,7 +990,7 @@ class LZ4BlockJS {
         } else {
             oBuf[oPos++] = lLen << 4;
         }
-        while ( lLen-- ) {
+        while (lLen--) {
             oBuf[oPos++] = iBuf[anchorPos++];
         }
         return new Uint8Array(oBuf.buffer, 0, oPos);
@@ -1000,39 +1000,39 @@ class LZ4BlockJS {
         this.growOutputBuffer(oLen);
         const oBuf = new Uint8Array(this.outputBuffer, 0, oLen);
         let iPos = iOffset, oPos = 0;
-        while ( iPos < iLen ) {
+        while (iPos < iLen) {
             const token = iBuf[iPos++];
             // literals
             let clen = token >>> 4;
             // length of literals
-            if ( clen !== 0 ) {
-                if ( clen === 15 ) {
+            if (clen !== 0) {
+                if (clen === 15) {
                     let l;
-                    for (;;) {
+                    for (; ;) {
                         l = iBuf[iPos++];
-                        if ( l !== 255 ) { break; }
+                        if (l !== 255) { break; }
                         clen += 255;
                     }
                     clen += l;
                 }
                 // copy literals
                 const end = iPos + clen;
-                while ( iPos < end ) {
+                while (iPos < end) {
                     oBuf[oPos++] = iBuf[iPos++];
                 }
-                if ( iPos === iLen ) { break; }
+                if (iPos === iLen) { break; }
             }
             // match
-            const mOffset = iBuf[iPos+0] | (iBuf[iPos+1] << 8);
-            if ( mOffset === 0 || mOffset > oPos ) { return; }
+            const mOffset = iBuf[iPos + 0] | (iBuf[iPos + 1] << 8);
+            if (mOffset === 0 || mOffset > oPos) { return; }
             iPos += 2;
             // length of match
             clen = (token & 0x0F) + 4;
-            if ( clen === 19 ) {
+            if (clen === 19) {
                 let l;
-                for (;;) {
+                for (; ;) {
                     l = iBuf[iPos++];
-                    if ( l !== 255 ) { break; }
+                    if (l !== 255) { break; }
                     clen += 255;
                 }
                 clen += l;
@@ -1040,24 +1040,24 @@ class LZ4BlockJS {
             // copy match
             const end = oPos + clen;
             let mPos = oPos - mOffset;
-            while ( oPos < end ) {
+            while (oPos < end) {
                 oBuf[oPos++] = oBuf[mPos++];
             }
         }
         return oBuf;
     }
     encode(input, outputOffset) {
-        if ( isInstanceOf(input, 'ArrayBuffer') ) {
+        if (isInstanceOf(input, 'ArrayBuffer')) {
             input = new Uint8Array(input);
-        } else if ( isInstanceOf(input, 'Uint8Array') === false ) {
+        } else if (isInstanceOf(input, 'Uint8Array') === false) {
             throw new TypeError();
         }
         return this.encodeBlock(input, outputOffset);
     }
     decode(input, inputOffset, outputSize) {
-        if ( isInstanceOf(input, 'ArrayBuffer') ) {
+        if (isInstanceOf(input, 'ArrayBuffer')) {
             input = new Uint8Array(input);
-        } else if ( isInstanceOf(input, 'Uint8Array') === false ) {
+        } else if (isInstanceOf(input, 'Uint8Array') === false) {
             throw new TypeError();
         }
         return this.decodeBlock(input, inputOffset, outputSize);
@@ -1077,7 +1077,7 @@ export const serialize = (data, options = {}) => {
     const s = writeBuffer.join('');
     writeRefs.clear();
     writeBuffer.length = 0;
-    if ( shouldCompress(s, options) === false ) { return s; }
+    if (shouldCompress(s, options) === false) { return s; }
     const lz4Util = new LZ4BlockJS();
     const uint8ArrayBefore = textCodec.encode(s);
     const uint8ArrayAfter = lz4Util.encode(uint8ArrayBefore, 0);
@@ -1103,17 +1103,17 @@ const deserializeById = (blockid, s) => {
     const data = _deserialize();
     readRefs.clear();
     readStr = '';
-    if ( readPtr === FAILMARK ) { return; }
+    if (readPtr === FAILMARK) { return; }
     return data;
 };
 
 export const deserialize = s => {
-    if ( s.startsWith(MAGICLZ4PREFIX) ) {
+    if (s.startsWith(MAGICLZ4PREFIX)) {
         const lz4 = deserializeById(MAGICLZ4PREFIX, s);
-        if ( lz4 ) {
+        if (lz4) {
             const lz4Util = new LZ4BlockJS();
             const uint8ArrayAfter = lz4Util.decode(lz4.data, 0, lz4.size);
-            if ( uint8ArrayAfter ) {
+            if (uint8ArrayAfter) {
                 s = textCodec.decode(new Uint8Array(uint8ArrayAfter));
             }
         }
@@ -1127,7 +1127,7 @@ export const deserialize = s => {
 
 export const isSerialized = s =>
     typeof s === 'string' &&
-        (s.startsWith(MAGICLZ4PREFIX) || s.startsWith(MAGICPREFIX));
+    (s.startsWith(MAGICLZ4PREFIX) || s.startsWith(MAGICPREFIX));
 
 export const isCompressed = s =>
     typeof s === 'string' && s.startsWith(MAGICLZ4PREFIX);
@@ -1146,7 +1146,7 @@ export async function serializeAsync(data, options = {}) {
 }
 
 export async function deserializeAsync(data, options = {}) {
-    if ( isSerialized(data) === false ) { return data; }
+    if (isSerialized(data) === false) { return data; }
     return deserialize(data, options);
 }
 

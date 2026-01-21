@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -26,18 +26,18 @@ import { registerScriptlet } from './base.js';
 /******************************************************************************/
 
 export function parseReplaceFn(s) {
-    if ( s.charCodeAt(0) !== 0x2F /* / */ ) { return; }
+    if (s.charCodeAt(0) !== 0x2F /* / */) { return; }
     const parser = new ArglistParser('/');
     parser.nextArg(s, 1);
     let pattern = s.slice(parser.argBeg, parser.argEnd);
-    if ( parser.transform ) {
+    if (parser.transform) {
         pattern = parser.normalizeArg(pattern);
     }
-    if ( pattern === '' ) { return; }
+    if (pattern === '') { return; }
     parser.nextArg(s, parser.separatorEnd);
     let replacement = s.slice(parser.argBeg, parser.argEnd);
-    if ( parser.separatorEnd === parser.separatorBeg ) { return; }
-    if ( parser.transform ) {
+    if (parser.separatorEnd === parser.separatorBeg) { return; }
+    if (parser.transform) {
         replacement = parser.normalizeArg(replacement);
     }
     const flags = s.slice(parser.separatorEnd);

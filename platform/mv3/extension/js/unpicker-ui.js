@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -33,10 +33,10 @@ function onMinimizeClicked() {
 
 function highlight() {
     const selectors = [];
-    for ( const selectorElem of qsa$('#customFilters .customFilter.on') ) {
+    for (const selectorElem of qsa$('#customFilters .customFilter.on')) {
         selectors.push(selectorElem.dataset.selector);
     }
-    if ( selectors.length !== 0 ) {
+    if (selectors.length !== 0) {
         toolOverlay.postMessage({
             what: 'highlightFromSelector',
             selector: selectors.join(','),
@@ -52,10 +52,10 @@ function highlight() {
 function onFilterClicked(ev) {
     const target = ev.target;
     const filterElem = target.closest('.customFilter');
-    if ( filterElem === null ) { return; }
+    if (filterElem === null) { return; }
     const selectorElem = qs$(filterElem, ':scope > span.selector');
-    if ( target === selectorElem ) {
-        if ( dom.cl.has(filterElem, 'on') ) {
+    if (target === selectorElem) {
+        if (dom.cl.has(filterElem, 'on')) {
             dom.cl.remove(filterElem, 'on');
         } else {
             dom.cl.remove('.customFilter.on', 'on');
@@ -66,24 +66,26 @@ function onFilterClicked(ev) {
     }
     const selector = filterElem.dataset.selector;
     const trashElem = qs$(filterElem, ':scope > span.remove');
-    if ( target === trashElem ) {
+    if (target === trashElem) {
         dom.cl.add(filterElem, 'removed');
         dom.cl.remove(filterElem, 'on');
-        toolOverlay.sendMessage({ what: 'removeCustomFilters',
+        toolOverlay.sendMessage({
+            what: 'removeCustomFilters',
             hostname: toolOverlay.url.hostname,
-            selectors: [ selector ],
-        }).then(( ) => {
+            selectors: [selector],
+        }).then(() => {
             autoSelectFilter();
         });
         return;
     }
     const undoElem = qs$(filterElem, ':scope > span.undo');
-    if ( target === undoElem ) {
+    if (target === undoElem) {
         dom.cl.remove(filterElem, 'removed');
-        toolOverlay.sendMessage({ what: 'addCustomFilters',
+        toolOverlay.sendMessage({
+            what: 'addCustomFilters',
             hostname: toolOverlay.url.hostname,
-            selectors: [ selector ],
-        }).then(( ) => {
+            selectors: [selector],
+        }).then(() => {
             dom.cl.remove('.customFilter.on', 'on');
             dom.cl.add(filterElem, 'on');
             highlight();
@@ -96,9 +98,9 @@ function onFilterClicked(ev) {
 
 function autoSelectFilter() {
     let filterElem = qs$('.customFilter.on');
-    if ( filterElem !== null ) { return; }
+    if (filterElem !== null) { return; }
     filterElem = qs$('.customFilter:not(.removed)');
-    if ( filterElem !== null ) {
+    if (filterElem !== null) {
         dom.cl.add(filterElem, 'on');
     }
     highlight();
@@ -110,12 +112,12 @@ function populateFilters(selectors) {
     const container = qs$('#customFilters');
     dom.clear(container);
     const rowTemplate = qs$('template#customFilterRow');
-    for ( const selector of selectors ) {
+    for (const selector of selectors) {
         const fragment = rowTemplate.content.cloneNode(true);
         const row = qs$(fragment, '.customFilter');
         row.dataset.selector = selector;
         let text = selector;
-        if ( selector.startsWith('{') ) {
+        if (selector.startsWith('{')) {
             const o = JSON.parse(selector);
             text = o.raw;
         }
@@ -133,7 +135,7 @@ async function startUnpicker() {
         what: 'customFiltersFromHostname',
         hostname: toolOverlay.url.hostname,
     })
-    if ( selectors.length === 0 ) {
+    if (selectors.length === 0) {
         return quitUnpicker();
     }
     await toolOverlay.postMessage({ what: 'terminateCustomFilters' });
@@ -154,12 +156,12 @@ async function quitUnpicker() {
 /******************************************************************************/
 
 function onMessage(msg) {
-    switch ( msg.what ) {
-    case 'startTool':
-        startUnpicker();
-        break;
-    default:
-        break;
+    switch (msg.what) {
+        case 'startTool':
+            startUnpicker();
+            break;
+        default:
+            break;
     }
 }
 

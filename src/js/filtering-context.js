@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import {
@@ -33,93 +33,93 @@ import {
 // values -- the assumption being that integer operations are faster than
 // string operations.
 
-export const           NO_TYPE = 0;
-export const            BEACON = 1 <<  0;
-export const        CSP_REPORT = 1 <<  1;
-export const              FONT = 1 <<  2;
-export const             IMAGE = 1 <<  4;
-export const          IMAGESET = 1 <<  4;
-export const        MAIN_FRAME = 1 <<  5;
-export const             MEDIA = 1 <<  6;
-export const            OBJECT = 1 <<  7;
-export const OBJECT_SUBREQUEST = 1 <<  7;
-export const              PING = 1 <<  8;
-export const            SCRIPT = 1 <<  9;
-export const        STYLESHEET = 1 << 10;
-export const         SUB_FRAME = 1 << 11;
-export const         WEBSOCKET = 1 << 12;
-export const    XMLHTTPREQUEST = 1 << 13;
-export const       INLINE_FONT = 1 << 14;
-export const     INLINE_SCRIPT = 1 << 15;
-export const             OTHER = 1 << 16;
-export const         FRAME_ANY = MAIN_FRAME | SUB_FRAME | OBJECT;
-export const          FONT_ANY = FONT | INLINE_FONT;
-export const        INLINE_ANY = INLINE_FONT | INLINE_SCRIPT;
-export const          PING_ANY = BEACON | CSP_REPORT | PING;
-export const        SCRIPT_ANY = SCRIPT | INLINE_SCRIPT;
+export const NO_TYPE = 0;
+export const BEACON = 1 << 0;
+export const CSP_REPORT = 1 << 1;
+export const FONT = 1 << 2;
+export const IMAGE = 1 << 4;
+export const IMAGESET = 1 << 4;
+export const MAIN_FRAME = 1 << 5;
+export const MEDIA = 1 << 6;
+export const OBJECT = 1 << 7;
+export const OBJECT_SUBREQUEST = 1 << 7;
+export const PING = 1 << 8;
+export const SCRIPT = 1 << 9;
+export const STYLESHEET = 1 << 10;
+export const SUB_FRAME = 1 << 11;
+export const WEBSOCKET = 1 << 12;
+export const XMLHTTPREQUEST = 1 << 13;
+export const INLINE_FONT = 1 << 14;
+export const INLINE_SCRIPT = 1 << 15;
+export const OTHER = 1 << 16;
+export const FRAME_ANY = MAIN_FRAME | SUB_FRAME | OBJECT;
+export const FONT_ANY = FONT | INLINE_FONT;
+export const INLINE_ANY = INLINE_FONT | INLINE_SCRIPT;
+export const PING_ANY = BEACON | CSP_REPORT | PING;
+export const SCRIPT_ANY = SCRIPT | INLINE_SCRIPT;
 
 const typeStrToIntMap = {
-           'no_type': NO_TYPE,
-            'beacon': BEACON,
-        'csp_report': CSP_REPORT,
-              'font': FONT,
-             'image': IMAGE,
-          'imageset': IMAGESET,
-        'main_frame': MAIN_FRAME,
-             'media': MEDIA,
-            'object': OBJECT,
- 'object_subrequest': OBJECT_SUBREQUEST,
-              'ping': PING,
-            'script': SCRIPT,
-        'stylesheet': STYLESHEET,
-         'sub_frame': SUB_FRAME,
-         'websocket': WEBSOCKET,
+    'no_type': NO_TYPE,
+    'beacon': BEACON,
+    'csp_report': CSP_REPORT,
+    'font': FONT,
+    'image': IMAGE,
+    'imageset': IMAGESET,
+    'main_frame': MAIN_FRAME,
+    'media': MEDIA,
+    'object': OBJECT,
+    'object_subrequest': OBJECT_SUBREQUEST,
+    'ping': PING,
+    'script': SCRIPT,
+    'stylesheet': STYLESHEET,
+    'sub_frame': SUB_FRAME,
+    'websocket': WEBSOCKET,
     'xmlhttprequest': XMLHTTPREQUEST,
-       'inline-font': INLINE_FONT,
-     'inline-script': INLINE_SCRIPT,
-             'other': OTHER,
+    'inline-font': INLINE_FONT,
+    'inline-script': INLINE_SCRIPT,
+    'other': OTHER,
 };
 
-export const    METHOD_NONE = 0;
+export const METHOD_NONE = 0;
 export const METHOD_CONNECT = 1 << 1;
-export const  METHOD_DELETE = 1 << 2;
-export const     METHOD_GET = 1 << 3;
-export const    METHOD_HEAD = 1 << 4;
+export const METHOD_DELETE = 1 << 2;
+export const METHOD_GET = 1 << 3;
+export const METHOD_HEAD = 1 << 4;
 export const METHOD_OPTIONS = 1 << 5;
-export const   METHOD_PATCH = 1 << 6;
-export const    METHOD_POST = 1 << 7;
-export const     METHOD_PUT = 1 << 8;
+export const METHOD_PATCH = 1 << 6;
+export const METHOD_POST = 1 << 7;
+export const METHOD_PUT = 1 << 8;
 
 const methodStrToBitMap = {
-           '': METHOD_NONE,
+    '': METHOD_NONE,
     'connect': METHOD_CONNECT,
-     'delete': METHOD_DELETE,
-        'get': METHOD_GET,
-       'head': METHOD_HEAD,
+    'delete': METHOD_DELETE,
+    'get': METHOD_GET,
+    'head': METHOD_HEAD,
     'options': METHOD_OPTIONS,
-      'patch': METHOD_PATCH,
-       'post': METHOD_POST,
-        'put': METHOD_PUT,
+    'patch': METHOD_PATCH,
+    'post': METHOD_POST,
+    'put': METHOD_PUT,
     'CONNECT': METHOD_CONNECT,
-     'DELETE': METHOD_DELETE,
-        'GET': METHOD_GET,
-       'HEAD': METHOD_HEAD,
+    'DELETE': METHOD_DELETE,
+    'GET': METHOD_GET,
+    'HEAD': METHOD_HEAD,
     'OPTIONS': METHOD_OPTIONS,
-      'PATCH': METHOD_PATCH,
-       'POST': METHOD_POST,
-        'PUT': METHOD_PUT,
+    'PATCH': METHOD_PATCH,
+    'POST': METHOD_POST,
+    'PUT': METHOD_PUT,
 };
 
 const methodBitToStrMap = new Map([
-    [ METHOD_NONE, '' ],
-    [ METHOD_CONNECT, 'connect' ],
-    [ METHOD_DELETE, 'delete' ],
-    [ METHOD_GET, 'get' ],
-    [ METHOD_HEAD, 'head' ],
-    [ METHOD_OPTIONS, 'options' ],
-    [ METHOD_PATCH, 'patch' ],
-    [ METHOD_POST, 'post' ],
-    [ METHOD_PUT, 'put' ],
+    [METHOD_NONE, ''],
+    [METHOD_CONNECT, 'connect'],
+    [METHOD_DELETE, 'delete'],
+    [METHOD_GET, 'get'],
+    [METHOD_HEAD, 'head'],
+    [METHOD_OPTIONS, 'options'],
+    [METHOD_PATCH, 'patch'],
+    [METHOD_POST, 'post'],
+    [METHOD_PUT, 'put'],
 ]);
 
 const reIPv4 = /^\d+\.\d+\.\d+\.\d+$/;
@@ -128,7 +128,7 @@ const reIPv4 = /^\d+\.\d+\.\d+\.\d+$/;
 
 export const FilteringContext = class {
     constructor(other) {
-        if ( other instanceof FilteringContext ) {
+        if (other instanceof FilteringContext) {
             return this.fromFilteringContext(other);
         }
         this.tstamp = 0;
@@ -218,7 +218,7 @@ export const FilteringContext = class {
     }
 
     setURL(a) {
-        if ( a !== this.url ) {
+        if (a !== this.url) {
             this.hostname = this.domain = this.ipaddress = undefined;
             this.url = a;
         }
@@ -226,14 +226,14 @@ export const FilteringContext = class {
     }
 
     getHostname() {
-        if ( this.hostname === undefined ) {
+        if (this.hostname === undefined) {
             this.hostname = hostnameFromURI(this.url);
         }
         return this.hostname;
     }
 
     setHostname(a) {
-        if ( a !== this.hostname ) {
+        if (a !== this.hostname) {
             this.domain = undefined;
             this.hostname = a;
         }
@@ -241,7 +241,7 @@ export const FilteringContext = class {
     }
 
     getDomain() {
-        if ( this.domain === undefined ) {
+        if (this.domain === undefined) {
             this.domain = domainFromHostname(this.getHostname());
         }
         return this.domain;
@@ -253,15 +253,15 @@ export const FilteringContext = class {
     }
 
     getIPAddress() {
-        if ( this.ipaddress !== undefined ) {
+        if (this.ipaddress !== undefined) {
             return this.ipaddress;
         }
         const ipaddr = this.getHostname();
         const c0 = ipaddr.charCodeAt(0);
-        if ( c0 === 0x5B /* [ */ ) {
+        if (c0 === 0x5B /* [ */) {
             return (this.ipaddress = ipaddr.slice(1, -1));
-        } else if ( c0 <= 0x39 && c0 >= 0x30 ) {
-            if ( reIPv4.test(ipaddr) ) {
+        } else if (c0 <= 0x39 && c0 >= 0x30) {
+            if (reIPv4.test(ipaddr)) {
                 return (this.ipaddress = ipaddr);
             }
         }
@@ -275,14 +275,14 @@ export const FilteringContext = class {
     }
 
     getDocOrigin() {
-        if ( this.docOrigin === undefined ) {
+        if (this.docOrigin === undefined) {
             this.docOrigin = this.tabOrigin;
         }
         return this.docOrigin;
     }
 
     setDocOrigin(a) {
-        if ( a !== this.docOrigin ) {
+        if (a !== this.docOrigin) {
             this.docHostname = this.docDomain = undefined;
             this.docOrigin = a;
         }
@@ -294,14 +294,14 @@ export const FilteringContext = class {
     }
 
     getDocHostname() {
-        if ( this.docHostname === undefined ) {
+        if (this.docHostname === undefined) {
             this.docHostname = hostnameFromURI(this.getDocOrigin());
         }
         return this.docHostname;
     }
 
     setDocHostname(a) {
-        if ( a !== this.docHostname ) {
+        if (a !== this.docHostname) {
             this.docDomain = undefined;
             this.docHostname = a;
         }
@@ -309,7 +309,7 @@ export const FilteringContext = class {
     }
 
     getDocDomain() {
-        if ( this.docDomain === undefined ) {
+        if (this.docDomain === undefined) {
             this.docDomain = domainFromHostname(this.getDocHostname());
         }
         return this.docDomain;
@@ -324,14 +324,14 @@ export const FilteringContext = class {
     // the resource is 3rd-party to the document.
     is3rdPartyToDoc() {
         let docDomain = this.getDocDomain();
-        if ( docDomain === '' ) { docDomain = this.docHostname; }
-        if ( this.domain !== undefined && this.domain !== '' ) {
+        if (docDomain === '') { docDomain = this.docHostname; }
+        if (this.domain !== undefined && this.domain !== '') {
             return this.domain !== docDomain;
         }
         const hostname = this.getHostname();
-        if ( hostname.endsWith(docDomain) === false ) { return true; }
+        if (hostname.endsWith(docDomain) === false) { return true; }
         const i = hostname.length - docDomain.length;
-        if ( i === 0 ) { return false; }
+        if (i === 0) { return false; }
         return hostname.charCodeAt(i - 1) !== 0x2E /* '.' */;
     }
 
@@ -345,7 +345,7 @@ export const FilteringContext = class {
     }
 
     setTabOrigin(a) {
-        if ( a !== this.tabOrigin ) {
+        if (a !== this.tabOrigin) {
             this.tabHostname = this.tabDomain = undefined;
             this.tabOrigin = a;
         }
@@ -357,14 +357,14 @@ export const FilteringContext = class {
     }
 
     getTabHostname() {
-        if ( this.tabHostname === undefined ) {
+        if (this.tabHostname === undefined) {
             this.tabHostname = hostnameFromURI(this.getTabOrigin());
         }
         return this.tabHostname;
     }
 
     setTabHostname(a) {
-        if ( a !== this.tabHostname ) {
+        if (a !== this.tabHostname) {
             this.tabDomain = undefined;
             this.tabHostname = a;
         }
@@ -372,7 +372,7 @@ export const FilteringContext = class {
     }
 
     getTabDomain() {
-        if ( this.tabDomain === undefined ) {
+        if (this.tabDomain === undefined) {
             this.tabDomain = domainFromHostname(this.getTabHostname());
         }
         return this.tabDomain;
@@ -387,14 +387,14 @@ export const FilteringContext = class {
     // the resource is 3rd-party to the top document.
     is3rdPartyToTab() {
         let tabDomain = this.getTabDomain();
-        if ( tabDomain === '' ) { tabDomain = this.tabHostname; }
-        if ( this.domain !== undefined && this.domain !== '' ) {
+        if (tabDomain === '') { tabDomain = this.tabHostname; }
+        if (this.domain !== undefined && this.domain !== '') {
             return this.domain !== tabDomain;
         }
         const hostname = this.getHostname();
-        if ( hostname.endsWith(tabDomain) === false ) { return true; }
+        if (hostname.endsWith(tabDomain) === false) { return true; }
         const i = hostname.length - tabDomain.length;
-        if ( i === 0 ) { return false; }
+        if (i === 0) { return false; }
         return hostname.charCodeAt(i - 1) !== 0x2E /* '.' */;
     }
 
@@ -404,25 +404,25 @@ export const FilteringContext = class {
     }
 
     pushFilter(a) {
-        if ( this.filter === undefined ) {
+        if (this.filter === undefined) {
             return this.setFilter(a);
         }
-        if ( Array.isArray(this.filter) ) {
+        if (Array.isArray(this.filter)) {
             this.filter.push(a);
         } else {
-            this.filter = [ this.filter, a ];
+            this.filter = [this.filter, a];
         }
         return this;
     }
 
     pushFilters(a) {
-        if ( this.filter === undefined ) {
+        if (this.filter === undefined) {
             return this.setFilter(a);
         }
-        if ( Array.isArray(this.filter) ) {
+        if (Array.isArray(this.filter)) {
             this.filter.push(...a);
         } else {
-            this.filter = [ this.filter, ...a ];
+            this.filter = [this.filter, ...a];
         }
         return this;
     }

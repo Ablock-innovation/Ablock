@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import fs from 'fs/promises';
@@ -24,17 +24,17 @@ import process from 'process';
 
 /******************************************************************************/
 
-const commandLineArgs = (( ) => {
+const commandLineArgs = (() => {
     const args = Object.create(null);
     let name, value;
-    for ( const arg of process.argv.slice(2) ) {
+    for (const arg of process.argv.slice(2)) {
         const pos = arg.indexOf('=');
-        if ( pos === -1 ) {
+        if (pos === -1) {
             name = arg;
             value = '';
         } else {
             name = arg.slice(0, pos);
-            value = arg.slice(pos+1);
+            value = arg.slice(pos + 1);
         }
         args[name] = value;
     }
@@ -48,16 +48,17 @@ async function main() {
     const manifestPath = `${packageDir}/manifest.json`;
 
     // Get manifest content
-    const manifest = await fs.readFile(manifestPath, { encoding: 'utf8'
+    const manifest = await fs.readFile(manifestPath, {
+        encoding: 'utf8'
     }).then(text =>
         JSON.parse(text)
     );
 
     // https://learn.microsoft.com/answers/questions/918426/cant-update-extension-with-declarative-net-request
     // Set all ruleset path to package root
-    for ( const ruleset of manifest.declarative_net_request.rule_resources ) {
+    for (const ruleset of manifest.declarative_net_request.rule_resources) {
         const pos = ruleset.path.lastIndexOf('/');
-        if ( pos === -1 ) { continue; }
+        if (pos === -1) { continue; }
         ruleset.path = ruleset.path.slice(pos + 1);
     }
     // Commit changes

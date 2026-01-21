@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -73,7 +73,7 @@ builtinScriptlets.push({
     fn: shouldDebug,
 });
 function shouldDebug(details) {
-    if ( details instanceof Object === false ) { return false; }
+    if (details instanceof Object === false) { return false; }
     return scriptletGlobals.canDebug && details.debug;
 }
 
@@ -95,8 +95,8 @@ function abortCurrentScriptFn(
     needle = '',
     context = ''
 ) {
-    if ( typeof target !== 'string' ) { return; }
-    if ( target === '' ) { return; }
+    if (typeof target !== 'string') { return; }
+    if (target === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('abort-current-script', target, needle, context);
     const reNeedle = safe.patternToRegex(needle);
@@ -106,12 +106,12 @@ function abortCurrentScriptFn(
     const chain = safe.String_split.call(target, '.');
     let owner = window;
     let prop;
-    for (;;) {
+    for (; ;) {
         prop = chain.shift();
-        if ( chain.length === 0 ) { break; }
-        if ( prop in owner === false ) { break; }
+        if (chain.length === 0) { break; }
+        if (prop in owner === false) { break; }
         owner = owner[prop];
-        if ( owner instanceof Object === false ) { return; }
+        if (owner instanceof Object === false) { return; }
     }
     let value;
     let desc = Object.getOwnPropertyDescriptor(owner, prop);
@@ -128,71 +128,71 @@ function abortCurrentScriptFn(
     const textContentGetter = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent').get;
     const getScriptText = elem => {
         let text = textContentGetter.call(elem);
-        if ( text.trim() !== '' ) { return text; }
-        if ( scriptTexts.has(elem) ) { return scriptTexts.get(elem); }
-        const [ , mime, content ] =
+        if (text.trim() !== '') { return text; }
+        if (scriptTexts.has(elem)) { return scriptTexts.get(elem); }
+        const [, mime, content] =
             /^data:([^,]*),(.+)$/.exec(elem.src.trim()) ||
-            [ '', '', '' ];
+            ['', '', ''];
         try {
-            switch ( true ) {
-            case mime.endsWith(';base64'):
-                text = self.atob(content);
-                break;
-            default:
-                text = self.decodeURIComponent(content);
-                break;
+            switch (true) {
+                case mime.endsWith(';base64'):
+                    text = self.atob(content);
+                    break;
+                default:
+                    text = self.decodeURIComponent(content);
+                    break;
             }
         } catch {
         }
         scriptTexts.set(elem, text);
         return text;
     };
-    const validate = ( ) => {
+    const validate = () => {
         const e = document.currentScript;
-        if ( e instanceof HTMLScriptElement === false ) { return; }
-        if ( e === thisScript ) { return; }
-        if ( context !== '' && reContext.test(e.src) === false ) {
+        if (e instanceof HTMLScriptElement === false) { return; }
+        if (e === thisScript) { return; }
+        if (context !== '' && reContext.test(e.src) === false) {
             // eslint-disable-next-line no-debugger
-            if ( debug === 'nomatch' || debug === 'all' ) { debugger; }
+            if (debug === 'nomatch' || debug === 'all') { debugger; }
             return;
         }
-        if ( safe.logLevel > 1 && context !== '' ) {
+        if (safe.logLevel > 1 && context !== '') {
             safe.uboLog(logPrefix, `Matched src\n${e.src}`);
         }
         const scriptText = getScriptText(e);
-        if ( reNeedle.test(scriptText) === false ) {
+        if (reNeedle.test(scriptText) === false) {
             // eslint-disable-next-line no-debugger
-            if ( debug === 'nomatch' || debug === 'all' ) { debugger; }
+            if (debug === 'nomatch' || debug === 'all') { debugger; }
             return;
         }
-        if ( safe.logLevel > 1 ) {
+        if (safe.logLevel > 1) {
             safe.uboLog(logPrefix, `Matched text\n${scriptText}`);
         }
         // eslint-disable-next-line no-debugger
-        if ( debug === 'match' || debug === 'all' ) { debugger; }
+        if (debug === 'match' || debug === 'all') { debugger; }
         safe.uboLog(logPrefix, 'Aborted');
         throw new ReferenceError(exceptionToken);
     };
     // eslint-disable-next-line no-debugger
-    if ( debug === 'install' ) { debugger; }
+    if (debug === 'install') { debugger; }
     try {
         Object.defineProperty(owner, prop, {
-            get: function() {
+            get: function () {
                 validate();
                 return desc instanceof Object
                     ? desc.get.call(owner)
                     : value;
             },
-            set: function(a) {
+            set: function (a) {
                 validate();
-                if ( desc instanceof Object ) {
+                if (desc instanceof Object) {
                     desc.set.call(owner, a);
                 } else {
                     value = a;
                 }
             }
         });
-    } catch(ex) {
+    } catch (ex) {
         safe.uboErr(logPrefix, `Error: ${ex}`);
     }
 }
@@ -225,20 +225,20 @@ function replaceNodeTextFn(
         ? safe.patternToRegex(extraArgs.excludes, 'ms')
         : null;
     const stop = (takeRecord = true) => {
-        if ( takeRecord ) {
+        if (takeRecord) {
             handleMutations(observer.takeRecords());
         }
         observer.disconnect();
-        if ( safe.logLevel > 1 ) {
+        if (safe.logLevel > 1) {
             safe.uboLog(logPrefix, 'Quitting');
         }
     };
-    const textContentFactory = (( ) => {
+    const textContentFactory = (() => {
         const out = { createScript: s => s };
         const { trustedTypes: tt } = self;
-        if ( tt instanceof Object ) {
-            if ( typeof tt.getPropertyType === 'function' ) {
-                if ( tt.getPropertyType('script', 'textContent') === 'TrustedScript' ) {
+        if (tt instanceof Object) {
+            if (typeof tt.getPropertyType === 'function') {
+                if (tt.getPropertyType('script', 'textContent') === 'TrustedScript') {
                     return tt.createPolicy(getRandomTokenFn(), out);
                 }
             }
@@ -248,16 +248,16 @@ function replaceNodeTextFn(
     let sedCount = extraArgs.sedCount || 0;
     const handleNode = node => {
         const before = node.textContent;
-        if ( reIncludes ) {
+        if (reIncludes) {
             reIncludes.lastIndex = 0;
-            if ( safe.RegExp_test.call(reIncludes, before) === false ) { return true; }
+            if (safe.RegExp_test.call(reIncludes, before) === false) { return true; }
         }
-        if ( reExcludes ) {
+        if (reExcludes) {
             reExcludes.lastIndex = 0;
-            if ( safe.RegExp_test.call(reExcludes, before) ) { return true; }
+            if (safe.RegExp_test.call(reExcludes, before)) { return true; }
         }
         rePattern.lastIndex = 0;
-        if ( safe.RegExp_test.call(rePattern, before) === false ) { return true; }
+        if (safe.RegExp_test.call(rePattern, before) === false) { return true; }
         rePattern.lastIndex = 0;
         const after = pattern !== ''
             ? before.replace(rePattern, replacement)
@@ -265,45 +265,45 @@ function replaceNodeTextFn(
         node.textContent = node.nodeName === 'SCRIPT'
             ? textContentFactory.createScript(after)
             : after;
-        if ( safe.logLevel > 1 ) {
+        if (safe.logLevel > 1) {
             safe.uboLog(logPrefix, `Text before:\n${before.trim()}`);
         }
         safe.uboLog(logPrefix, `Text after:\n${after.trim()}`);
         return sedCount === 0 || (sedCount -= 1) !== 0;
     };
     const handleMutations = mutations => {
-        for ( const mutation of mutations ) {
-            for ( const node of mutation.addedNodes ) {
-                if ( reNodeName.test(node.nodeName) === false ) { continue; }
-                if ( handleNode(node) ) { continue; }
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (reNodeName.test(node.nodeName) === false) { continue; }
+                if (handleNode(node)) { continue; }
                 stop(false); return;
             }
         }
     };
     const observer = new MutationObserver(handleMutations);
     observer.observe(document, { childList: true, subtree: true });
-    if ( document.documentElement ) {
+    if (document.documentElement) {
         const treeWalker = document.createTreeWalker(
             document.documentElement,
             NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT
         );
         let count = 0;
-        for (;;) {
+        for (; ;) {
             const node = treeWalker.nextNode();
             count += 1;
-            if ( node === null ) { break; }
-            if ( reNodeName.test(node.nodeName) === false ) { continue; }
-            if ( node === document.currentScript ) { continue; }
-            if ( handleNode(node) ) { continue; }
+            if (node === null) { break; }
+            if (reNodeName.test(node.nodeName) === false) { continue; }
+            if (node === document.currentScript) { continue; }
+            if (handleNode(node)) { continue; }
             stop(); break;
         }
         safe.uboLog(logPrefix, `${count} nodes present before installing mutation observer`);
     }
-    if ( extraArgs.stay ) { return; }
-    runAt(( ) => {
+    if (extraArgs.stay) { return; }
+    runAt(() => {
         const quitAfter = extraArgs.quitAfter || 0;
-        if ( quitAfter !== 0 ) {
-            setTimeout(( ) => { stop(); }, quitAfter);
+        if (quitAfter !== 0) {
+            setTimeout(() => { stop(); }, quitAfter);
         } else {
             stop();
         }
@@ -328,34 +328,34 @@ function replaceFetchResponseFn(
     replacement = '',
     propsToMatch = ''
 ) {
-    if ( trusted !== true ) { return; }
+    if (trusted !== true) { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('replace-fetch-response', pattern, replacement, propsToMatch);
-    if ( pattern === '*' ) { pattern = '.*'; }
+    if (pattern === '*') { pattern = '.*'; }
     const rePattern = safe.patternToRegex(pattern);
     const propNeedles = parsePropertiesToMatchFn(propsToMatch, 'url');
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 4);
     const reIncludes = extraArgs.includes ? safe.patternToRegex(extraArgs.includes) : null;
     self.fetch = new Proxy(self.fetch, {
-        apply: function(target, thisArg, args) {
+        apply: function (target, thisArg, args) {
             const fetchPromise = Reflect.apply(target, thisArg, args);
-            if ( pattern === '' ) { return fetchPromise; }
-            if ( propNeedles.size !== 0 ) {
+            if (pattern === '') { return fetchPromise; }
+            if (propNeedles.size !== 0) {
                 const props = collateFetchArgumentsFn(...args);
                 const matched = matchObjectPropertiesFn(propNeedles, props);
-                if ( matched === undefined ) { return fetchPromise; }
-                if ( safe.logLevel > 1 ) {
+                if (matched === undefined) { return fetchPromise; }
+                if (safe.logLevel > 1) {
                     safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
                 }
             }
             return fetchPromise.then(responseBefore => {
                 const response = responseBefore.clone();
                 return response.text().then(textBefore => {
-                    if ( reIncludes && reIncludes.test(textBefore) === false ) {
+                    if (reIncludes && reIncludes.test(textBefore) === false) {
                         return responseBefore;
                     }
                     const textAfter = textBefore.replace(rePattern, replacement);
-                    if ( textAfter === textBefore ) { return responseBefore; }
+                    if (textAfter === textBefore) { return responseBefore; }
                     safe.uboLog(logPrefix, 'Replaced');
                     const responseAfter = new Response(textAfter, {
                         status: responseBefore.status,
@@ -398,7 +398,7 @@ function preventXhrFn(
     propsToMatch = '',
     directive = ''
 ) {
-    if ( typeof propsToMatch !== 'string' ) { return; }
+    if (typeof propsToMatch !== 'string') { return; }
     const safe = safeSelf();
     const scriptletName = trusted ? 'trusted-prevent-xhr' : 'prevent-xhr';
     const logPrefix = safe.makeLogPrefix(scriptletName, propsToMatch, directive);
@@ -415,15 +415,15 @@ function preventXhrFn(
     self.XMLHttpRequest = class extends self.XMLHttpRequest {
         open(method, url, ...args) {
             xhrInstances.delete(this);
-            if ( warOrigin !== undefined && url.startsWith(warOrigin) ) {
+            if (warOrigin !== undefined && url.startsWith(warOrigin)) {
                 return super.open(method, url, ...args);
             }
             const haystack = { method, url };
-            if ( propsToMatch === '' && directive === '' ) {
+            if (propsToMatch === '' && directive === '') {
                 safe.uboLog(logPrefix, `Called: ${safe.JSON_stringify(haystack, null, 2)}`);
                 return super.open(method, url, ...args);
             }
-            if ( matchObjectPropertiesFn(propNeedles, haystack) ) {
+            if (matchObjectPropertiesFn(propNeedles, haystack)) {
                 const xhrDetails = Object.assign(haystack, {
                     xhr: this,
                     defer: args.length === 0 || !!args[0],
@@ -446,50 +446,50 @@ function preventXhrFn(
         }
         send(...args) {
             const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails === undefined ) {
+            if (xhrDetails === undefined) {
                 return super.send(...args);
             }
             xhrDetails.headers['date'] = (new Date()).toUTCString();
             let xhrText = '';
-            switch ( this.responseType ) {
-            case 'arraybuffer':
-                xhrDetails.props.response.value = new ArrayBuffer(0);
-                xhrDetails.headers['content-type'] = 'application/octet-stream';
-                break;
-            case 'blob':
-                xhrDetails.props.response.value = new Blob([]);
-                xhrDetails.headers['content-type'] = 'application/octet-stream';
-                break;
-            case 'document': {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString('', 'text/html');
-                xhrDetails.props.response.value = doc;
-                xhrDetails.props.responseXML.value = doc;
-                xhrDetails.headers['content-type'] = 'text/html';
-                break;
-            }
-            case 'json':
-                xhrDetails.props.response.value = {};
-                xhrDetails.props.responseText.value = '{}';
-                xhrDetails.headers['content-type'] = 'application/json';
-                break;
-            default: {
-                if ( directive === '' ) { break; }
-                xhrText = generateContentFn(trusted, xhrDetails.directive);
-                if ( xhrText instanceof Promise ) {
-                    xhrText = xhrText.then(text => {
-                        xhrDetails.props.response.value = text;
-                        xhrDetails.props.responseText.value = text;
-                    });
-                } else {
-                    xhrDetails.props.response.value = xhrText;
-                    xhrDetails.props.responseText.value = xhrText;
+            switch (this.responseType) {
+                case 'arraybuffer':
+                    xhrDetails.props.response.value = new ArrayBuffer(0);
+                    xhrDetails.headers['content-type'] = 'application/octet-stream';
+                    break;
+                case 'blob':
+                    xhrDetails.props.response.value = new Blob([]);
+                    xhrDetails.headers['content-type'] = 'application/octet-stream';
+                    break;
+                case 'document': {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString('', 'text/html');
+                    xhrDetails.props.response.value = doc;
+                    xhrDetails.props.responseXML.value = doc;
+                    xhrDetails.headers['content-type'] = 'text/html';
+                    break;
                 }
-                xhrDetails.headers['content-type'] = 'text/plain';
-                break;
+                case 'json':
+                    xhrDetails.props.response.value = {};
+                    xhrDetails.props.responseText.value = '{}';
+                    xhrDetails.headers['content-type'] = 'application/json';
+                    break;
+                default: {
+                    if (directive === '') { break; }
+                    xhrText = generateContentFn(trusted, xhrDetails.directive);
+                    if (xhrText instanceof Promise) {
+                        xhrText = xhrText.then(text => {
+                            xhrDetails.props.response.value = text;
+                            xhrDetails.props.responseText.value = text;
+                        });
+                    } else {
+                        xhrDetails.props.response.value = xhrText;
+                        xhrDetails.props.responseText.value = xhrText;
+                    }
+                    xhrDetails.headers['content-type'] = 'text/plain';
+                    break;
+                }
             }
-            }
-            if ( xhrDetails.defer === false ) {
+            if (xhrDetails.defer === false) {
                 xhrDetails.headers['content-length'] = `${xhrDetails.props.response.value}`.length;
                 Object.defineProperties(xhrDetails.xhr, {
                     readyState: { value: 4 },
@@ -500,7 +500,7 @@ function preventXhrFn(
                 Object.defineProperties(xhrDetails.xhr, xhrDetails.props);
                 return;
             }
-            Promise.resolve(xhrText).then(( ) => xhrDetails).then(details => {
+            Promise.resolve(xhrText).then(() => xhrDetails).then(details => {
                 Object.defineProperties(details.xhr, {
                     readyState: { value: 1, configurable: true },
                     responseURL: { value: xhrDetails.url },
@@ -535,37 +535,37 @@ function preventXhrFn(
         }
         getResponseHeader(headerName) {
             const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails === undefined || this.readyState < this.HEADERS_RECEIVED ) {
+            if (xhrDetails === undefined || this.readyState < this.HEADERS_RECEIVED) {
                 return super.getResponseHeader(headerName);
             }
             const value = xhrDetails.headers[headerName.toLowerCase()];
-            if ( value !== undefined && value !== '' ) { return value; }
+            if (value !== undefined && value !== '') { return value; }
             return null;
         }
         getAllResponseHeaders() {
             const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails === undefined || this.readyState < this.HEADERS_RECEIVED ) {
+            if (xhrDetails === undefined || this.readyState < this.HEADERS_RECEIVED) {
                 return super.getAllResponseHeaders();
             }
             const out = [];
-            for ( const [ name, value ] of Object.entries(xhrDetails.headers) ) {
-                if ( !value ) { continue; }
+            for (const [name, value] of Object.entries(xhrDetails.headers)) {
+                if (!value) { continue; }
                 out.push(`${name}: ${value}`);
             }
-            if ( out.length !== 0 ) { out.push(''); }
+            if (out.length !== 0) { out.push(''); }
             return out.join('\r\n');
         }
     };
-    self.XMLHttpRequest.prototype.open.toString = function() {
+    self.XMLHttpRequest.prototype.open.toString = function () {
         return XHRBefore.open.toString();
     };
-    self.XMLHttpRequest.prototype.send.toString = function() {
+    self.XMLHttpRequest.prototype.send.toString = function () {
         return XHRBefore.send.toString();
     };
-    self.XMLHttpRequest.prototype.getResponseHeader.toString = function() {
+    self.XMLHttpRequest.prototype.getResponseHeader.toString = function () {
         return XHRBefore.getResponseHeader.toString();
     };
-    self.XMLHttpRequest.prototype.getAllResponseHeaders.toString = function() {
+    self.XMLHttpRequest.prototype.getAllResponseHeaders.toString = function () {
         return XHRBefore.getAllResponseHeaders.toString();
     };
 }
@@ -597,7 +597,7 @@ builtinScriptlets.push({
 // Issues to mind before changing anything:
 //  https://github.com/uBlockOrigin/uBlock-issues/issues/2154
 function abortCurrentScript(...args) {
-    runAtHtmlElementFn(( ) => {
+    runAtHtmlElementFn(() => {
         abortCurrentScriptFn(...args);
     });
 }
@@ -618,23 +618,23 @@ builtinScriptlets.push({
 function abortOnPropertyRead(
     chain = ''
 ) {
-    if ( typeof chain !== 'string' ) { return; }
-    if ( chain === '' ) { return; }
+    if (typeof chain !== 'string') { return; }
+    if (chain === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('abort-on-property-read', chain);
     const exceptionToken = getExceptionTokenFn();
-    const abort = function() {
+    const abort = function () {
         safe.uboLog(logPrefix, 'Aborted');
         throw new ReferenceError(exceptionToken);
     };
-    const makeProxy = function(owner, chain) {
+    const makeProxy = function (owner, chain) {
         const pos = chain.indexOf('.');
-        if ( pos === -1 ) {
+        if (pos === -1) {
             const desc = Object.getOwnPropertyDescriptor(owner, chain);
-            if ( !desc || desc.get !== abort ) {
+            if (!desc || desc.get !== abort) {
                 Object.defineProperty(owner, chain, {
                     get: abort,
-                    set: function(){}
+                    set: function () { }
                 });
             }
             return;
@@ -642,17 +642,17 @@ function abortOnPropertyRead(
         const prop = chain.slice(0, pos);
         let v = owner[prop];
         chain = chain.slice(pos + 1);
-        if ( v ) {
+        if (v) {
             makeProxy(v, chain);
             return;
         }
         const desc = Object.getOwnPropertyDescriptor(owner, prop);
-        if ( desc && desc.set !== undefined ) { return; }
+        if (desc && desc.set !== undefined) { return; }
         Object.defineProperty(owner, prop, {
-            get: function() { return v; },
-            set: function(a) {
+            get: function () { return v; },
+            set: function (a) {
                 v = a;
-                if ( a instanceof Object ) {
+                if (a instanceof Object) {
                     makeProxy(a, chain);
                 }
             }
@@ -678,22 +678,22 @@ builtinScriptlets.push({
 function abortOnPropertyWrite(
     prop = ''
 ) {
-    if ( typeof prop !== 'string' ) { return; }
-    if ( prop === '' ) { return; }
+    if (typeof prop !== 'string') { return; }
+    if (prop === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('abort-on-property-write', prop);
     const exceptionToken = getExceptionTokenFn();
     let owner = window;
-    for (;;) {
+    for (; ;) {
         const pos = prop.indexOf('.');
-        if ( pos === -1 ) { break; }
+        if (pos === -1) { break; }
         owner = owner[prop.slice(0, pos)];
-        if ( owner instanceof Object === false ) { return; }
+        if (owner instanceof Object === false) { return; }
         prop = prop.slice(pos + 1);
     }
     delete owner[prop];
     Object.defineProperty(owner, prop, {
-        set: function() {
+        set: function () {
             safe.uboLog(logPrefix, 'Aborted');
             throw new ReferenceError(exceptionToken);
         }
@@ -730,18 +730,18 @@ function adjustSetInterval(
     delayArg = '',
     boostArg = ''
 ) {
-    if ( typeof needleArg !== 'string' ) { return; }
+    if (typeof needleArg !== 'string') { return; }
     const safe = safeSelf();
     const reNeedle = safe.patternToRegex(needleArg);
     let delay = delayArg !== '*' ? parseInt(delayArg, 10) : -1;
-    if ( isNaN(delay) || isFinite(delay) === false ) { delay = 1000; }
+    if (isNaN(delay) || isFinite(delay) === false) { delay = 1000; }
     let boost = parseFloat(boostArg);
     boost = isNaN(boost) === false && isFinite(boost)
         ? Math.min(Math.max(boost, 0.001), 50)
         : 0.05;
     self.setInterval = new Proxy(self.setInterval, {
-        apply: function(target, thisArg, args) {
-            const [ a, b ] = args;
+        apply: function (target, thisArg, args) {
+            const [a, b] = args;
             if (
                 (delay === -1 || b === delay) &&
                 reNeedle.test(a.toString())
@@ -784,18 +784,18 @@ function adjustSetTimeout(
     delayArg = '',
     boostArg = ''
 ) {
-    if ( typeof needleArg !== 'string' ) { return; }
+    if (typeof needleArg !== 'string') { return; }
     const safe = safeSelf();
     const reNeedle = safe.patternToRegex(needleArg);
     let delay = delayArg !== '*' ? parseInt(delayArg, 10) : -1;
-    if ( isNaN(delay) || isFinite(delay) === false ) { delay = 1000; }
+    if (isNaN(delay) || isFinite(delay) === false) { delay = 1000; }
     let boost = parseFloat(boostArg);
     boost = isNaN(boost) === false && isFinite(boost)
         ? Math.min(Math.max(boost, 0.001), 50)
         : 0.05;
     self.setTimeout = new Proxy(self.setTimeout, {
-        apply: function(target, thisArg, args) {
-            const [ a, b ] = args;
+        apply: function (target, thisArg, args) {
+            const [a, b] = args;
             if (
                 (delay === -1 || b === delay) &&
                 reNeedle.test(a.toString())
@@ -824,24 +824,24 @@ builtinScriptlets.push({
 function preventRefresh(
     delay = ''
 ) {
-    if ( typeof delay !== 'string' ) { return; }
+    if (typeof delay !== 'string') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('prevent-refresh', delay);
     const stop = content => {
         window.stop();
         safe.uboLog(logPrefix, `Prevented "${content}"`);
     };
-    const defuse = ( ) => {
+    const defuse = () => {
         const meta = document.querySelector('meta[http-equiv="refresh" i][content]');
-        if ( meta === null ) { return; }
+        if (meta === null) { return; }
         const content = meta.getAttribute('content') || '';
         const ms = delay === ''
             ? Math.max(parseFloat(content) || 0, 0) * 500
             : 0;
-        if ( ms === 0 ) {
+        if (ms === 0) {
             stop(content);
         } else {
-            setTimeout(( ) => { stop(content); }, ms);
+            setTimeout(() => { stop(content); }, ms);
         }
     };
     self.addEventListener('load', defuse, { capture: true, once: true });
@@ -866,60 +866,60 @@ function removeClass(
     rawSelector = '',
     behavior = ''
 ) {
-    if ( typeof rawToken !== 'string' ) { return; }
-    if ( rawToken === '' ) { return; }
+    if (typeof rawToken !== 'string') { return; }
+    if (rawToken === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('remove-class', rawToken, rawSelector, behavior);
     const tokens = safe.String_split.call(rawToken, /\s*\|\s*/);
     const selector = tokens
         .map(a => `${rawSelector}.${CSS.escape(a)}`)
         .join(',');
-    if ( safe.logLevel > 1 ) {
+    if (safe.logLevel > 1) {
         safe.uboLog(logPrefix, `Target selector:\n\t${selector}`);
     }
     const mustStay = /\bstay\b/.test(behavior);
     let timer;
-    const rmclass = ( ) => {
+    const rmclass = () => {
         timer = undefined;
         try {
             const nodes = document.querySelectorAll(selector);
-            for ( const node of nodes ) {
+            for (const node of nodes) {
                 node.classList.remove(...tokens);
                 safe.uboLog(logPrefix, 'Removed class(es)');
             }
         } catch {
         }
-        if ( mustStay ) { return; }
-        if ( document.readyState !== 'complete' ) { return; }
+        if (mustStay) { return; }
+        if (document.readyState !== 'complete') { return; }
         observer.disconnect();
     };
     const mutationHandler = mutations => {
-        if ( timer !== undefined ) { return; }
+        if (timer !== undefined) { return; }
         let skip = true;
-        for ( let i = 0; i < mutations.length && skip; i++ ) {
+        for (let i = 0; i < mutations.length && skip; i++) {
             const { type, addedNodes, removedNodes } = mutations[i];
-            if ( type === 'attributes' ) { skip = false; }
-            for ( let j = 0; j < addedNodes.length && skip; j++ ) {
-                if ( addedNodes[j].nodeType === 1 ) { skip = false; break; }
+            if (type === 'attributes') { skip = false; }
+            for (let j = 0; j < addedNodes.length && skip; j++) {
+                if (addedNodes[j].nodeType === 1) { skip = false; break; }
             }
-            for ( let j = 0; j < removedNodes.length && skip; j++ ) {
-                if ( removedNodes[j].nodeType === 1 ) { skip = false; break; }
+            for (let j = 0; j < removedNodes.length && skip; j++) {
+                if (removedNodes[j].nodeType === 1) { skip = false; break; }
             }
         }
-        if ( skip ) { return; }
+        if (skip) { return; }
         timer = safe.onIdle(rmclass, { timeout: 67 });
     };
     const observer = new MutationObserver(mutationHandler);
-    const start = ( ) => {
+    const start = () => {
         rmclass();
         observer.observe(document, {
             attributes: true,
-            attributeFilter: [ 'class' ],
+            attributeFilter: ['class'],
             childList: true,
             subtree: true,
         });
     };
-    runAt(( ) => {
+    runAt(() => {
         start();
     }, /\bcomplete\b/.test(behavior) ? 'idle' : 'loading');
 }
@@ -936,33 +936,33 @@ builtinScriptlets.push({
 function webrtcIf(
     good = ''
 ) {
-    if ( typeof good !== 'string' ) { return; }
+    if (typeof good !== 'string') { return; }
     const safe = safeSelf();
     const reGood = safe.patternToRegex(good);
     const rtcName = window.RTCPeerConnection
         ? 'RTCPeerConnection'
         : (window.webkitRTCPeerConnection ? 'webkitRTCPeerConnection' : '');
-    if ( rtcName === '' ) { return; }
+    if (rtcName === '') { return; }
     const log = console.log.bind(console);
     const neuteredPeerConnections = new WeakSet();
-    const isGoodConfig = function(instance, config) {
-        if ( neuteredPeerConnections.has(instance) ) { return false; }
-        if ( config instanceof Object === false ) { return true; }
-        if ( Array.isArray(config.iceServers) === false ) { return true; }
-        for ( const server of config.iceServers ) {
+    const isGoodConfig = function (instance, config) {
+        if (neuteredPeerConnections.has(instance)) { return false; }
+        if (config instanceof Object === false) { return true; }
+        if (Array.isArray(config.iceServers) === false) { return true; }
+        for (const server of config.iceServers) {
             const urls = typeof server.urls === 'string'
-                ? [ server.urls ]
+                ? [server.urls]
                 : server.urls;
-            if ( Array.isArray(urls) ) {
-                for ( const url of urls ) {
-                    if ( reGood.test(url) ) { return true; }
+            if (Array.isArray(urls)) {
+                for (const url of urls) {
+                    if (reGood.test(url)) { return true; }
                 }
             }
-            if ( typeof server.username === 'string' ) {
-                if ( reGood.test(server.username) ) { return true; }
+            if (typeof server.username === 'string') {
+                if (reGood.test(server.username)) { return true; }
             }
-            if ( typeof server.credential === 'string' ) {
-                if ( reGood.test(server.credential) ) { return true; }
+            if (typeof server.credential === 'string') {
+                if (reGood.test(server.credential)) { return true; }
             }
         }
         neuteredPeerConnections.add(instance);
@@ -972,8 +972,8 @@ function webrtcIf(
     const peerConnectionProto = peerConnectionCtor.prototype;
     peerConnectionProto.createDataChannel =
         new Proxy(peerConnectionProto.createDataChannel, {
-            apply: function(target, thisArg, args) {
-                if ( isGoodConfig(target, args[1]) === false ) {
+            apply: function (target, thisArg, args) {
+                if (isGoodConfig(target, args[1]) === false) {
                     log('uBO:', args[1]);
                     return Reflect.apply(target, thisArg, args.slice(0, 1));
                 }
@@ -982,8 +982,8 @@ function webrtcIf(
         });
     window[rtcName] =
         new Proxy(peerConnectionCtor, {
-            construct: function(target, args) {
-                if ( isGoodConfig(target, args[0]) === false ) {
+            construct: function (target, args) {
+                if (isGoodConfig(target, args[0]) === false) {
                     log('uBO:', args[0]);
                     return Reflect.construct(target);
                 }
@@ -1063,75 +1063,75 @@ function noWindowOpenIf(
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('no-window-open-if', pattern, delay, decoy);
     const targetMatchResult = pattern.startsWith('!') === false;
-    if ( targetMatchResult === false ) {
+    if (targetMatchResult === false) {
         pattern = pattern.slice(1);
     }
     const rePattern = safe.patternToRegex(pattern);
     const autoRemoveAfter = (parseFloat(delay) || 0) * 1000;
     const setTimeout = self.setTimeout;
-    const createDecoy = function(tag, urlProp, url) {
+    const createDecoy = function (tag, urlProp, url) {
         const decoyElem = document.createElement(tag);
         decoyElem[urlProp] = url;
-        decoyElem.style.setProperty('height','1px', 'important');
-        decoyElem.style.setProperty('position','fixed', 'important');
-        decoyElem.style.setProperty('top','-1px', 'important');
-        decoyElem.style.setProperty('width','1px', 'important');
+        decoyElem.style.setProperty('height', '1px', 'important');
+        decoyElem.style.setProperty('position', 'fixed', 'important');
+        decoyElem.style.setProperty('top', '-1px', 'important');
+        decoyElem.style.setProperty('width', '1px', 'important');
         document.body.appendChild(decoyElem);
-        setTimeout(( ) => { decoyElem.remove(); }, autoRemoveAfter);
+        setTimeout(() => { decoyElem.remove(); }, autoRemoveAfter);
         return decoyElem;
     };
-    const noopFunc = function(){};
+    const noopFunc = function () { };
     proxyApplyFn('open', function open(context) {
-        if ( pattern === 'debug' && safe.logLevel !== 0 ) {
+        if (pattern === 'debug' && safe.logLevel !== 0) {
             debugger; // eslint-disable-line no-debugger
             return context.reflect();
         }
         const { callArgs } = context;
         const haystack = callArgs.join(' ');
-        if ( rePattern.test(haystack) !== targetMatchResult ) {
-            if ( safe.logLevel > 1 ) {
+        if (rePattern.test(haystack) !== targetMatchResult) {
+            if (safe.logLevel > 1) {
                 safe.uboLog(logPrefix, `Allowed (${callArgs.join(', ')})`);
             }
             return context.reflect();
         }
         safe.uboLog(logPrefix, `Prevented (${callArgs.join(', ')})`);
-        if ( delay === '' ) { return null; }
-        if ( decoy === 'blank' ) {
+        if (delay === '') { return null; }
+        if (decoy === 'blank') {
             callArgs[0] = 'about:blank';
             const r = context.reflect();
-            setTimeout(( ) => { r.close(); }, autoRemoveAfter);
+            setTimeout(() => { r.close(); }, autoRemoveAfter);
             return r;
         }
         const decoyElem = decoy === 'obj'
             ? createDecoy('object', 'data', ...callArgs)
             : createDecoy('iframe', 'src', ...callArgs);
         let popup = decoyElem.contentWindow;
-        if ( typeof popup === 'object' && popup !== null ) {
+        if (typeof popup === 'object' && popup !== null) {
             Object.defineProperty(popup, 'closed', { value: false });
         } else {
             popup = new Proxy(self, {
-                get: function(target, prop, ...args) {
-                    if ( prop === 'closed' ) { return false; }
+                get: function (target, prop, ...args) {
+                    if (prop === 'closed') { return false; }
                     const r = Reflect.get(target, prop, ...args);
-                    if ( typeof r === 'function' ) { return noopFunc; }
+                    if (typeof r === 'function') { return noopFunc; }
                     return r;
                 },
-                set: function(...args) {
+                set: function (...args) {
                     return Reflect.set(...args);
                 },
             });
         }
-        if ( safe.logLevel !== 0 ) {
+        if (safe.logLevel !== 0) {
             popup = new Proxy(popup, {
-                get: function(target, prop, ...args) {
+                get: function (target, prop, ...args) {
                     const r = Reflect.get(target, prop, ...args);
                     safe.uboLog(logPrefix, `popup / get ${prop} === ${r}`);
-                    if ( typeof r === 'function' ) {
+                    if (typeof r === 'function') {
                         return (...args) => { return r.call(target, ...args); };
                     }
                     return r;
                 },
-                set: function(target, prop, value, ...args) {
+                set: function (target, prop, value, ...args) {
                     safe.uboLog(logPrefix, `popup / set ${prop} = ${value}`);
                     return Reflect.set(target, prop, value, ...args);
                 },
@@ -1160,20 +1160,20 @@ builtinScriptlets.push({
 function closeWindow(
     arg1 = ''
 ) {
-    if ( typeof arg1 !== 'string' ) { return; }
+    if (typeof arg1 !== 'string') { return; }
     const safe = safeSelf();
     let subject = '';
-    if ( /^\/.*\/$/.test(arg1) ) {
+    if (/^\/.*\/$/.test(arg1)) {
         subject = window.location.href;
-    } else if ( arg1 !== '' ) {
+    } else if (arg1 !== '') {
         subject = `${window.location.pathname}${window.location.search}`;
     }
     try {
         const re = safe.patternToRegex(arg1);
-        if ( re.test(subject) ) {
+        if (re.test(subject)) {
             window.close();
         }
-    } catch(ex) {
+    } catch (ex) {
         console.log(ex);
     }
 }
@@ -1184,9 +1184,9 @@ builtinScriptlets.push({
     name: 'window.name-defuser.js',
     fn: windowNameDefuser,
 });
-// https://github.com/gorhill/uBlock/issues/1228
+// https://github.com/Ablock/Ablock/issues/1228
 function windowNameDefuser() {
-    if ( window === window.top ) {
+    if (window === window.top) {
         window.name = '';
     }
 }
@@ -1201,30 +1201,30 @@ builtinScriptlets.push({
 // if this works well and proves to be useful, this may end up
 // as a stock tool in uBO's popup panel.
 function overlayBuster(allFrames) {
-    if ( allFrames === '' && window !== window.top ) { return; }
+    if (allFrames === '' && window !== window.top) { return; }
     var tstart;
     var ttl = 30000;
     var delay = 0;
     var delayStep = 50;
-    var buster = function() {
+    var buster = function () {
         var docEl = document.documentElement,
             bodyEl = document.body,
             vw = Math.min(docEl.clientWidth, window.innerWidth),
             vh = Math.min(docEl.clientHeight, window.innerHeight),
             tol = Math.min(vw, vh) * 0.05,
-            el = document.elementFromPoint(vw/2, vh/2),
+            el = document.elementFromPoint(vw / 2, vh / 2),
             style, rect;
-        for (;;) {
-            if ( el === null || el.parentNode === null || el === bodyEl ) {
+        for (; ;) {
+            if (el === null || el.parentNode === null || el === bodyEl) {
                 break;
             }
             style = window.getComputedStyle(el);
-            if ( parseInt(style.zIndex, 10) >= 1000 || style.position === 'fixed' ) {
+            if (parseInt(style.zIndex, 10) >= 1000 || style.position === 'fixed') {
                 rect = el.getBoundingClientRect();
-                if ( rect.left <= tol && rect.top <= tol && (vw - rect.right) <= tol && (vh - rect.bottom) < tol ) {
+                if (rect.left <= tol && rect.top <= tol && (vw - rect.right) <= tol && (vh - rect.bottom) < tol) {
                     el.parentNode.removeChild(el);
                     tstart = Date.now();
-                    el = document.elementFromPoint(vw/2, vh/2);
+                    el = document.elementFromPoint(vw / 2, vh / 2);
                     bodyEl.style.setProperty('overflow', 'auto', 'important');
                     docEl.style.setProperty('overflow', 'auto', 'important');
                     continue;
@@ -1232,19 +1232,19 @@ function overlayBuster(allFrames) {
             }
             el = el.parentNode;
         }
-        if ( (Date.now() - tstart) < ttl ) {
+        if ((Date.now() - tstart) < ttl) {
             delay = Math.min(delay + delayStep, 1000);
             setTimeout(buster, delay);
         }
     };
-    var domReady = function(ev) {
-        if ( ev ) {
+    var domReady = function (ev) {
+        if (ev) {
             document.removeEventListener(ev.type, domReady);
         }
         tstart = Date.now();
         setTimeout(buster, delay);
     };
-    if ( document.readyState === 'loading' ) {
+    if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', domReady);
     } else {
         domReady();
@@ -1260,11 +1260,11 @@ builtinScriptlets.push({
 // https://github.com/uBlockOrigin/uAssets/issues/8
 function alertBuster() {
     window.alert = new Proxy(window.alert, {
-        apply: function(a) {
+        apply: function (a) {
             console.info(a);
         },
         get(target, prop) {
-            if ( prop === 'toString' ) {
+            if (prop === 'toString') {
                 return target.toString.bind(target);
             }
             return Reflect.get(target, prop);
@@ -1283,29 +1283,29 @@ function noWebrtc() {
     var rtcName = window.RTCPeerConnection ? 'RTCPeerConnection' : (
         window.webkitRTCPeerConnection ? 'webkitRTCPeerConnection' : ''
     );
-    if ( rtcName === '' ) { return; }
+    if (rtcName === '') { return; }
     var log = console.log.bind(console);
-    var pc = function(cfg) {
+    var pc = function (cfg) {
         log('Document tried to create an RTCPeerConnection: %o', cfg);
     };
-    const noop = function() {
+    const noop = function () {
     };
     pc.prototype = {
         close: noop,
         createDataChannel: noop,
         createOffer: noop,
         setRemoteDescription: noop,
-        toString: function() {
+        toString: function () {
             return '[object RTCPeerConnection]';
         }
     };
     var z = window[rtcName];
     window[rtcName] = pc.bind(window);
-    if ( z.prototype ) {
-        z.prototype.createDataChannel = function() {
+    if (z.prototype) {
+        z.prototype.createDataChannel = function () {
             return {
-                close: function() {},
-                send: function() {}
+                close: function () { },
+                send: function () { }
             };
         }.bind(null);
     }
@@ -1321,8 +1321,8 @@ builtinScriptlets.push({
 function disableNewtabLinks() {
     document.addEventListener('click', ev => {
         let target = ev.target;
-        while ( target !== null ) {
-            if ( target.localName === 'a' && target.hasAttribute('target') ) {
+        while (target !== null) {
+            if (target.localName === 'a' && target.hasAttribute('target')) {
                 ev.stopPropagation();
                 ev.preventDefault();
                 break;
@@ -1346,15 +1346,15 @@ function xmlPrune(
     selectorCheck = '',
     urlPattern = ''
 ) {
-    if ( typeof selector !== 'string' ) { return; }
-    if ( selector === '' ) { return; }
+    if (typeof selector !== 'string') { return; }
+    if (selector === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('xml-prune', selector, selectorCheck, urlPattern);
     const reUrl = safe.patternToRegex(urlPattern);
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 3);
     const queryAll = (xmlDoc, selector) => {
         const isXpath = /^xpath\(.+\)$/.test(selector);
-        if ( isXpath === false ) {
+        if (isXpath === false) {
             return Array.from(xmlDoc.querySelectorAll(selector));
         }
         const xpr = xmlDoc.evaluate(
@@ -1365,7 +1365,7 @@ function xmlPrune(
             null
         );
         const out = [];
-        for ( let i = 0; i < xpr.snapshotLength; i++ ) {
+        for (let i = 0; i < xpr.snapshotLength; i++) {
             const node = xpr.snapshotItem(i);
             out.push(node);
         }
@@ -1373,31 +1373,31 @@ function xmlPrune(
     };
     const pruneFromDoc = xmlDoc => {
         try {
-            if ( selectorCheck !== '' && xmlDoc.querySelector(selectorCheck) === null ) {
+            if (selectorCheck !== '' && xmlDoc.querySelector(selectorCheck) === null) {
                 return xmlDoc;
             }
-            if ( extraArgs.logdoc ) {
+            if (extraArgs.logdoc) {
                 const serializer = new XMLSerializer();
                 safe.uboLog(logPrefix, `Document is\n\t${serializer.serializeToString(xmlDoc)}`);
             }
             const items = queryAll(xmlDoc, selector);
-            if ( items.length === 0 ) { return xmlDoc; }
+            if (items.length === 0) { return xmlDoc; }
             safe.uboLog(logPrefix, `Removing ${items.length} items`);
-            for ( const item of items ) {
-                if ( item.nodeType === 1 ) {
+            for (const item of items) {
+                if (item.nodeType === 1) {
                     item.remove();
-                } else if ( item.nodeType === 2 ) {
+                } else if (item.nodeType === 2) {
                     item.ownerElement.removeAttribute(item.nodeName);
                 }
                 safe.uboLog(logPrefix, `${item.constructor.name}.${item.nodeName} removed`);
             }
-        } catch(ex) {
+        } catch (ex) {
             safe.uboErr(logPrefix, `Error: ${ex}`);
         }
         return xmlDoc;
     };
     const pruneFromText = text => {
-        if ( (/^\s*</.test(text) && />\s*$/.test(text)) === false ) {
+        if ((/^\s*</.test(text) && />\s*$/.test(text)) === false) {
             return text;
         }
         try {
@@ -1411,14 +1411,14 @@ function xmlPrune(
         return text;
     };
     const urlFromArg = arg => {
-        if ( typeof arg === 'string' ) { return arg; }
-        if ( arg instanceof Request ) { return arg.url; }
+        if (typeof arg === 'string') { return arg; }
+        if (arg instanceof Request) { return arg.url; }
         return String(arg);
     };
     self.fetch = new Proxy(self.fetch, {
-        apply: function(target, thisArg, args) {
+        apply: function (target, thisArg, args) {
             const fetchPromise = Reflect.apply(target, thisArg, args);
-            if ( reUrl.test(urlFromArg(args[0])) === false ) {
+            if (reUrl.test(urlFromArg(args[0])) === false) {
                 return fetchPromise;
             }
             return fetchPromise.then(responseBefore => {
@@ -1436,7 +1436,7 @@ function xmlPrune(
                         url: { value: responseBefore.url },
                     });
                     return responseAfter;
-                }).catch(( ) =>
+                }).catch(() =>
                     responseBefore
                 );
             });
@@ -1444,11 +1444,11 @@ function xmlPrune(
     });
     self.XMLHttpRequest.prototype.open = new Proxy(self.XMLHttpRequest.prototype.open, {
         apply: async (target, thisArg, args) => {
-            if ( reUrl.test(urlFromArg(args[1])) === false ) {
+            if (reUrl.test(urlFromArg(args[1])) === false) {
                 return Reflect.apply(target, thisArg, args);
             }
-            thisArg.addEventListener('readystatechange', function() {
-                if ( thisArg.readyState !== 4 ) { return; }
+            thisArg.addEventListener('readystatechange', function () {
+                if (thisArg.readyState !== 4) { return; }
                 const type = thisArg.responseType;
                 if (
                     type === 'document' ||
@@ -1458,7 +1458,7 @@ function xmlPrune(
                     const serializer = new XMLSerializer();
                     const textout = serializer.serializeToString(thisArg.responseXML);
                     Object.defineProperty(thisArg, 'responseText', { value: textout });
-                    if ( typeof thisArg.response === 'string' ) {
+                    if (typeof thisArg.response === 'string') {
                         Object.defineProperty(thisArg, 'response', { value: textout });
                     }
                     return;
@@ -1469,7 +1469,7 @@ function xmlPrune(
                 ) {
                     const textin = thisArg.responseText;
                     const textout = pruneFromText(textin);
-                    if ( textout === textin ) { return; }
+                    if (textout === textin) { return; }
                     Object.defineProperty(thisArg, 'response', { value: textout });
                     Object.defineProperty(thisArg, 'responseText', { value: textout });
                     return;
@@ -1495,16 +1495,16 @@ function m3uPrune(
     m3uPattern = '',
     urlPattern = ''
 ) {
-    if ( typeof m3uPattern !== 'string' ) { return; }
+    if (typeof m3uPattern !== 'string') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('m3u-prune', m3uPattern, urlPattern);
     const toLog = [];
     const regexFromArg = arg => {
-        if ( arg === '' ) { return /^/; }
+        if (arg === '') { return /^/; }
         const match = /^\/(.+)\/([gms]*)$/.exec(arg);
-        if ( match !== null ) {
+        if (match !== null) {
             let flags = match[2] || '';
-            if ( flags.includes('m') ) { flags += 's'; }
+            if (flags.includes('m')) { flags += 's'; }
             return new RegExp(match[1], flags);
         }
         return new RegExp(
@@ -1514,51 +1514,51 @@ function m3uPrune(
     const reM3u = regexFromArg(m3uPattern);
     const reUrl = regexFromArg(urlPattern);
     const pruneSpliceoutBlock = (lines, i) => {
-        if ( lines[i].startsWith('#EXT-X-CUE:TYPE="SpliceOut"') === false ) {
+        if (lines[i].startsWith('#EXT-X-CUE:TYPE="SpliceOut"') === false) {
             return false;
         }
         toLog.push(`\t${lines[i]}`);
         lines[i] = undefined; i += 1;
-        if ( lines[i].startsWith('#EXT-X-ASSET:CAID') ) {
+        if (lines[i].startsWith('#EXT-X-ASSET:CAID')) {
             toLog.push(`\t${lines[i]}`);
             lines[i] = undefined; i += 1;
         }
-        if ( lines[i].startsWith('#EXT-X-SCTE35:') ) {
+        if (lines[i].startsWith('#EXT-X-SCTE35:')) {
             toLog.push(`\t${lines[i]}`);
             lines[i] = undefined; i += 1;
         }
-        if ( lines[i].startsWith('#EXT-X-CUE-IN') ) {
+        if (lines[i].startsWith('#EXT-X-CUE-IN')) {
             toLog.push(`\t${lines[i]}`);
             lines[i] = undefined; i += 1;
         }
-        if ( lines[i].startsWith('#EXT-X-SCTE35:') ) {
+        if (lines[i].startsWith('#EXT-X-SCTE35:')) {
             toLog.push(`\t${lines[i]}`);
             lines[i] = undefined; i += 1;
         }
         return true;
     };
     const pruneInfBlock = (lines, i) => {
-        if ( lines[i].startsWith('#EXTINF') === false ) { return false; }
-        if ( reM3u.test(lines[i+1]) === false ) { return false; }
-        toLog.push('Discarding', `\t${lines[i]}, \t${lines[i+1]}`);
-        lines[i] = lines[i+1] = undefined; i += 2;
-        if ( lines[i].startsWith('#EXT-X-DISCONTINUITY') ) {
+        if (lines[i].startsWith('#EXTINF') === false) { return false; }
+        if (reM3u.test(lines[i + 1]) === false) { return false; }
+        toLog.push('Discarding', `\t${lines[i]}, \t${lines[i + 1]}`);
+        lines[i] = lines[i + 1] = undefined; i += 2;
+        if (lines[i].startsWith('#EXT-X-DISCONTINUITY')) {
             toLog.push(`\t${lines[i]}`);
             lines[i] = undefined; i += 1;
         }
         return true;
     };
     const pruner = text => {
-        if ( (/^\s*#EXTM3U/.test(text)) === false ) { return text; }
-        if ( m3uPattern === '' ) {
+        if ((/^\s*#EXTM3U/.test(text)) === false) { return text; }
+        if (m3uPattern === '') {
             safe.uboLog(` Content:\n${text}`);
             return text;
         }
-        if ( reM3u.multiline ) {
+        if (reM3u.multiline) {
             reM3u.lastIndex = 0;
-            for (;;) {
+            for (; ;) {
                 const match = reM3u.exec(text);
-                if ( match === null ) { break; }
+                if (match === null) { break; }
                 let discard = match[0];
                 let before = text.slice(0, match.index);
                 if (
@@ -1566,7 +1566,7 @@ function m3uPrune(
                     /[\n\r]+$/.test(before) === false
                 ) {
                     const startOfLine = /[^\n\r]+$/.exec(before);
-                    if ( startOfLine !== null ) {
+                    if (startOfLine !== null) {
                         before = before.slice(0, startOfLine.index);
                         discard = startOfLine[0] + discard;
                     }
@@ -1577,7 +1577,7 @@ function m3uPrune(
                     /^[\n\r]+/.test(after) === false
                 ) {
                     const endOfLine = /^[^\n\r]+/.exec(after);
-                    if ( endOfLine !== null ) {
+                    if (endOfLine !== null) {
                         after = after.slice(endOfLine.index);
                         discard += discard + endOfLine[0];
                     }
@@ -1585,32 +1585,32 @@ function m3uPrune(
                 text = before.trim() + '\n' + after.trim();
                 reM3u.lastIndex = before.length + 1;
                 toLog.push('Discarding', ...safe.String_split.call(discard, /\n+/).map(s => `\t${s}`));
-                if ( reM3u.global === false ) { break; }
+                if (reM3u.global === false) { break; }
             }
             return text;
         }
         const lines = safe.String_split.call(text, /\n\r|\n|\r/);
-        for ( let i = 0; i < lines.length; i++ ) {
-            if ( lines[i] === undefined ) { continue; }
-            if ( pruneSpliceoutBlock(lines, i) ) { continue; }
-            if ( pruneInfBlock(lines, i) ) { continue; }
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i] === undefined) { continue; }
+            if (pruneSpliceoutBlock(lines, i)) { continue; }
+            if (pruneInfBlock(lines, i)) { continue; }
         }
         return lines.filter(l => l !== undefined).join('\n');
     };
     const urlFromArg = arg => {
-        if ( typeof arg === 'string' ) { return arg; }
-        if ( arg instanceof Request ) { return arg.url; }
+        if (typeof arg === 'string') { return arg; }
+        if (arg instanceof Request) { return arg.url; }
         return String(arg);
     };
     proxyApplyFn('fetch', async function fetch(context) {
         const args = context.callArgs;
         const fetchPromise = context.reflect();
-        if ( reUrl.test(urlFromArg(args[0])) === false ) { return fetchPromise; }
+        if (reUrl.test(urlFromArg(args[0])) === false) { return fetchPromise; }
         const responseBefore = await fetchPromise;
         const responseClone = responseBefore.clone();
         const textBefore = await responseClone.text();
         const textAfter = pruner(textBefore);
-        if ( textAfter === textBefore ) { return responseBefore; }
+        if (textAfter === textBefore) { return responseBefore; }
         const responseAfter = new Response(textAfter, {
             status: responseBefore.status,
             statusText: responseBefore.statusText,
@@ -1620,7 +1620,7 @@ function m3uPrune(
             url: { value: responseBefore.url },
             type: { value: responseBefore.type },
         });
-        if ( toLog.length !== 0 ) {
+        if (toLog.length !== 0) {
             toLog.unshift(logPrefix);
             safe.uboLog(toLog.join('\n'));
         }
@@ -1628,19 +1628,19 @@ function m3uPrune(
     })
     self.XMLHttpRequest.prototype.open = new Proxy(self.XMLHttpRequest.prototype.open, {
         apply: async (target, thisArg, args) => {
-            if ( reUrl.test(urlFromArg(args[1])) === false ) {
+            if (reUrl.test(urlFromArg(args[1])) === false) {
                 return Reflect.apply(target, thisArg, args);
             }
-            thisArg.addEventListener('readystatechange', function() {
-                if ( thisArg.readyState !== 4 ) { return; }
+            thisArg.addEventListener('readystatechange', function () {
+                if (thisArg.readyState !== 4) { return; }
                 const type = thisArg.responseType;
-                if ( type !== '' && type !== 'text' ) { return; }
+                if (type !== '' && type !== 'text') { return; }
                 const textin = thisArg.responseText;
                 const textout = pruner(textin);
-                if ( textout === textin ) { return; }
+                if (textout === textin) { return; }
                 Object.defineProperty(thisArg, 'response', { value: textout });
                 Object.defineProperty(thisArg, 'responseText', { value: textout });
-                if ( toLog.length !== 0 ) {
+                if (toLog.length !== 0) {
                     toLog.unshift(logPrefix);
                     safe.uboLog(toLog.join('\n'));
                 }
@@ -1684,22 +1684,22 @@ builtinScriptlets.push({
 function callNothrow(
     chain = ''
 ) {
-    if ( typeof chain !== 'string' ) { return; }
-    if ( chain === '' ) { return; }
+    if (typeof chain !== 'string') { return; }
+    if (chain === '') { return; }
     const safe = safeSelf();
     const parts = safe.String_split.call(chain, '.');
     let owner = window, prop;
-    for (;;) {
+    for (; ;) {
         prop = parts.shift();
-        if ( parts.length === 0 ) { break; }
+        if (parts.length === 0) { break; }
         owner = owner[prop];
-        if ( owner instanceof Object === false ) { return; }
+        if (owner instanceof Object === false) { return; }
     }
-    if ( prop === '' ) { return; }
+    if (prop === '') { return; }
     const fn = owner[prop];
-    if ( typeof fn !== 'function' ) { return; }
+    if (typeof fn !== 'function') { return; }
     owner[prop] = new Proxy(fn, {
-        apply: function(...args) {
+        apply: function (...args) {
             let r;
             try {
                 r = Reflect.apply(...args);
@@ -1789,7 +1789,7 @@ function preventCanvas(
     const proto = globalThis.HTMLCanvasElement.prototype;
     proto.getContext = new Proxy(proto.getContext, {
         apply(target, thisArg, args) {
-            if ( safe.testPattern(pattern, args[0]) ) { return null; }
+            if (safe.testPattern(pattern, args[0])) { return null; }
             return Reflect.apply(target, thisArg, args);
         }
     });
@@ -1805,12 +1805,12 @@ builtinScriptlets.push({
 function multiup() {
     const handler = ev => {
         const target = ev.target;
-        if ( target.matches('button[link]') === false ) { return; }
+        if (target.matches('button[link]') === false) { return; }
         const ancestor = target.closest('form');
-        if ( ancestor === null ) { return; }
-        if ( ancestor !== target.parentElement ) { return; }
+        if (ancestor === null) { return; }
+        if (ancestor !== target.parentElement) { return; }
         const link = (target.getAttribute('link') || '').trim();
-        if ( link === '' ) { return; }
+        if (link === '') { return; }
         ev.preventDefault();
         ev.stopPropagation();
         document.location.href = link;
@@ -1851,8 +1851,8 @@ function multiup() {
  * stage of a document.
  * 
  * See commit messages for usage:
- * - https://github.com/gorhill/uBlock/commit/99ce027fd702
- * - https://github.com/gorhill/uBlock/commit/41876336db48
+ * - https://github.com/Ablock/Ablock/commit/99ce027fd702
+ * - https://github.com/Ablock/Ablock/commit/41876336db48
  * 
  **/
 
@@ -1926,7 +1926,7 @@ function trustedReplaceXhrResponse(
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('trusted-replace-xhr-response', pattern, replacement, propsToMatch);
     const xhrInstances = new WeakMap();
-    if ( pattern === '*' ) { pattern = '.*'; }
+    if (pattern === '*') { pattern = '.*'; }
     const rePattern = safe.patternToRegex(pattern);
     const propNeedles = parsePropertiesToMatchFn(propsToMatch, 'url');
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 3);
@@ -1936,13 +1936,13 @@ function trustedReplaceXhrResponse(
             const outerXhr = this;
             const xhrDetails = { method, url };
             let outcome = 'match';
-            if ( propNeedles.size !== 0 ) {
-                if ( matchObjectPropertiesFn(propNeedles, xhrDetails) === undefined ) {
+            if (propNeedles.size !== 0) {
+                if (matchObjectPropertiesFn(propNeedles, xhrDetails) === undefined) {
                     outcome = 'nomatch';
                 }
             }
-            if ( outcome === 'match' ) {
-                if ( safe.logLevel > 1 ) {
+            if (outcome === 'match') {
+                if (safe.logLevel > 1) {
                     safe.uboLog(logPrefix, `Matched "propsToMatch"`);
                 }
                 xhrInstances.set(outerXhr, xhrDetails);
@@ -1952,35 +1952,35 @@ function trustedReplaceXhrResponse(
         get response() {
             const innerResponse = super.response;
             const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails === undefined ) {
+            if (xhrDetails === undefined) {
                 return innerResponse;
             }
             const responseLength = typeof innerResponse === 'string'
                 ? innerResponse.length
                 : undefined;
-            if ( xhrDetails.lastResponseLength !== responseLength ) {
+            if (xhrDetails.lastResponseLength !== responseLength) {
                 xhrDetails.response = undefined;
                 xhrDetails.lastResponseLength = responseLength;
             }
-            if ( xhrDetails.response !== undefined ) {
+            if (xhrDetails.response !== undefined) {
                 return xhrDetails.response;
             }
-            if ( typeof innerResponse !== 'string' ) {
+            if (typeof innerResponse !== 'string') {
                 return (xhrDetails.response = innerResponse);
             }
-            if ( reIncludes && reIncludes.test(innerResponse) === false ) {
+            if (reIncludes && reIncludes.test(innerResponse) === false) {
                 return (xhrDetails.response = innerResponse);
             }
             const textBefore = innerResponse;
             const textAfter = textBefore.replace(rePattern, replacement);
-            if ( textAfter !== textBefore ) {
+            if (textAfter !== textBefore) {
                 safe.uboLog(logPrefix, 'Match');
             }
             return (xhrDetails.response = textAfter);
         }
         get responseText() {
             const response = this.response;
-            if ( typeof response !== 'string' ) {
+            if (typeof response !== 'string') {
                 return super.responseText;
             }
             return response;
@@ -2017,23 +2017,23 @@ function trustedClickElement(
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('trusted-click-element', selectors, extraMatch, delay);
 
-    if ( extraMatch !== '' ) {
+    if (extraMatch !== '') {
         const assertions = safe.String_split.call(extraMatch, ',').map(s => {
             const pos1 = s.indexOf(':');
             const s1 = pos1 !== -1 ? s.slice(0, pos1) : s;
             const not = s1.startsWith('!');
             const type = not ? s1.slice(1) : s1;
-            const s2 = pos1 !== -1 ? s.slice(pos1+1).trim() : '';
-            if ( s2 === '' ) { return; }
+            const s2 = pos1 !== -1 ? s.slice(pos1 + 1).trim() : '';
+            if (s2 === '') { return; }
             const out = { not, type };
             const match = /^\/(.+)\/(i?)$/.exec(s2);
-            if ( match !== null ) {
+            if (match !== null) {
                 out.re = new RegExp(match[1], match[2] || undefined);
                 return out;
             }
             const pos2 = s2.indexOf('=');
             const key = pos2 !== -1 ? s2.slice(0, pos2).trim() : s2;
-            const value = pos2 !== -1 ? s2.slice(pos2+1).trim() : '';
+            const value = pos2 !== -1 ? s2.slice(pos2 + 1).trim() : '';
             out.re = new RegExp(`^${this.escapeRegexChars(key)}=${this.escapeRegexChars(value)}`);
             return out;
         }).filter(details => details !== undefined);
@@ -2044,31 +2044,31 @@ function trustedClickElement(
             ? getAllLocalStorageFn()
             : [];
         const hasNeedle = (haystack, needle) => {
-            for ( const { key, value } of haystack ) {
-                if ( needle.test(`${key}=${value}`) ) { return true; }
+            for (const { key, value } of haystack) {
+                if (needle.test(`${key}=${value}`)) { return true; }
             }
             return false;
         };
-        for ( const { not, type, re } of assertions ) {
-            switch ( type ) {
-            case 'cookie':
-                if ( hasNeedle(allCookies, re) === not ) { return; }
-                break;
-            case 'localStorage':
-                if ( hasNeedle(allStorageItems, re) === not ) { return; }
-                break;
+        for (const { not, type, re } of assertions) {
+            switch (type) {
+                case 'cookie':
+                    if (hasNeedle(allCookies, re) === not) { return; }
+                    break;
+                case 'localStorage':
+                    if (hasNeedle(allStorageItems, re) === not) { return; }
+                    break;
             }
         }
     }
 
     const getShadowRoot = elem => {
         // Firefox
-        if ( elem.openOrClosedShadowRoot ) {
+        if (elem.openOrClosedShadowRoot) {
             return elem.openOrClosedShadowRoot;
         }
         // Chromium
-        if ( typeof chrome === 'object' ) {
-            if ( chrome.dom && chrome.dom.openOrClosedShadowRoot ) {
+        if (typeof chrome === 'object') {
+            if (chrome.dom && chrome.dom.openOrClosedShadowRoot) {
                 return chrome.dom.openOrClosedShadowRoot(elem);
             }
         }
@@ -2077,45 +2077,45 @@ function trustedClickElement(
 
     const querySelectorEx = (selector, context = document) => {
         const pos = selector.indexOf(' >>> ');
-        if ( pos === -1 ) { return context.querySelector(selector); }
+        if (pos === -1) { return context.querySelector(selector); }
         const outside = selector.slice(0, pos).trim();
         const inside = selector.slice(pos + 5).trim();
         const elem = context.querySelector(outside);
-        if ( elem === null ) { return null; }
+        if (elem === null) { return null; }
         const shadowRoot = getShadowRoot(elem);
         return shadowRoot && querySelectorEx(inside, shadowRoot);
     };
 
     const steps = safe.String_split.call(selectors, /\s*,\s*/).map(a => {
-        if ( /^\d+$/.test(a) ) { return parseInt(a, 10); }
+        if (/^\d+$/.test(a)) { return parseInt(a, 10); }
         return a;
     });
-    if ( steps.length === 0 ) { return; }
+    if (steps.length === 0) { return; }
     const clickDelay = parseInt(delay, 10) || 1;
-    for ( let i = steps.length-1; i > 0; i-- ) {
-        if ( typeof steps[i] !== 'string' ) { continue; }
-        if ( typeof steps[i-1] !== 'string' ) { continue; }
+    for (let i = steps.length - 1; i > 0; i--) {
+        if (typeof steps[i] !== 'string') { continue; }
+        if (typeof steps[i - 1] !== 'string') { continue; }
         steps.splice(i, 0, clickDelay);
     }
-    if ( steps.length === 1 && delay !== '' ) {
+    if (steps.length === 1 && delay !== '') {
         steps.unshift(clickDelay);
     }
-    if ( typeof steps.at(-1) !== 'number' ) {
+    if (typeof steps.at(-1) !== 'number') {
         steps.push(10000);
     }
 
     const waitForTime = ms => {
         return new Promise(resolve => {
             safe.uboLog(logPrefix, `Waiting for ${ms} ms`);
-            waitForTime.timer = setTimeout(( ) => {
+            waitForTime.timer = setTimeout(() => {
                 waitForTime.timer = undefined;
                 resolve();
             }, ms);
         });
     };
-    waitForTime.cancel = ( ) => {
+    waitForTime.cancel = () => {
         const { timer } = waitForTime;
-        if ( timer === undefined ) { return; }
+        if (timer === undefined) { return; }
         clearTimeout(timer);
         waitForTime.timer = undefined;
     };
@@ -2123,15 +2123,15 @@ function trustedClickElement(
     const waitForElement = selector => {
         return new Promise(resolve => {
             const elem = querySelectorEx(selector);
-            if ( elem !== null ) {
+            if (elem !== null) {
                 elem.click();
                 resolve();
                 return;
             }
             safe.uboLog(logPrefix, `Waiting for ${selector}`);
-            const observer = new MutationObserver(( ) => {
+            const observer = new MutationObserver(() => {
                 const elem = querySelectorEx(selector);
-                if ( elem === null ) { return; }
+                if (elem === null) { return; }
                 waitForElement.cancel();
                 elem.click();
                 resolve();
@@ -2144,44 +2144,44 @@ function trustedClickElement(
             waitForElement.observer = observer;
         });
     };
-    waitForElement.cancel = ( ) => {
+    waitForElement.cancel = () => {
         const { observer } = waitForElement;
-        if ( observer === undefined ) { return; }
+        if (observer === undefined) { return; }
         waitForElement.observer = undefined;
         observer.disconnect();
     };
 
     const waitForTimeout = ms => {
         waitForTimeout.cancel();
-        waitForTimeout.timer = setTimeout(( ) => {
+        waitForTimeout.timer = setTimeout(() => {
             waitForTimeout.timer = undefined;
             terminate();
             safe.uboLog(logPrefix, `Timed out after ${ms} ms`);
         }, ms);
     };
-    waitForTimeout.cancel = ( ) => {
-        if ( waitForTimeout.timer === undefined ) { return; }
+    waitForTimeout.cancel = () => {
+        if (waitForTimeout.timer === undefined) { return; }
         clearTimeout(waitForTimeout.timer);
         waitForTimeout.timer = undefined;
     };
 
-    const terminate = ( ) => {
+    const terminate = () => {
         waitForTime.cancel();
         waitForElement.cancel();
         waitForTimeout.cancel();
     };
 
-    const process = async ( ) => {
+    const process = async () => {
         waitForTimeout(steps.pop());
-        while ( steps.length !== 0 ) {
+        while (steps.length !== 0) {
             const step = steps.shift();
-            if ( step === undefined ) { break; }
-            if ( typeof step === 'number' ) {
+            if (step === undefined) { break; }
+            if (typeof step === 'number') {
                 await waitForTime(step);
-                if ( step === 1 ) { continue; }
+                if (step === 1) { continue; }
                 continue;
             }
-            if ( step.startsWith('!') ) { continue; }
+            if (step.startsWith('!')) { continue; }
             await waitForElement(step);
             safe.uboLog(logPrefix, `Clicked ${step}`);
         }
@@ -2208,7 +2208,7 @@ function trustedReplaceOutboundText(
     rawReplacement = '',
     ...args
 ) {
-    if ( propChain === '' ) { return; }
+    if (propChain === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('trusted-replace-outbound-text', propChain, rawPattern, rawReplacement, ...args);
     const rePattern = safe.patternToRegex(rawPattern);
@@ -2217,27 +2217,27 @@ function trustedReplaceOutboundText(
         : rawReplacement;
     const extraArgs = safe.getExtraArgs(args);
     const reCondition = safe.patternToRegex(extraArgs.condition || '');
-    proxyApplyFn(propChain, function(context) {
+    proxyApplyFn(propChain, function (context) {
         const encodedTextBefore = context.reflect();
         let textBefore = encodedTextBefore;
-        if ( extraArgs.encoding === 'base64' ) {
+        if (extraArgs.encoding === 'base64') {
             try { textBefore = self.atob(encodedTextBefore); }
             catch { return encodedTextBefore; }
         }
-        if ( rawPattern === '' ) {
+        if (rawPattern === '') {
             safe.uboLog(logPrefix, 'Decoded outbound text:\n', textBefore);
             return encodedTextBefore;
         }
         reCondition.lastIndex = 0;
-        if ( reCondition.test(textBefore) === false ) { return encodedTextBefore; }
+        if (reCondition.test(textBefore) === false) { return encodedTextBefore; }
         const textAfter = textBefore.replace(rePattern, replacement);
-        if ( textAfter === textBefore ) { return encodedTextBefore; }
+        if (textAfter === textBefore) { return encodedTextBefore; }
         safe.uboLog(logPrefix, 'Matched and replaced');
-        if ( safe.logLevel > 1 ) {
+        if (safe.logLevel > 1) {
             safe.uboLog(logPrefix, 'Modified decoded outbound text:\n', textAfter);
         }
         let encodedTextAfter = textAfter;
-        if ( extraArgs.encoding === 'base64' ) {
+        if (extraArgs.encoding === 'base64') {
             encodedTextAfter = self.btoa(textAfter);
         }
         return encodedTextAfter;
@@ -2275,63 +2275,63 @@ function trustedSuppressNativeMethod(
     how = '',
     stack = ''
 ) {
-    if ( methodPath === '' ) { return; }
+    if (methodPath === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('trusted-suppress-native-method', methodPath, signature, how, stack);
     const signatureArgs = safe.String_split.call(signature, /\s*\|\s*/).map(v => {
-        if ( /^".*"$/.test(v) ) {
+        if (/^".*"$/.test(v)) {
             return { type: 'pattern', re: safe.patternToRegex(v.slice(1, -1)) };
         }
-        if ( /^\/.+\/$/.test(v) ) {
+        if (/^\/.+\/$/.test(v)) {
             return { type: 'pattern', re: safe.patternToRegex(v) };
         }
-        if ( v === 'false' ) {
+        if (v === 'false') {
             return { type: 'exact', value: false };
         }
-        if ( v === 'true' ) {
+        if (v === 'true') {
             return { type: 'exact', value: true };
         }
-        if ( v === 'null' ) {
+        if (v === 'null') {
             return { type: 'exact', value: null };
         }
-        if ( v === 'undefined' ) {
+        if (v === 'undefined') {
             return { type: 'exact', value: undefined };
         }
     });
     const stackNeedle = safe.initPattern(stack, { canNegate: true });
-    proxyApplyFn(methodPath, function(context) {
+    proxyApplyFn(methodPath, function (context) {
         const { callArgs } = context;
-        if ( signature === '' ) {
+        if (signature === '') {
             safe.uboLog(logPrefix, `Arguments:\n${callArgs.join('\n')}`);
             return context.reflect();
         }
-        for ( let i = 0; i < signatureArgs.length; i++ ) {
+        for (let i = 0; i < signatureArgs.length; i++) {
             const signatureArg = signatureArgs[i];
-            if ( signatureArg === undefined ) { continue; }
+            if (signatureArg === undefined) { continue; }
             const targetArg = i < callArgs.length ? callArgs[i] : undefined;
-            if ( signatureArg.type === 'exact' ) {
-                if ( targetArg !== signatureArg.value ) {
+            if (signatureArg.type === 'exact') {
+                if (targetArg !== signatureArg.value) {
                     return context.reflect();
                 }
             }
-            if ( signatureArg.type === 'pattern' ) {
-                if ( safe.RegExp_test.call(signatureArg.re, targetArg) === false ) {
+            if (signatureArg.type === 'pattern') {
+                if (safe.RegExp_test.call(signatureArg.re, targetArg) === false) {
                     return context.reflect();
                 }
             }
         }
-        if ( stackNeedle.matchAll !== true ) {
+        if (stackNeedle.matchAll !== true) {
             const logLevel = safe.logLevel > 1 ? 'all' : '';
-            if ( matchesStackTraceFn(stackNeedle, logLevel) === false ) {
+            if (matchesStackTraceFn(stackNeedle, logLevel) === false) {
                 return context.reflect();
             }
         }
-        if ( how === 'debug' ) {
+        if (how === 'debug') {
             debugger; // eslint-disable-line no-debugger
             return context.reflect();
         }
         safe.uboLog(logPrefix, `Suppressed:\n${callArgs.join('\n')}`);
-        if ( how === 'abort' ) {
+        if (how === 'abort') {
             throw new ReferenceError();
         }
     });
@@ -2402,30 +2402,30 @@ function trustedPreventDomBypass(
     methodPath = '',
     targetProp = ''
 ) {
-    if ( methodPath === '' ) { return; }
+    if (methodPath === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('trusted-prevent-dom-bypass', methodPath, targetProp);
-    proxyApplyFn(methodPath, function(context) {
+    proxyApplyFn(methodPath, function (context) {
         const elems = new Set(context.callArgs.filter(e => e instanceof HTMLElement));
         const r = context.reflect();
-        if ( elems.length === 0 ) { return r; }
-        for ( const elem of elems ) {
+        if (elems.length === 0) { return r; }
+        for (const elem of elems) {
             try {
-                if ( `${elem.contentWindow}` !== '[object Window]' ) { continue; }
-                if ( elem.contentWindow.location.href !== 'about:blank' ) {
-                    if ( elem.contentWindow.location.href !== self.location.href ) {
+                if (`${elem.contentWindow}` !== '[object Window]') { continue; }
+                if (elem.contentWindow.location.href !== 'about:blank') {
+                    if (elem.contentWindow.location.href !== self.location.href) {
                         continue;
                     }
                 }
-                if ( targetProp !== '' ) {
+                if (targetProp !== '') {
                     let me = self, it = elem.contentWindow;
                     let chain = targetProp;
-                    for (;;) {
+                    for (; ;) {
                         const pos = chain.indexOf('.');
-                        if ( pos === -1 ) { break; }
+                        if (pos === -1) { break; }
                         const prop = chain.slice(0, pos);
                         me = me[prop]; it = it[prop];
-                        chain = chain.slice(pos+1);
+                        chain = chain.slice(pos + 1);
                     }
                     it[chain] = me[chain];
                 } else {
@@ -2478,28 +2478,28 @@ function trustedOverrideElementMethod(
     selector = '',
     disposition = ''
 ) {
-    if ( methodPath === '' ) { return; }
+    if (methodPath === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('trusted-override-element-method', methodPath, selector, disposition);
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 3);
-    proxyApplyFn(methodPath, function(context) {
+    proxyApplyFn(methodPath, function (context) {
         let override = selector === '';
-        if ( override === false ) {
+        if (override === false) {
             const { thisArg } = context;
             try {
                 override = thisArg.closest(selector) === thisArg;
             } catch {
             }
         }
-        if ( override === false ) {
+        if (override === false) {
             return context.reflect();
         }
         safe.uboLog(logPrefix, 'Overridden');
-        if ( disposition === '' ) { return; }
-        if ( disposition === 'debug' && safe.logLevel !== 0 ) {
+        if (disposition === '') { return; }
+        if (disposition === 'debug' && safe.logLevel !== 0) {
             debugger; // eslint-disable-line no-debugger
         }
-        if ( disposition === 'throw' ) {
+        if (disposition === 'throw') {
             throw new ReferenceError();
         }
         return validateConstantFn(true, disposition, extraArgs);

@@ -42,7 +42,7 @@
 
 /* Common uBO styles */
 body {
-    background-color: var(--surface-1);
+    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 50%, var(--surface-3) 100%);
     border: 0;
     box-sizing: border-box;
     color: var(--ink-1);

@@ -1,6 +1,6 @@
 एक बेहतर ब्लॉकर : एक बेहतर ब्लॉक कर जो मेमोरी और सीपीयू पर ज्यादा जोर नहीं देता, और जो हजारों फिल्टरों को आसानी से लोड करके और लागू कर सकता है दूसरे लोकप्रिय ब्लॉकरों से।
 
-अपनी काबिलियत का ओवरव्यू: https://github.com/gorhill/uBlock/wiki/uBlock-vs.-ABP:-efficiency-compared
+अपनी काबिलियत का ओवरव्यू: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 इस्तेमाल: बड़ा पावर बटन पॉपअप uBlock को मौजूदा वेबसाइट में बंद या चालू करने के लिए है। यह सिर्फ मौजूदा वेब साइट पर लागू होता है, यह एक ग्लोबल पावर बटन नहीं है।
 
@@ -38,7 +38,7 @@
 ओपन-सोर्स पब्लिक लाइसेंस के साथ (GPLv3)
 उपयोगकर्ताओं द्वारा उपयोगकर्ताओं के लिए।
 
-योगदानकर्ताओं @ Github: https://github.com/gorhill/uBlock/graphs/contributors
+योगदानकर्ताओं @ Github: https://github.com/Ablock/Ablock/graphs/contributors
 योगदानकर्ताओं @ Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@
 It's quite an early version, keep this in mind when you review.
 
 प्रोजेक्ट परिवर्तन लॉग:
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases

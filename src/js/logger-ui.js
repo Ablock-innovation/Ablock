@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -59,18 +59,18 @@ let cnameOfEnabled = false;
 
 // Various helpers.
 
-const tabIdFromPageSelector = logger.tabIdFromPageSelector = function() {
+const tabIdFromPageSelector = logger.tabIdFromPageSelector = function () {
     const value = qs$('#pageSelector').value;
     return value !== '_' ? (parseInt(value, 10) || 0) : activeTabId;
 };
 
-const tabIdFromAttribute = function(elem) {
+const tabIdFromAttribute = function (elem) {
     const value = dom.attr(elem, 'data-tabid') || '';
     const tabId = parseInt(value, 10);
     return isNaN(tabId) ? 0 : tabId;
 };
 
-const dispatchTabidChange = vAPI.defer.create(( ) => {
+const dispatchTabidChange = vAPI.defer.create(() => {
     document.dispatchEvent(new Event('tabIdChanged'));
 });
 
@@ -81,19 +81,19 @@ const escapeRegexStr = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Current design allows for only one modal DOM-based dialog at any given time.
 //
-const modalDialog = (( ) => {
+const modalDialog = (() => {
     const overlay = qs$('#modalOverlay');
     const container = qs$('#modalOverlayContainer');
     const closeButton = qs$(overlay, ':scope .closeButton');
     let onDestroyed;
 
-    const removeChildren = logger.removeAllChildren = function(node) {
-        while ( node.firstChild ) {
+    const removeChildren = logger.removeAllChildren = function (node) {
+        while (node.firstChild) {
             node.removeChild(node.firstChild);
         }
     };
 
-    const create = function(selector, destroyListener) {
+    const create = function (selector, destroyListener) {
         const template = qs$(selector);
         const dialog = dom.clone(template);
         removeChildren(container);
@@ -102,22 +102,22 @@ const modalDialog = (( ) => {
         return dialog;
     };
 
-    const show = function() {
+    const show = function () {
         dom.cl.add(overlay, 'on');
     };
 
-    const destroy = function() {
+    const destroy = function () {
         dom.cl.remove(overlay, 'on');
         const dialog = container.firstElementChild;
         removeChildren(container);
-        if ( typeof onDestroyed === 'function' ) {
+        if (typeof onDestroyed === 'function') {
             onDestroyed(dialog);
         }
         onDestroyed = undefined;
     };
 
-    const onClose = function(ev) {
-        if ( ev.target === overlay || ev.target === closeButton ) {
+    const onClose = function (ev) {
+        if (ev.target === overlay || ev.target === closeButton) {
             destroy();
         }
     };
@@ -153,11 +153,11 @@ let allTabIdsToken;
 /******************************************************************************/
 /******************************************************************************/
 
-const regexFromURLFilteringResult = function(result) {
+const regexFromURLFilteringResult = function (result) {
     const beg = result.indexOf(' ');
     const end = result.indexOf(' ', beg + 1);
     const url = result.slice(beg + 1, end);
-    if ( url === '*' ) {
+    if (url === '*') {
         return new RegExp('^.*$', 'gi');
     }
     return new RegExp('^' + escapeRegexStr(url), 'gi');
@@ -167,19 +167,19 @@ const regexFromURLFilteringResult = function(result) {
 
 // Emphasize hostname in URL, as this is what matters in uMatrix's rules.
 
-const nodeFromURL = function(parent, url, re, type) {
+const nodeFromURL = function (parent, url, re, type) {
     const fragment = document.createDocumentFragment();
-    if ( re === undefined ) {
+    if (re === undefined) {
         fragment.textContent = url;
     } else {
-        if ( typeof re === 'string' ) {
+        if (typeof re === 'string') {
             re = new RegExp(escapeRegexStr(re), 'g');
         }
         const matches = re.exec(url);
-        if ( matches === null || matches[0].length === 0 ) {
+        if (matches === null || matches[0].length === 0) {
             fragment.textContent = url;
         } else {
-            if ( matches.index !== 0 ) {
+            if (matches.index !== 0) {
                 fragment.appendChild(
                     document.createTextNode(url.slice(0, matches.index))
                 );
@@ -187,28 +187,28 @@ const nodeFromURL = function(parent, url, re, type) {
             const b = document.createElement('b');
             b.textContent = url.slice(matches.index, re.lastIndex);
             fragment.appendChild(b);
-            if ( re.lastIndex !== url.length ) {
+            if (re.lastIndex !== url.length) {
                 fragment.appendChild(
                     document.createTextNode(url.slice(re.lastIndex))
                 );
             }
         }
     }
-    if ( /^https?:\/\//.test(url) ) {
+    if (/^https?:\/\//.test(url)) {
         const a = document.createElement('a');
         let href = url;
-        switch ( type ) {
-        case 'css':
-        case 'doc':
-        case 'frame':
-        case 'object':
-        case 'other':
-        case 'script':
-        case 'xhr':
-            href = `code-viewer.html?url=${encodeURIComponent(href)}`;
-            break;
-        default:
-            break;
+        switch (type) {
+            case 'css':
+            case 'doc':
+            case 'frame':
+            case 'object':
+            case 'other':
+            case 'script':
+            case 'xhr':
+                href = `code-viewer.html?url=${encodeURIComponent(href)}`;
+                break;
+            default:
+                break;
         }
         dom.attr(a, 'href', href);
         dom.attr(a, 'target', '_blank');
@@ -219,11 +219,11 @@ const nodeFromURL = function(parent, url, re, type) {
 
 /******************************************************************************/
 
-const padTo2 = function(v) {
+const padTo2 = function (v) {
     return v < 10 ? '0' + v : v;
 };
 
-const normalizeToStr = function(s) {
+const normalizeToStr = function (s) {
     return typeof s === 'string' && s !== '' ? s : '';
 };
 
@@ -248,21 +248,21 @@ class LogEntry {
         this.tstamp = 0;
         this.type = '';
         this.voided = false;
-        if ( details instanceof Object === false ) { return; }
-        for ( const prop in this ) {
-            if ( Object.hasOwn(details, prop) === false ) { continue; }
+        if (details instanceof Object === false) { return; }
+        for (const prop in this) {
+            if (Object.hasOwn(details, prop) === false) { continue; }
             this[prop] = details[prop];
         }
-        if ( details.aliasURL !== undefined ) {
+        if (details.aliasURL !== undefined) {
             this.aliased = true;
         }
-        if ( this.tabDomain === '' ) {
+        if (this.tabDomain === '') {
             this.tabDomain = this.tabHostname || '';
         }
-        if ( this.docDomain === '' ) {
+        if (this.docDomain === '') {
             this.docDomain = this.docHostname || '';
         }
-        if ( this.domain === '' ) {
+        if (this.domain === '') {
             this.domain = details.hostname || '';
         }
     }
@@ -270,7 +270,7 @@ class LogEntry {
 
 /******************************************************************************/
 
-const createLogSeparator = function(details, text) {
+const createLogSeparator = function (details, text) {
     const separator = new LogEntry();
     separator.tstamp = details.tstamp;
     separator.realm = 'message';
@@ -283,14 +283,14 @@ const createLogSeparator = function(details, text) {
     textContent.push(
         // cell 0
         padTo2(logDate.getUTCHours()) + ':' +
-            padTo2(logDate.getUTCMinutes()) + ':' +
-            padTo2(logDate.getSeconds()),
+        padTo2(logDate.getUTCMinutes()) + ':' +
+        padTo2(logDate.getSeconds()),
         // cell 1
         text
     );
     separator.textContent = textContent.join('\x1F');
 
-    if ( details.voided ) {
+    if (details.voided) {
         separator.voided = true;
     }
 
@@ -303,25 +303,25 @@ const createLogSeparator = function(details, text) {
 //       unshift(). This will require inverting the access logic
 //       throughout the code.
 //
-const processLoggerEntries = function(response) {
+const processLoggerEntries = function (response) {
     const entries = response.entries;
-    if ( entries.length === 0 ) { return; }
+    if (entries.length === 0) { return; }
 
     const autoDeleteVoidedRows = qs$('#pageSelector').value === '_';
     const previousCount = filteredLoggerEntries.length;
 
-    for ( const entry of entries ) {
+    for (const entry of entries) {
         const unboxed = JSON.parse(entry);
-        if ( unboxed.filter instanceof Object ){
+        if (unboxed.filter instanceof Object) {
             loggerStats.processFilter(unboxed.filter);
         }
-        if ( netInspectorPaused ) { continue; }
+        if (netInspectorPaused) { continue; }
         const parsed = parseLogEntry(unboxed);
         if (
             parsed.tabId !== undefined &&
             allTabIds.has(parsed.tabId) === false
         ) {
-            if ( autoDeleteVoidedRows ) { continue; }
+            if (autoDeleteVoidedRows) { continue; }
             parsed.voided = true;
         }
         if (
@@ -333,28 +333,28 @@ const processLoggerEntries = function(response) {
         ) {
             const separator = createLogSeparator(parsed, unboxed.url);
             loggerEntries.unshift(separator);
-            if ( rowFilterer.filterOne(separator) ) {
+            if (rowFilterer.filterOne(separator)) {
                 filteredLoggerEntries.unshift(separator);
-                if ( separator.voided ) {
+                if (separator.voided) {
                     filteredLoggerEntryVoidedCount += 1;
                 }
             }
         }
-        if ( cnameOfEnabled === false && parsed.aliased ) {
+        if (cnameOfEnabled === false && parsed.aliased) {
             qs$('#filterExprCnameOf').style.display = '';
             cnameOfEnabled = true;
         }
         loggerEntries.unshift(parsed);
-        if ( rowFilterer.filterOne(parsed) ) {
+        if (rowFilterer.filterOne(parsed)) {
             filteredLoggerEntries.unshift(parsed);
-            if ( parsed.voided ) {
+            if (parsed.voided) {
                 filteredLoggerEntryVoidedCount += 1;
             }
         }
     }
 
     const addedCount = filteredLoggerEntries.length - previousCount;
-    if ( addedCount === 0 ) { return; }
+    if (addedCount === 0) { return; }
     viewPort.updateContent(addedCount);
     rowJanitor.inserted(addedCount);
     consolePane.updateContent();
@@ -362,9 +362,9 @@ const processLoggerEntries = function(response) {
 
 /******************************************************************************/
 
-const parseLogEntry = function(details) {
+const parseLogEntry = function (details) {
     // Patch realm until changed all over codebase to make this unnecessary
-    if ( details.realm === 'cosmetic' ) {
+    if (details.realm === 'cosmetic') {
         details.realm = 'extended';
     }
 
@@ -383,12 +383,12 @@ const parseLogEntry = function(details) {
     );
 
     // Cell 1
-    if ( details.realm === 'message' ) {
+    if (details.realm === 'message') {
         textContent.push(details.text);
-        if ( details.type ) {
+        if (details.type) {
             textContent.push(details.type);
         }
-        if ( details.keywords ) {
+        if (details.keywords) {
             textContent.push(...details.keywords);
         }
         entry.textContent = textContent.join('\x1F') + '\x1F';
@@ -396,15 +396,15 @@ const parseLogEntry = function(details) {
     }
 
     // Cell 1, 2
-    if ( entry.filter !== undefined ) {
+    if (entry.filter !== undefined) {
         textContent.push(entry.filter.raw);
-        if ( entry.filter.result === 1 ) {
+        if (entry.filter.result === 1) {
             textContent.push('--');
-        } else if ( entry.filter.result === 2 ) {
+        } else if (entry.filter.result === 2) {
             textContent.push('++');
-        } else if ( entry.filter.result === 3 ) {
+        } else if (entry.filter.result === 3) {
             textContent.push('**');
-        } else if ( entry.filter.source === 'redirect' ) {
+        } else if (entry.filter.source === 'redirect') {
             textContent.push('<<');
         } else {
             textContent.push('');
@@ -423,17 +423,17 @@ const parseLogEntry = function(details) {
         entry.domain !== ''
     ) {
         let partyness = '';
-        if ( entry.tabDomain !== undefined ) {
-            if ( entry.tabId < 0 ) {
+        if (entry.tabDomain !== undefined) {
+            if (entry.tabId < 0) {
                 partyness += '0,';
             }
             partyness += entry.domain === entry.tabDomain ? '1' : '3';
         } else {
             partyness += '?';
         }
-        if ( entry.docDomain !== entry.tabDomain ) {
+        if (entry.docDomain !== entry.tabDomain) {
             partyness += ',';
-            if ( entry.docDomain !== undefined ) {
+            if (entry.docDomain !== undefined) {
                 partyness += entry.domain === entry.docDomain ? '1' : '3';
             } else {
                 partyness += '?';
@@ -458,7 +458,7 @@ const parseLogEntry = function(details) {
     // Hidden cells -- useful for row-filtering purpose
 
     // Cell 8
-    if ( entry.aliased ) {
+    if (entry.aliased) {
         textContent.push(`aliasURL=${details.aliasURL}`);
     }
 
@@ -468,7 +468,7 @@ const parseLogEntry = function(details) {
 
 /******************************************************************************/
 
-const viewPort = (( ) => {
+const viewPort = (() => {
     const vwRenderer = qs$('#vwRenderer');
     const vwScroller = qs$('#vwScroller');
     const vwVirtualContent = qs$('#vwVirtualContent');
@@ -477,7 +477,7 @@ const viewPort = (( ) => {
     const vwLogEntryTemplate = qs$('#logEntryTemplate > div');
     const vwEntries = [];
 
-    const detailableRealms = new Set([ 'network', 'extended' ]);
+    const detailableRealms = new Set(['network', 'extended']);
 
     let vwHeight = 0;
     let lineHeight = 0;
@@ -485,31 +485,31 @@ const viewPort = (( ) => {
     let lastTopPix = 0;
     let lastTopRow = 0;
 
-    const ViewEntry = function() {
+    const ViewEntry = function () {
         this.div = document.createElement('div');
         this.div.className = 'logEntry';
         vwContent.appendChild(this.div);
         this.logEntry = undefined;
     };
     ViewEntry.prototype = {
-        dispose: function() {
+        dispose: function () {
             vwContent.removeChild(this.div);
         },
     };
 
-    const rowFromScrollTopPix = function(px) {
+    const rowFromScrollTopPix = function (px) {
         return lineHeight !== 0 ? Math.floor(px / lineHeight) : 0;
     };
 
     // This is called when the browser fired scroll events
-    const onScrollChanged = function() {
+    const onScrollChanged = function () {
         const newScrollTopPix = vwScroller.scrollTop;
         const delta = newScrollTopPix - lastTopPix;
-        if ( delta === 0 ) { return; }
+        if (delta === 0) { return; }
         lastTopPix = newScrollTopPix;
-        if ( filteredLoggerEntries.length <= 2 ) { return; }
+        if (filteredLoggerEntries.length <= 2) { return; }
         // No entries were rolled = all entries keep their current details
-        if ( rollLines(rowFromScrollTopPix(newScrollTopPix)) ) {
+        if (rollLines(rowFromScrollTopPix(newScrollTopPix))) {
             fillLines();
         }
         positionLines();
@@ -518,12 +518,12 @@ const viewPort = (( ) => {
 
     // Coalesce scroll events
     const scrollTimer = vAPI.defer.create(onScrollChanged);
-    const onScroll = ( ) => {
-        scrollTimer.onvsync(1000/32);
+    const onScroll = () => {
+        scrollTimer.onvsync(1000 / 32);
     };
     dom.on(vwScroller, 'scroll', onScroll, { passive: true });
 
-    const onLayoutChanged = function() {
+    const onLayoutChanged = function () {
         vwHeight = vwRenderer.clientHeight;
         vwContent.style.height = `${vwScroller.clientHeight}px`;
 
@@ -532,21 +532,21 @@ const viewPort = (( ) => {
 
         let newLineHeight = qs$(vwLineSizer, '.oneLine').clientHeight;
 
-        if ( vExpanded ) {
+        if (vExpanded) {
             newLineHeight *= loggerSettings.linesPerEntry;
         }
 
         const lineCount = newLineHeight !== 0
             ? Math.ceil(vwHeight / newLineHeight) + 1
             : 0;
-        if ( lineCount > vwEntries.length ) {
+        if (lineCount > vwEntries.length) {
             do {
                 vwEntries.push(new ViewEntry());
-            } while ( lineCount > vwEntries.length );
-        } else if ( lineCount < vwEntries.length ) {
+            } while (lineCount > vwEntries.length);
+        } else if (lineCount < vwEntries.length) {
             do {
                 vwEntries.pop().dispose();
-            } while ( lineCount < vwEntries.length );
+            } while (lineCount < vwEntries.length);
         }
 
         const cellWidths = Array.from(
@@ -563,12 +563,12 @@ const viewPort = (( ) => {
             cellWidths[COLUMN_METHOD] +
             cellWidths[COLUMN_TYPE];
         cellWidths[COLUMN_URL] = 0.5;
-        if ( cellWidths[COLUMN_FILTER] === 0 && cellWidths[COLUMN_INITIATOR] === 0 ) {
+        if (cellWidths[COLUMN_FILTER] === 0 && cellWidths[COLUMN_INITIATOR] === 0) {
             cellWidths[COLUMN_URL] = 1;
-        } else if ( cellWidths[COLUMN_FILTER] === 0 ) {
+        } else if (cellWidths[COLUMN_FILTER] === 0) {
             cellWidths[COLUMN_INITIATOR] = 0.35;
             cellWidths[COLUMN_URL] = 0.65;
-        } else if ( cellWidths[COLUMN_INITIATOR] === 0 ) {
+        } else if (cellWidths[COLUMN_INITIATOR] === 0) {
             cellWidths[COLUMN_FILTER] = 0.35;
             cellWidths[COLUMN_URL] = 0.65;
         } else {
@@ -581,37 +581,37 @@ const viewPort = (( ) => {
             '#vwContent .logEntry {',
             `  height: ${newLineHeight}px;`,
             '}',
-            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_TIMESTAMP+1}) {`,
+            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_TIMESTAMP + 1}) {`,
             `  width: ${cellWidths[COLUMN_TIMESTAMP]}px;`,
             '}',
-            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_FILTER+1}) {`,
+            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_FILTER + 1}) {`,
             `  width: calc(calc(100% - ${reservedWidth}px) * ${cellWidths[COLUMN_FILTER]});`,
             '}',
-            `#vwContent .logEntry > div.messageRealm > span:nth-of-type(${COLUMN_MESSAGE+1}) {`,
+            `#vwContent .logEntry > div.messageRealm > span:nth-of-type(${COLUMN_MESSAGE + 1}) {`,
             `  width: calc(100% - ${cellWidths[COLUMN_TIMESTAMP]}px);`,
             '}',
-            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_RESULT+1}) {`,
+            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_RESULT + 1}) {`,
             `  width: ${cellWidths[COLUMN_RESULT]}px;`,
             '}',
-            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_INITIATOR+1}) {`,
+            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_INITIATOR + 1}) {`,
             `  width: calc(calc(100% - ${reservedWidth}px) * ${cellWidths[COLUMN_INITIATOR]});`,
             '}',
-            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_PARTYNESS+1}) {`,
+            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_PARTYNESS + 1}) {`,
             `  width: ${cellWidths[COLUMN_PARTYNESS]}px;`,
             '}',
-            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_METHOD+1}) {`,
+            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_METHOD + 1}) {`,
             `  width: ${cellWidths[COLUMN_METHOD]}px;`,
             '}',
-            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_TYPE+1}) {`,
+            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_TYPE + 1}) {`,
             `  width: ${cellWidths[COLUMN_TYPE]}px;`,
             '}',
-            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_URL+1}) {`,
+            `#vwContent .logEntry > div > span:nth-of-type(${COLUMN_URL + 1}) {`,
             `  width: calc(calc(100% - ${reservedWidth}px) * ${cellWidths[COLUMN_URL]});`,
             '}',
             '',
         ];
-        for ( let i = 0; i < cellWidths.length; i++ ) {
-            if ( cellWidths[i] !== 0 ) { continue; }
+        for (let i = 0; i < cellWidths.length; i++) {
+            if (cellWidths[i] !== 0) { continue; }
             cssRules.push(
                 `#vwContent .logEntry > div > span:nth-of-type(${i + 1}) {`,
                 '  display: none;',
@@ -628,18 +628,18 @@ const viewPort = (( ) => {
     };
 
     const resizeTimer = vAPI.defer.create(onLayoutChanged);
-    const updateLayout = ( ) => {
-        resizeTimer.onvsync(1000/8);
+    const updateLayout = () => {
+        resizeTimer.onvsync(1000 / 8);
     };
     const resizeObserver = new self.ResizeObserver(updateLayout);
     resizeObserver.observe(qs$('#netInspector .vscrollable'));
 
     updateLayout();
 
-    const renderFilterToSpan = function(span, filter) {
-        if ( filter.charCodeAt(0) !== 0x23 /* '#' */ ) { return false; }
+    const renderFilterToSpan = function (span, filter) {
+        if (filter.charCodeAt(0) !== 0x23 /* '#' */) { return false; }
         const match = /^#@?#/.exec(filter);
-        if ( match === null ) { return false; }
+        if (match === null) { return false; }
         let child = document.createElement('span');
         child.textContent = match[0];
         span.appendChild(child);
@@ -649,14 +649,14 @@ const viewPort = (( ) => {
         return true;
     };
 
-    const renderToDiv = function(vwEntry, i) {
-        if ( i >= filteredLoggerEntries.length ) {
+    const renderToDiv = function (vwEntry, i) {
+        if (i >= filteredLoggerEntries.length) {
             vwEntry.logEntry = undefined;
             return null;
         }
 
         const details = filteredLoggerEntries[i];
-        if ( vwEntry.logEntry === details ) {
+        if (vwEntry.logEntry === details) {
             return vwEntry.div.firstElementChild;
         }
 
@@ -668,7 +668,7 @@ const viewPort = (( ) => {
         let span;
 
         // Realm
-        if ( details.realm !== undefined ) {
+        if (details.realm !== undefined) {
             divcl.add(details.realm + 'Realm');
         }
 
@@ -677,15 +677,15 @@ const viewPort = (( ) => {
         span.textContent = cells[COLUMN_TIMESTAMP];
 
         // Tab id
-        if ( details.tabId !== undefined ) {
+        if (details.tabId !== undefined) {
             dom.attr(div, 'data-tabid', details.tabId);
-            if ( details.voided ) {
+            if (details.voided) {
                 divcl.add('voided');
             }
         }
 
-        if ( details.realm === 'message' ) {
-            if ( details.type !== undefined ) {
+        if (details.realm === 'message') {
+            if (details.type !== undefined) {
                 dom.attr(div, 'data-type', details.type);
             }
             span = div.children[COLUMN_MESSAGE];
@@ -693,30 +693,30 @@ const viewPort = (( ) => {
             return div;
         }
 
-        if ( detailableRealms.has(details.realm) ) {
+        if (detailableRealms.has(details.realm)) {
             divcl.add('canDetails');
         }
 
         // Filter
         const filter = details.filter || undefined;
         let filteringType;
-        if ( filter !== undefined ) {
-            if ( typeof filter.source === 'string' ) {
+        if (filter !== undefined) {
+            if (typeof filter.source === 'string') {
                 filteringType = filter.source;
             }
-            if ( filteringType === 'static' ) {
+            if (filteringType === 'static') {
                 divcl.add('canLookup');
-            } else if ( details.realm === 'extended' ) {
+            } else if (details.realm === 'extended') {
                 divcl.toggle('canLookup', /^#@?#/.test(filter.raw));
                 divcl.toggle('isException', filter.raw.startsWith('#@#'));
             }
-            if ( filter.modifier === true ) {
+            if (filter.modifier === true) {
                 dom.attr(div, 'data-modifier', '');
             }
         }
         span = div.children[COLUMN_FILTER];
-        if ( renderFilterToSpan(span, cells[COLUMN_FILTER]) ) {
-            if ( /^\+js\(.*\)$/.test(span.children[1].textContent) ) {
+        if (renderFilterToSpan(span, cells[COLUMN_FILTER])) {
+            if (/^\+js\(.*\)$/.test(span.children[1].textContent)) {
                 divcl.add('scriptlet');
             }
         } else {
@@ -724,23 +724,23 @@ const viewPort = (( ) => {
         }
 
         // Event
-        if ( cells[COLUMN_RESULT] === '--' ) {
+        if (cells[COLUMN_RESULT] === '--') {
             dom.attr(div, 'data-status', '1');
-        } else if ( cells[COLUMN_RESULT] === '++' ) {
+        } else if (cells[COLUMN_RESULT] === '++') {
             dom.attr(div, 'data-status', '2');
-        } else if ( cells[COLUMN_RESULT] === '**' ) {
+        } else if (cells[COLUMN_RESULT] === '**') {
             dom.attr(div, 'data-status', '3');
-        } else if ( cells[COLUMN_RESULT] === '<<' ) {
+        } else if (cells[COLUMN_RESULT] === '<<') {
             divcl.add('redirect');
         }
         span = div.children[COLUMN_RESULT];
         span.textContent = cells[COLUMN_RESULT];
 
         // Origins
-        if ( details.tabHostname ) {
+        if (details.tabHostname) {
             dom.attr(div, 'data-tabhn', details.tabHostname);
         }
-        if ( details.docHostname ) {
+        if (details.docHostname) {
             dom.attr(div, 'data-dochn', details.docHostname);
         }
         span = div.children[COLUMN_INITIATOR];
@@ -753,7 +753,7 @@ const viewPort = (( ) => {
             details.domain !== undefined
         ) {
             let text = `${details.tabDomain}`;
-            if ( details.docDomain !== details.tabDomain ) {
+            if (details.docDomain !== details.tabDomain) {
                 text += ` \u22ef ${details.docDomain}`;
             }
             text += ` \u21d2 ${details.domain}`;
@@ -772,17 +772,17 @@ const viewPort = (( ) => {
 
         // URL
         let re;
-        if ( filteringType === 'static' ) {
+        if (filteringType === 'static') {
             re = new RegExp(filter.regex, 'gi');
-        } else if ( filteringType === 'dynamicUrl' ) {
+        } else if (filteringType === 'dynamicUrl') {
             re = regexFromURLFilteringResult(filter.rule.join(' '));
         }
         nodeFromURL(div.children[COLUMN_URL], cells[COLUMN_URL], re, cells[COLUMN_TYPE]);
 
         // Alias URL (CNAME, etc.)
-        if ( cells.length > 8 ) {
+        if (cells.length > 8) {
             const pos = details.textContent.lastIndexOf('\x1FaliasURL=');
-            if ( pos !== -1 ) {
+            if (pos !== -1) {
                 div.dataset.aliasid = `${details.id}`;
             }
         }
@@ -792,21 +792,21 @@ const viewPort = (( ) => {
 
     // The idea is that positioning DOM elements is faster than
     // removing/inserting DOM elements.
-    const positionLines = function() {
-        if ( lineHeight === 0 ) { return; }
+    const positionLines = function () {
+        if (lineHeight === 0) { return; }
         let y = -(lastTopPix % lineHeight);
-        for ( const vwEntry of vwEntries ) {
+        for (const vwEntry of vwEntries) {
             vwEntry.div.style.top = `${y}px`;
             y += lineHeight;
         }
     };
 
-    const rollLines = function(topRow) {
+    const rollLines = function (topRow) {
         let delta = topRow - lastTopRow;
         let deltaLength = Math.abs(delta);
         // No point rolling if no rows can be reused
-        if ( deltaLength > 0 && deltaLength < vwEntries.length ) {
-            if ( delta < 0 ) {      // Move bottom rows to the top
+        if (deltaLength > 0 && deltaLength < vwEntries.length) {
+            if (delta < 0) {      // Move bottom rows to the top
                 vwEntries.unshift(...vwEntries.splice(delta));
             } else {                // Move top rows to the bottom
                 vwEntries.push(...vwEntries.splice(0, delta));
@@ -816,48 +816,48 @@ const viewPort = (( ) => {
         return delta;
     };
 
-    const fillLines = function() {
+    const fillLines = function () {
         let rowBeg = lastTopRow;
-        for ( const vwEntry of vwEntries ) {
+        for (const vwEntry of vwEntries) {
             const newDiv = renderToDiv(vwEntry, rowBeg);
             const container = vwEntry.div;
             const oldDiv = container.firstElementChild;
-            if ( newDiv !== null ) {
-                if ( oldDiv === null ) {
+            if (newDiv !== null) {
+                if (oldDiv === null) {
                     container.appendChild(newDiv);
-                } else if ( newDiv !== oldDiv ) {
+                } else if (newDiv !== oldDiv) {
                     container.removeChild(oldDiv);
                     container.appendChild(newDiv);
                 }
-            } else if ( oldDiv !== null ) {
+            } else if (oldDiv !== null) {
                 container.removeChild(oldDiv);
             }
             rowBeg += 1;
         }
     };
 
-    const contentChanged = function(addedCount) {
+    const contentChanged = function (addedCount) {
         lastTopRow += addedCount;
         const newWholeHeight = Math.max(
             filteredLoggerEntries.length * lineHeight,
             vwRenderer.clientHeight
         );
-        if ( newWholeHeight !== wholeHeight ) {
+        if (newWholeHeight !== wholeHeight) {
             vwVirtualContent.style.height = `${newWholeHeight}px`;
             wholeHeight = newWholeHeight;
         }
     };
 
-    const updateContent = function(addedCount) {
+    const updateContent = function (addedCount) {
         contentChanged(addedCount);
         // Content changed
-        if ( addedCount === 0 ) {
+        if (addedCount === 0) {
             if (
                 lastTopRow !== 0 &&
                 lastTopRow + vwEntries.length > filteredLoggerEntries.length
             ) {
                 lastTopRow = filteredLoggerEntries.length - vwEntries.length;
-                if ( lastTopRow < 0 ) { lastTopRow = 0; }
+                if (lastTopRow < 0) { lastTopRow = 0; }
                 lastTopPix = lastTopRow * lineHeight;
                 vwContent.style.top = `${lastTopPix}px`;
                 vwScroller.scrollTop = lastTopPix;
@@ -869,7 +869,7 @@ const viewPort = (( ) => {
 
         // Content added
         // Preserve scroll position
-        if ( lastTopPix === 0 ) {
+        if (lastTopPix === 0) {
             rollLines(0);
             positionLines();
             fillLines();
@@ -887,16 +887,16 @@ const viewPort = (( ) => {
 
 /******************************************************************************/
 
-const updateCurrentTabTitle = (( ) => {
+const updateCurrentTabTitle = (() => {
     const i18nCurrentTab = i18n$('loggerCurrentTab');
 
-    return ( ) => {
+    return () => {
         const select = qs$('#pageSelector');
-        if ( select.value !== '_' || activeTabId === 0 ) { return; }
+        if (select.value !== '_' || activeTabId === 0) { return; }
         const opt0 = qs$(select, '[value="_"]');
         const opt1 = qs$(select, `[value="${activeTabId}"]`);
         let text = i18nCurrentTab;
-        if ( opt1 !== null ) {
+        if (opt1 !== null) {
             text += ' / ' + opt1.textContent;
         }
         opt0.textContent = text;
@@ -905,15 +905,15 @@ const updateCurrentTabTitle = (( ) => {
 
 /******************************************************************************/
 
-const synchronizeTabIds = function(newTabIds) {
+const synchronizeTabIds = function (newTabIds) {
     const select = qs$('#pageSelector');
     const selectedTabValue = select.value;
     const oldTabIds = allTabIds;
 
     // Collate removed tab ids.
     const toVoid = new Set();
-    for ( const tabId of oldTabIds.keys() ) {
-        if ( newTabIds.has(tabId) ) { continue; }
+    for (const tabId of oldTabIds.keys()) {
+        if (newTabIds.has(tabId)) { continue; }
         toVoid.add(tabId);
     }
     allTabIds = newTabIds;
@@ -924,43 +924,43 @@ const synchronizeTabIds = function(newTabIds) {
     // in order to ensure the entry has a new identity. A new identity ensures
     // that identity-based associations elsewhere are automatically
     // invalidated.
-    if ( toVoid.size !== 0 ) {
+    if (toVoid.size !== 0) {
         const autoDeleteVoidedRows = selectedTabValue === '_';
         let rowVoided = false;
-        for ( let i = 0, n = loggerEntries.length; i < n; i++ ) {
+        for (let i = 0, n = loggerEntries.length; i < n; i++) {
             const entry = loggerEntries[i];
-            if ( toVoid.has(entry.tabId) === false ) { continue; }
-            if ( entry.voided ) { continue; }
+            if (toVoid.has(entry.tabId) === false) { continue; }
+            if (entry.voided) { continue; }
             rowVoided = entry.voided = true;
-            if ( autoDeleteVoidedRows ) {
+            if (autoDeleteVoidedRows) {
                 entry.dead = true;
             }
             loggerEntries[i] = new LogEntry(entry);
         }
-        if ( rowVoided ) {
+        if (rowVoided) {
             rowFilterer.filterAll();
         }
     }
 
     // Remove popup if it is currently bound to a removed tab.
-    if ( toVoid.has(popupManager.tabId) ) {
+    if (toVoid.has(popupManager.tabId)) {
         popupManager.toggleOff();
     }
 
-    const tabIds = Array.from(newTabIds.keys()).sort(function(a, b) {
+    const tabIds = Array.from(newTabIds.keys()).sort(function (a, b) {
         return newTabIds.get(a).localeCompare(newTabIds.get(b));
     });
     let j = 3;
-    for ( const tabId of tabIds ) {
-        if ( tabId <= 0 ) { continue; }
-        if ( j === select.options.length ) {
+    for (const tabId of tabIds) {
+        if (tabId <= 0) { continue; }
+        if (j === select.options.length) {
             select.appendChild(document.createElement('option'));
         }
         const option = select.options[j];
         // Truncate too long labels.
         option.textContent = newTabIds.get(tabId).slice(0, 80);
         dom.attr(option, 'value', tabId);
-        if ( option.value === selectedTabValue ) {
+        if (option.value === selectedTabValue) {
             select.selectedIndex = j;
             dom.attr(option, 'selected', '');
         } else {
@@ -968,10 +968,10 @@ const synchronizeTabIds = function(newTabIds) {
         }
         j += 1;
     }
-    while ( j < select.options.length ) {
+    while (j < select.options.length) {
         select.removeChild(select.options[j]);
     }
-    if ( select.value !== selectedTabValue ) {
+    if (select.value !== selectedTabValue) {
         select.selectedIndex = 0;
         select.value = '';
         dom.attr(select.options[0], 'selected', '');
@@ -983,8 +983,8 @@ const synchronizeTabIds = function(newTabIds) {
 
 /******************************************************************************/
 
-const onLogBufferRead = function(response) {
-    if ( !response || response.unavailable ) { return; }
+const onLogBufferRead = function (response) {
+    if (!response || response.unavailable) { return; }
 
     // Disable tooltips?
     if (
@@ -992,29 +992,29 @@ const onLogBufferRead = function(response) {
         response.tooltips !== undefined
     ) {
         popupLoggerTooltips = response.tooltips;
-        if ( popupLoggerTooltips === false ) {
+        if (popupLoggerTooltips === false) {
             dom.attr('[data-i18n-title]', 'title', '');
         }
     }
 
     // Tab id of currently active tab
     let activeTabIdChanged = false;
-    if ( response.activeTabId ) {
+    if (response.activeTabId) {
         activeTabIdChanged = response.activeTabId !== activeTabId;
         activeTabId = response.activeTabId;
     }
 
-    if ( Array.isArray(response.tabIds) ) {
+    if (Array.isArray(response.tabIds)) {
         response.tabIds = new Map(response.tabIds);
     }
 
     // List of tab ids has changed
-    if ( response.tabIds !== undefined ) {
+    if (response.tabIds !== undefined) {
         synchronizeTabIds(response.tabIds);
         allTabIdsToken = response.tabIdsToken;
     }
 
-    if ( activeTabIdChanged ) {
+    if (activeTabIdChanged) {
         pageSelectorFromURLHash();
     }
 
@@ -1028,12 +1028,12 @@ const onLogBufferRead = function(response) {
 
 /******************************************************************************/
 
-const readLogBuffer = (( ) => {
+const readLogBuffer = (() => {
     let reading = false;
 
-    const readLogBufferNow = async function() {
-        if ( logger.ownerId === undefined ) { return; }
-        if ( reading ) { return; }
+    const readLogBufferNow = async function () {
+        if (logger.ownerId === undefined) { return; }
+        if (reading) { return; }
 
         reading = true;
 
@@ -1074,36 +1074,36 @@ const readLogBuffer = (( ) => {
 
     readLogBufferNow();
 
-    return ( ) => {
+    return () => {
         timer.on(1200);
     };
 })();
- 
+
 /******************************************************************************/
 
-const pageSelectorChanged = function() {
+const pageSelectorChanged = function () {
     const select = qs$('#pageSelector');
     window.location.replace('#' + select.value);
     pageSelectorFromURLHash();
 };
 
-const pageSelectorFromURLHash = (( ) => {
+const pageSelectorFromURLHash = (() => {
     let lastHash;
     let lastSelectedTabId;
 
-    return function() {
+    return function () {
         let hash = window.location.hash.slice(1);
         let match = /^([^+]+)\+(.+)$/.exec(hash);
-        if ( match !== null ) {
+        if (match !== null) {
             hash = match[1];
             activeTabId = parseInt(match[2], 10) || 0;
             window.location.hash = '#' + hash;
         }
 
-        if ( hash !== lastHash ) {
+        if (hash !== lastHash) {
             const select = qs$('#pageSelector');
             let option = qs$(select, `option[value="${hash}"]`);
-            if ( option === null ) {
+            if (option === null) {
                 hash = '0';
                 option = select.options[0];
             }
@@ -1116,7 +1116,7 @@ const pageSelectorFromURLHash = (( ) => {
             ? activeTabId
             : parseInt(hash, 10) || 0;
 
-        if ( lastSelectedTabId === selectedTabId ) { return; }
+        if (lastSelectedTabId === selectedTabId) { return; }
 
         rowFilterer.filterAll();
         updateCurrentTabTitle();
@@ -1129,9 +1129,9 @@ const pageSelectorFromURLHash = (( ) => {
 
 /******************************************************************************/
 
-const reloadTab = function(bypassCache = false) {
+const reloadTab = function (bypassCache = false) {
     const tabId = tabIdFromPageSelector();
-    if ( tabId <= 0 ) { return; }
+    if (tabId <= 0) { return; }
     messaging.send('loggerUI', {
         what: 'reloadTab',
         tabId,
@@ -1144,21 +1144,21 @@ dom.on('#refresh', 'click', ev => {
 });
 
 dom.on(document, 'keydown', ev => {
-    if ( ev.isComposing ) { return; }
+    if (ev.isComposing) { return; }
     let bypassCache = false;
-    switch ( ev.key ) {
-    case 'F5':
-        bypassCache = ev.ctrlKey || ev.metaKey || ev.shiftKey;
-        break;
-    case 'r':
-        if ( (ev.ctrlKey || ev.metaKey) !== true ) { return; }
-        break;
-    case 'R':
-        if ( (ev.ctrlKey || ev.metaKey) !== true ) { return; }
-        bypassCache = true;
-        break;
-    default:
-        return;
+    switch (ev.key) {
+        case 'F5':
+            bypassCache = ev.ctrlKey || ev.metaKey || ev.shiftKey;
+            break;
+        case 'r':
+            if ((ev.ctrlKey || ev.metaKey) !== true) { return; }
+            break;
+        case 'R':
+            if ((ev.ctrlKey || ev.metaKey) !== true) { return; }
+            bypassCache = true;
+            break;
+        default:
+            return;
     }
     reloadTab(bypassCache);
     ev.preventDefault();
@@ -1168,7 +1168,7 @@ dom.on(document, 'keydown', ev => {
 /******************************************************************************/
 /******************************************************************************/
 
-(( ) => {
+(() => {
     const reRFC3986 = /^([^:/?#]+:)?(\/\/[^/?#]*)?([^?#]*)(\?[^#]*)?(#.*)?/;
     const reSchemeOnly = /^[\w-]+:$/;
     const staticFilterTypes = {
@@ -1195,7 +1195,7 @@ dom.on(document, 'keydown', ev => {
 
     const uglyTypeFromSelector = pane => {
         const prettyType = selectValue('select.type.' + pane);
-        if ( pane === 'static' ) {
+        if (pane === 'static') {
             return staticFilterTypes[prettyType] || prettyType;
         }
         return uglyRequestTypes[prettyType] || prettyType;
@@ -1209,22 +1209,22 @@ dom.on(document, 'keydown', ev => {
         return selectNode(selector).value || '';
     };
 
-    const staticFilterNode = ( ) => {
+    const staticFilterNode = () => {
         return qs$(dialog, 'div.panes > div.static textarea');
     };
 
     const toExceptionFilter = (filter, extended) => {
-        if ( reIsExceptionFilter.test(filter) ) { return filter; }
+        if (reIsExceptionFilter.test(filter)) { return filter; }
         return extended ? filter.replace('##', '#@#') : `@@${filter}`;
     };
 
-    const onColorsReady = function(response) {
+    const onColorsReady = function (response) {
         dom.cl.toggle(dom.body, 'dirty', response.dirty);
-        for ( const url in response.colors ) {
-            if ( Object.hasOwn(response.colors, url) === false ) { continue; }
+        for (const url in response.colors) {
+            if (Object.hasOwn(response.colors, url) === false) { continue; }
             const colorEntry = response.colors[url];
             const node = qs$(dialog, `.dynamic .entry .action[data-url="${url}"]`);
-            if ( node === null ) { continue; }
+            if (node === null) { continue; }
             dom.cl.toggle(node, 'allow', colorEntry.r === 2);
             dom.cl.toggle(node, 'noop', colorEntry.r === 3);
             dom.cl.toggle(node, 'block', colorEntry.r === 1);
@@ -1232,7 +1232,7 @@ dom.on(document, 'keydown', ev => {
         }
     };
 
-    const colorize = async function() {
+    const colorize = async function () {
         const response = await messaging.send('loggerUI', {
             what: 'getURLFilteringData',
             context: selectValue('select.dynamic.origin'),
@@ -1242,19 +1242,19 @@ dom.on(document, 'keydown', ev => {
         onColorsReady(response);
     };
 
-    const parseStaticInputs = function() {
+    const parseStaticInputs = function () {
         const options = [];
         const block = selectValue('select.static.action') === '';
         let filter = '';
-        if ( !block ) {
+        if (!block) {
             filter = '@@';
         }
         let value = selectValue('select.static.url');
-        if ( value !== '' ) {
-            if ( reSchemeOnly.test(value) ) {
+        if (value !== '') {
+            if (reSchemeOnly.test(value)) {
                 value = `|${value}`;
             } else {
-                if ( /[/?]/.test(value) === false ) {
+                if (/[/?]/.test(value) === false) {
                     value += '^';
                 }
                 value = `||${value}`;
@@ -1262,28 +1262,28 @@ dom.on(document, 'keydown', ev => {
         }
         filter += value;
         value = selectValue('select.static.type');
-        if ( value !== '' ) {
+        if (value !== '') {
             options.push(uglyTypeFromSelector('static'));
         }
         value = selectValue('select.static.origin');
-        if ( value !== '' ) {
-            if ( value === targetDomain ) {
+        if (value !== '') {
+            if (value === targetDomain) {
                 options.push('1p');
             } else {
                 options.push('domain=' + value);
             }
         }
-        if ( block && selectValue('select.static.importance') !== '' ) {
+        if (block && selectValue('select.static.importance') !== '') {
             options.push('important');
         }
-        if ( options.length ) {
+        if (options.length) {
             filter += '$' + options.join(',');
         }
         staticFilterNode().value = filter;
         updateWidgets();
     };
 
-    const updateWidgets = function() {
+    const updateWidgets = function () {
         const value = staticFilterNode().value;
         dom.cl.toggle(
             qs$(dialog, '#createStaticFilter'),
@@ -1292,26 +1292,26 @@ dom.on(document, 'keydown', ev => {
         );
     };
 
-    const onClick = async function(ev) {
+    const onClick = async function (ev) {
         const target = ev.target;
         const tcl = target.classList;
 
         // Close entry tools
-        if ( tcl.contains('closeButton') ) {
+        if (tcl.contains('closeButton')) {
             ev.stopPropagation();
             toggleOff();
             return;
         }
 
         // Select a pane
-        if ( tcl.contains('header') ) {
+        if (tcl.contains('header')) {
             ev.stopPropagation();
             dom.attr(dialog, 'data-pane', dom.attr(target, 'data-pane'));
             return;
         }
 
         // Toggle temporary exception filter
-        if ( tcl.contains('exceptor') ) {
+        if (tcl.contains('exceptor')) {
             ev.stopPropagation();
             const filter = filterFromTargetRow();
             const status = await messaging.send('loggerUI', {
@@ -1322,20 +1322,20 @@ dom.on(document, 'keydown', ev => {
             dom.cl.toggle(row, 'exceptored', status);
             return;
         }
-        
+
         // Create static filter
-        if ( target.id === 'createStaticFilter' ) {
+        if (target.id === 'createStaticFilter') {
             ev.stopPropagation();
             const value = staticFilterNode().value
                 .replace(/^((?:@@)?\/.+\/)(\$|$)/, '$1*$2');
             // Avoid duplicates
-            if ( Object.hasOwn(createdStaticFilters, value) ) { return; }
+            if (Object.hasOwn(createdStaticFilters, value)) { return; }
             createdStaticFilters[value] = true;
             // https://github.com/uBlockOrigin/uBlock-issues/issues/1281#issuecomment-704217175
             // TODO:
             //   Figure a way to use the actual document URL. Currently using
             //   a synthetic URL derived from the document hostname.
-            if ( value !== '' ) {
+            if (value !== '') {
                 messaging.send('loggerUI', {
                     what: 'createUserFilter',
                     autoComment: true,
@@ -1348,7 +1348,7 @@ dom.on(document, 'keydown', ev => {
         }
 
         // Save url filtering rule(s)
-        if ( target.id === 'saveRules' ) {
+        if (target.id === 'saveRules') {
             ev.stopPropagation();
             await messaging.send('loggerUI', {
                 what: 'saveURLFilteringRules',
@@ -1363,7 +1363,7 @@ dom.on(document, 'keydown', ev => {
         const persist = !!ev.ctrlKey || !!ev.metaKey;
 
         // Remove url filtering rule
-        if ( tcl.contains('action') ) {
+        if (tcl.contains('action')) {
             ev.stopPropagation();
             await messaging.send('loggerUI', {
                 what: 'setURLFilteringRule',
@@ -1378,7 +1378,7 @@ dom.on(document, 'keydown', ev => {
         }
 
         // add "allow" url filtering rule
-        if ( tcl.contains('allow') ) {
+        if (tcl.contains('allow')) {
             ev.stopPropagation();
             await messaging.send('loggerUI', {
                 what: 'setURLFilteringRule',
@@ -1393,7 +1393,7 @@ dom.on(document, 'keydown', ev => {
         }
 
         // add "block" url filtering rule
-        if ( tcl.contains('noop') ) {
+        if (tcl.contains('noop')) {
             ev.stopPropagation();
             await messaging.send('loggerUI', {
                 what: 'setURLFilteringRule',
@@ -1408,7 +1408,7 @@ dom.on(document, 'keydown', ev => {
         }
 
         // add "block" url filtering rule
-        if ( tcl.contains('block') ) {
+        if (tcl.contains('block')) {
             ev.stopPropagation();
             await messaging.send('loggerUI', {
                 what: 'setURLFilteringRule',
@@ -1423,7 +1423,7 @@ dom.on(document, 'keydown', ev => {
         }
 
         // Highlight corresponding element in target web page
-        if ( tcl.contains('picker') ) {
+        if (tcl.contains('picker')) {
             ev.stopPropagation();
             messaging.send('loggerUI', {
                 what: 'launchElementPicker',
@@ -1435,7 +1435,7 @@ dom.on(document, 'keydown', ev => {
         }
 
         // Reload tab associated with event
-        if ( tcl.contains('reload') ) {
+        if (tcl.contains('reload')) {
             ev.stopPropagation();
             messaging.send('loggerUI', {
                 what: 'reloadTab',
@@ -1446,28 +1446,28 @@ dom.on(document, 'keydown', ev => {
         }
     };
 
-    const onSelectChange = function(ev) {
+    const onSelectChange = function (ev) {
         const tcl = ev.target.classList;
 
-        if ( tcl.contains('dynamic') ) {
+        if (tcl.contains('dynamic')) {
             colorize();
             return;
         }
 
-        if ( tcl.contains('static') ) {
+        if (tcl.contains('static')) {
             parseStaticInputs();
             return;
         }
     };
 
-    const onInputChange = function() {
+    const onInputChange = function () {
         updateWidgets();
     };
 
-    const createPreview = function(type, url) {
+    const createPreview = function (type, url) {
         const cantPreview =
             type !== 'image' ||
-            dom.cl.has(targetRow, 'networkRealm') === false  ||
+            dom.cl.has(targetRow, 'networkRealm') === false ||
             dom.attr(targetRow, 'data-status') === '1';
 
         // Whether picker can be used
@@ -1478,10 +1478,10 @@ dom.on(document, 'keydown', ev => {
         );
 
         // Whether the resource can be previewed
-        if ( cantPreview ) { return; }
+        if (cantPreview) { return; }
 
         const container = qs$(dialog, '.preview');
-        dom.on(qs$(container, 'span'), 'click', ( ) => {
+        dom.on(qs$(container, 'span'), 'click', () => {
             const preview = dom.create('img');
             dom.attr(preview, 'src', url);
             container.replaceChild(preview, container.firstElementChild);
@@ -1490,10 +1490,10 @@ dom.on(document, 'keydown', ev => {
         dom.cl.remove(container, 'hide');
     };
 
-    // https://github.com/gorhill/uBlock/issues/1511
-    const shortenLongString = function(url, max) {
+    // https://github.com/Ablock/Ablock/issues/1511
+    const shortenLongString = function (url, max) {
         const urlLen = url.length;
-        if ( urlLen <= max ) {
+        if (urlLen <= max) {
             return url;
         }
         const n = urlLen - max - 1;
@@ -1502,11 +1502,11 @@ dom.on(document, 'keydown', ev => {
     };
 
     // Build list of candidate URLs
-    const createTargetURLs = function(url) {
+    const createTargetURLs = function (url) {
         const matches = reRFC3986.exec(url);
-        if ( matches === null ) { return []; }
-        if ( typeof matches[2] !== 'string' || matches[2].length === 0 ) {
-            return [ matches[1] ];
+        if (matches === null) { return []; }
+        if (typeof matches[2] !== 'string' || matches[2].length === 0) {
+            return [matches[1]];
         }
         // Shortest URL for a valid URL filtering rule
         const urls = [];
@@ -1514,9 +1514,9 @@ dom.on(document, 'keydown', ev => {
         urls.unshift(rootURL);
         const path = matches[3] || '';
         let pos = path.charAt(0) === '/' ? 1 : 0;
-        while ( pos < path.length ) {
+        while (pos < path.length) {
             pos = path.indexOf('/', pos);
-            if ( pos === -1 ) {
+            if (pos === -1) {
                 pos = path.length;
             } else {
                 pos += 1;
@@ -1524,61 +1524,61 @@ dom.on(document, 'keydown', ev => {
             urls.unshift(rootURL + path.slice(0, pos));
         }
         const query = matches[4] || '';
-        if ( query !== '' ) {
+        if (query !== '') {
             urls.unshift(rootURL + path + query);
         }
         return urls;
     };
 
-    const filterFromTargetRow = function() {
+    const filterFromTargetRow = function () {
         return dom.text(targetRow.children[COLUMN_FILTER]);
     };
 
-    const aliasURLFromID = function(id) {
-        if ( id === '' ) { return ''; }
-        for ( const entry of loggerEntries ) {
-            if ( `${entry.id}` !== id ) { continue; }
+    const aliasURLFromID = function (id) {
+        if (id === '') { return ''; }
+        for (const entry of loggerEntries) {
+            if (`${entry.id}` !== id) { continue; }
             const match = /\baliasURL=([^\x1F]+)/.exec(entry.textContent);
-            if ( match === null ) { return ''; }
+            if (match === null) { return ''; }
             return match[1];
         }
         return '';
     };
 
-    const toSummaryPaneFilterNode = async function(receiver, filter) {
+    const toSummaryPaneFilterNode = async function (receiver, filter) {
         receiver.children[COLUMN_FILTER].textContent = filter;
-        if ( dom.cl.has(targetRow, 'canLookup') === false ) { return; }
+        if (dom.cl.has(targetRow, 'canLookup') === false) { return; }
         const isException = reIsExceptionFilter.test(filter);
         let isExcepted = false;
-        if ( isException ) {
+        if (isException) {
             isExcepted = await messaging.send('loggerUI', {
                 what: 'hasInMemoryFilter',
                 filter: toExceptionFilter(filter, dom.cl.has(targetRow, 'extendedRealm')),
             });
         }
-        if ( isException && isExcepted === false ) { return; }
+        if (isException && isExcepted === false) { return; }
         dom.cl.toggle(receiver, 'exceptored', isExcepted);
         receiver.children[2].style.visibility = '';
     };
 
-    const fillSummaryPaneFilterList = async function(rows) {
+    const fillSummaryPaneFilterList = async function (rows) {
         const rawFilter = targetRow.children[COLUMN_FILTER].textContent;
 
-        const nodeFromFilter = function(filter, lists) {
+        const nodeFromFilter = function (filter, lists) {
             const fragment = document.createDocumentFragment();
             const template = qs$('#filterFinderListEntry > span');
-            for ( const list of lists ) {
+            for (const list of lists) {
                 const span = dom.clone(template);
                 let a = qs$(span, 'a:nth-of-type(1)');
                 a.href += encodeURIComponent(list.assetKey);
                 a.append(i18n.patchUnicodeFlags(list.title));
                 a = qs$(span, 'a:nth-of-type(2)');
-                if ( list.supportURL ) {
+                if (list.supportURL) {
                     dom.attr(a, 'href', list.supportURL);
                 } else {
                     a.style.display = 'none';
                 }
-                if ( fragment.childElementCount !== 0 ) {
+                if (fragment.childElementCount !== 0) {
                     fragment.appendChild(document.createTextNode('\n'));
                 }
                 fragment.appendChild(span);
@@ -1586,13 +1586,13 @@ dom.on(document, 'keydown', ev => {
             return fragment;
         };
 
-        const handleResponse = function(response) {
-            if ( response instanceof Object === false ) {
+        const handleResponse = function (response) {
+            if (response instanceof Object === false) {
                 response = {};
             }
             let bestMatchFilter = '';
-            for ( const filter in response ) {
-                if ( filter.length <= bestMatchFilter.length ) { continue; }
+            for (const filter in response) {
+                if (filter.length <= bestMatchFilter.length) { continue; }
                 bestMatchFilter = filter;
             }
             if (
@@ -1605,8 +1605,8 @@ dom.on(document, 'keydown', ev => {
                     response[bestMatchFilter]
                 ));
             }
-            // https://github.com/gorhill/uBlock/issues/2179
-            if ( rows[1].children[1].childElementCount === 0 ) {
+            // https://github.com/Ablock/Ablock/issues/2179
+            if (rows[1].children[1].childElementCount === 0) {
                 i18n.safeTemplateToDOM(
                     'loggerStaticFilteringFinderSentence2',
                     { filter: rawFilter },
@@ -1615,13 +1615,13 @@ dom.on(document, 'keydown', ev => {
             }
         };
 
-        if ( dom.cl.has(targetRow, 'networkRealm') ) {
+        if (dom.cl.has(targetRow, 'networkRealm')) {
             const response = await messaging.send('loggerUI', {
                 what: 'listsFromNetFilter',
                 rawFilter,
             });
             handleResponse(response);
-        } else if ( dom.cl.has(targetRow, 'extendedRealm') ) {
+        } else if (dom.cl.has(targetRow, 'extendedRealm')) {
             const response = await messaging.send('loggerUI', {
                 what: 'listsFromCosmeticFilter',
                 url: targetRow.children[COLUMN_URL].textContent,
@@ -1631,7 +1631,7 @@ dom.on(document, 'keydown', ev => {
         }
     };
 
-    const fillSummaryPane = function() {
+    const fillSummaryPane = function () {
         const rows = qsa$(dialog, '.pane.details > div');
         const tr = targetRow;
         const trcl = tr.classList;
@@ -1661,7 +1661,7 @@ dom.on(document, 'keydown', ev => {
             rows[2].style.display = 'none';
         }
         // Filter list
-        if ( trcl.contains('canLookup') ) {
+        if (trcl.contains('canLookup')) {
             fillSummaryPaneFilterList(rows);
         } else {
             rows[1].style.display = 'none';
@@ -1669,37 +1669,37 @@ dom.on(document, 'keydown', ev => {
         // Root and immediate contexts
         const tabhn = dom.attr(tr, 'data-tabhn') || '';
         const dochn = dom.attr(tr, 'data-dochn') || '';
-        if ( tabhn !== '' && tabhn !== dochn ) {
+        if (tabhn !== '' && tabhn !== dochn) {
             rows[3].children[1].textContent = tabhn;
         } else {
             rows[3].style.display = 'none';
         }
-        if ( dochn !== '' ) {
+        if (dochn !== '') {
             rows[4].children[1].textContent = dochn;
         } else {
             rows[4].style.display = 'none';
         }
         // Partyness
         text = dom.attr(tr, 'data-parties') || '';
-        if ( text !== '' ) {
+        if (text !== '') {
             rows[5].children[1].textContent = `(${trch[COLUMN_PARTYNESS].textContent})\u2002${text}`;
         } else {
             rows[5].style.display = 'none';
         }
         // Type
         text = trch[COLUMN_TYPE].textContent;
-        if ( text !== '' ) {
+        if (text !== '') {
             rows[6].children[1].textContent = text;
         } else {
             rows[6].style.display = 'none';
         }
         // URL
         const canonicalURL = trch[COLUMN_URL].textContent;
-        if ( canonicalURL !== '' ) {
+        if (canonicalURL !== '') {
             const attr = dom.attr(tr, 'data-status') || '';
-            if ( attr !== '' ) {
+            if (attr !== '') {
                 dom.attr(rows[7], 'data-status', attr);
-                if ( tr.hasAttribute('data-modifier') ) {
+                if (tr.hasAttribute('data-modifier')) {
                     dom.attr(rows[7], 'data-modifier', '');
                 }
             }
@@ -1710,7 +1710,7 @@ dom.on(document, 'keydown', ev => {
         // Alias URL
         text = tr.dataset.aliasid;
         const aliasURL = text ? aliasURLFromID(text) : '';
-        if ( aliasURL !== '' ) {
+        if (aliasURL !== '') {
             rows[8].children[1].textContent =
                 hostnameFromURI(aliasURL) + ' \u21d2\n\u2003' +
                 hostnameFromURI(canonicalURL);
@@ -1722,14 +1722,14 @@ dom.on(document, 'keydown', ev => {
     };
 
     // Fill dynamic URL filtering pane
-    const fillDynamicPane = function() {
-        if ( dom.cl.has(targetRow, 'extendedRealm') ) { return; }
+    const fillDynamicPane = function () {
+        if (dom.cl.has(targetRow, 'extendedRealm')) { return; }
 
         // https://github.com/uBlockOrigin/uBlock-issues/issues/662#issuecomment-509220702
-        if ( targetType === 'doc' ) { return; }
+        if (targetType === 'doc') { return; }
 
-        // https://github.com/gorhill/uBlock/issues/2469
-        if ( targetURLs.length === 0 || reSchemeOnly.test(targetURLs[0]) ) {
+        // https://github.com/Ablock/Ablock/issues/2469
+        if (targetURLs.length === 0 || reSchemeOnly.test(targetURLs[0])) {
             return;
         }
 
@@ -1750,7 +1750,7 @@ dom.on(document, 'keydown', ev => {
         // Fill entries
         const menuEntryTemplate = qs$(dialog, '.dynamic .toolbar .entry');
         const tbody = qs$(dialog, '.dynamic .entries');
-        for ( const targetURL of  targetURLs ) {
+        for (const targetURL of targetURLs) {
             const menuEntry = dom.clone(menuEntryTemplate);
             dom.attr(menuEntry.children[0], 'data-url', targetURL);
             menuEntry.children[1].textContent = shortenLongString(targetURL, 128);
@@ -1760,124 +1760,124 @@ dom.on(document, 'keydown', ev => {
         colorize();
     };
 
-    const fillOriginSelect = function(select, hostname, domain) {
+    const fillOriginSelect = function (select, hostname, domain) {
         const template = i18n$('loggerStaticFilteringSentencePartOrigin');
         let value = hostname;
-        for (;;) {
+        for (; ;) {
             const option = document.createElement('option');
             dom.attr(option, 'value', value);
             option.textContent = template.replace('{{origin}}', value);
             select.appendChild(option);
-            if ( value === domain ) { break; }
+            if (value === domain) { break; }
             const pos = value.indexOf('.');
-            if ( pos === -1 ) { break; }
+            if (pos === -1) { break; }
             value = value.slice(pos + 1);
         }
     };
 
     // Fill static filtering pane
-    const fillStaticPane = function() {
-        if ( dom.cl.has(targetRow, 'extendedRealm') ) { return; }
+    const fillStaticPane = function () {
+        if (dom.cl.has(targetRow, 'extendedRealm')) { return; }
 
         const template = i18n$('loggerStaticFilteringSentence');
         const rePlaceholder = /\{\{[^}]+?\}\}/g;
         const nodes = [];
         let pos = 0;
-        for (;;) {
+        for (; ;) {
             const match = rePlaceholder.exec(template);
-            if ( match === null ) { break; }
-            if ( pos !== match.index ) {
+            if (match === null) { break; }
+            if (pos !== match.index) {
                 nodes.push(document.createTextNode(template.slice(pos, match.index)));
             }
             pos = rePlaceholder.lastIndex;
             let select, option;
-            switch ( match[0] ) {
-            case '{{br}}':
-                nodes.push(document.createElement('br'));
-                break;
+            switch (match[0]) {
+                case '{{br}}':
+                    nodes.push(document.createElement('br'));
+                    break;
 
-            case '{{action}}':
-                select = document.createElement('select');
-                select.className = 'static action';
-                option = document.createElement('option');
-                dom.attr(option, 'value', '');
-                option.textContent = i18n$('loggerStaticFilteringSentencePartBlock');
-                select.appendChild(option);
-                option = document.createElement('option');
-                dom.attr(option, 'value', '@@');
-                option.textContent = i18n$('loggerStaticFilteringSentencePartAllow');
-                select.appendChild(option);
-                nodes.push(select);
-                break;
-
-            case '{{type}}': {
-                const filterType = staticFilterTypes[targetType] || targetType;
-                select = document.createElement('select');
-                select.className = 'static type';
-                option = document.createElement('option');
-                dom.attr(option, 'value', filterType);
-                option.textContent = i18n$('loggerStaticFilteringSentencePartType').replace('{{type}}', filterType);
-                select.appendChild(option);
-                option = document.createElement('option');
-                dom.attr(option, 'value', '');
-                option.textContent = i18n$('loggerStaticFilteringSentencePartAnyType');
-                select.appendChild(option);
-                nodes.push(select);
-                break;
-            }
-            case '{{url}}':
-                select = document.createElement('select');
-                select.className = 'static url';
-                for ( const targetURL of targetURLs ) {
-                    const value = targetURL.replace(/^[a-z-]+:\/\//, '');
+                case '{{action}}':
+                    select = document.createElement('select');
+                    select.className = 'static action';
                     option = document.createElement('option');
-                    dom.attr(option, 'value', value);
-                    option.textContent = shortenLongString(value, 128);
+                    dom.attr(option, 'value', '');
+                    option.textContent = i18n$('loggerStaticFilteringSentencePartBlock');
                     select.appendChild(option);
+                    option = document.createElement('option');
+                    dom.attr(option, 'value', '@@');
+                    option.textContent = i18n$('loggerStaticFilteringSentencePartAllow');
+                    select.appendChild(option);
+                    nodes.push(select);
+                    break;
+
+                case '{{type}}': {
+                    const filterType = staticFilterTypes[targetType] || targetType;
+                    select = document.createElement('select');
+                    select.className = 'static type';
+                    option = document.createElement('option');
+                    dom.attr(option, 'value', filterType);
+                    option.textContent = i18n$('loggerStaticFilteringSentencePartType').replace('{{type}}', filterType);
+                    select.appendChild(option);
+                    option = document.createElement('option');
+                    dom.attr(option, 'value', '');
+                    option.textContent = i18n$('loggerStaticFilteringSentencePartAnyType');
+                    select.appendChild(option);
+                    nodes.push(select);
+                    break;
                 }
-                nodes.push(select);
-                break;
+                case '{{url}}':
+                    select = document.createElement('select');
+                    select.className = 'static url';
+                    for (const targetURL of targetURLs) {
+                        const value = targetURL.replace(/^[a-z-]+:\/\//, '');
+                        option = document.createElement('option');
+                        dom.attr(option, 'value', value);
+                        option.textContent = shortenLongString(value, 128);
+                        select.appendChild(option);
+                    }
+                    nodes.push(select);
+                    break;
 
-            case '{{origin}}':
-                select = document.createElement('select');
-                select.className = 'static origin';
-                fillOriginSelect(select, targetFrameHostname, targetFrameDomain);
-                option = document.createElement('option');
-                dom.attr(option, 'value', '');
-                option.textContent = i18n$('loggerStaticFilteringSentencePartAnyOrigin');
-                select.appendChild(option);
-                nodes.push(select);
-                break;
+                case '{{origin}}':
+                    select = document.createElement('select');
+                    select.className = 'static origin';
+                    fillOriginSelect(select, targetFrameHostname, targetFrameDomain);
+                    option = document.createElement('option');
+                    dom.attr(option, 'value', '');
+                    option.textContent = i18n$('loggerStaticFilteringSentencePartAnyOrigin');
+                    select.appendChild(option);
+                    nodes.push(select);
+                    break;
 
-            case '{{importance}}':
-                select = document.createElement('select');
-                select.className = 'static importance';
-                option = document.createElement('option');
-                dom.attr(option, 'value', '');
-                option.textContent = i18n$('loggerStaticFilteringSentencePartNotImportant');
-                select.appendChild(option);
-                option = document.createElement('option');
-                dom.attr(option, 'value', 'important');
-                option.textContent = i18n$('loggerStaticFilteringSentencePartImportant');
-                select.appendChild(option);
-                nodes.push(select);
-                break;
+                case '{{importance}}':
+                    select = document.createElement('select');
+                    select.className = 'static importance';
+                    option = document.createElement('option');
+                    dom.attr(option, 'value', '');
+                    option.textContent = i18n$('loggerStaticFilteringSentencePartNotImportant');
+                    select.appendChild(option);
+                    option = document.createElement('option');
+                    dom.attr(option, 'value', 'important');
+                    option.textContent = i18n$('loggerStaticFilteringSentencePartImportant');
+                    select.appendChild(option);
+                    nodes.push(select);
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
-        if ( pos < template.length ) {
+        if (pos < template.length) {
             nodes.push(document.createTextNode(template.slice(pos)));
         }
         const parent = qs$(dialog, 'div.panes > .static > div:first-of-type');
-        for ( let i = 0; i < nodes.length; i++ ) {
+        for (let i = 0; i < nodes.length; i++) {
             parent.appendChild(nodes[i]);
         }
         parseStaticInputs();
     };
 
-    const fillDialog = function(domains) {
+    const fillDialog = function (domains) {
         dialog = dom.clone('#templates .netFilteringDialog');
         dom.cl.toggle(
             dialog,
@@ -1895,17 +1895,17 @@ dom.on(document, 'keydown', ev => {
         dom.on(dialog, 'change', onSelectChange, true);
         dom.on(dialog, 'input', onInputChange, true);
         const container = qs$('#inspectors .entryTools');
-        if ( container.firstChild ) {
+        if (container.firstChild) {
             container.replaceChild(dialog, container.firstChild);
         } else {
             container.append(dialog);
         }
     };
 
-    const toggleOn = async function(ev) {
+    const toggleOn = async function (ev) {
         const clickedRow = ev.target.closest('.canDetails');
-        if ( clickedRow === null ) { return; }
-        if ( clickedRow === targetRow ) {
+        if (clickedRow === null) { return; }
+        if (clickedRow === targetRow) {
             return toggleOff();
         }
         targetRow = clickedRow;
@@ -1928,9 +1928,9 @@ dom.on(document, 'keydown', ev => {
         fillDialog(domains);
     };
 
-    const toggleOff = function() {
+    const toggleOff = function () {
         const container = qs$('#inspectors .entryTools');
-        if ( container.firstChild ) {
+        if (container.firstChild) {
             container.firstChild.remove();
         }
         targetURLs = [];
@@ -1946,22 +1946,22 @@ dom.on(document, 'keydown', ev => {
     let selectionAtMouseDown;
     let selectionAtTimer;
     dom.on('#netInspector', 'mousedown', '.canDetails *:not(a)', ev => {
-        if ( ev.button !== 0 ) { return; }
-        if ( selectionAtMouseDown !== undefined ) { return; }
-        selectionAtMouseDown =  document.getSelection().toString();
+        if (ev.button !== 0) { return; }
+        if (selectionAtMouseDown !== undefined) { return; }
+        selectionAtMouseDown = document.getSelection().toString();
     });
 
     dom.on('#netInspector', 'click', '.canDetails *:not(a)', ev => {
-        if ( ev.button !== 0 ) { return; }
-        if ( selectionAtTimer !== undefined ) {
+        if (ev.button !== 0) { return; }
+        if (selectionAtTimer !== undefined) {
             clearTimeout(selectionAtTimer);
         }
-        selectionAtTimer = setTimeout(( ) => {
+        selectionAtTimer = setTimeout(() => {
             selectionAtTimer = undefined;
             const selectionAsOfNow = document.getSelection().toString();
             const selectionHasChanged = selectionAsOfNow !== selectionAtMouseDown;
             selectionAtMouseDown = undefined;
-            if ( selectionHasChanged && selectionAsOfNow !== '' ) { return; }
+            if (selectionHasChanged && selectionAsOfNow !== '') { return; }
             toggleOn(ev);
         }, 333);
     });
@@ -1983,17 +1983,17 @@ dom.on(document, 'keydown', ev => {
 /******************************************************************************/
 /******************************************************************************/
 
-const consolePane = (( ) => {
+const consolePane = (() => {
     let on = false;
 
-    const lastInfoEntry = ( ) => {
+    const lastInfoEntry = () => {
         let j = Number.MAX_SAFE_INTEGER;
         let i = loggerEntries.length;
-        while ( i-- ) {
+        while (i--) {
             const entry = loggerEntries[i];
-            if ( entry.tabId !== selectedTabId ) { continue; }
-            if ( entry.realm !== 'message' ) { continue; }
-            if ( entry.voided ) { continue; }
+            if (entry.tabId !== selectedTabId) { continue; }
+            if (entry.realm !== 'message') { continue; }
+            if (entry.voided) { continue; }
             j = entry.id;
         }
         return j;
@@ -2004,34 +2004,34 @@ const consolePane = (( ) => {
         pattern: '',
     };
 
-    const filterExprFromInput = ( ) => {
+    const filterExprFromInput = () => {
         const raw = qs$('#infoInspector .permatoolbar input').value.trim();
-        if ( raw.startsWith('-') && raw.length > 1 ) {
+        if (raw.startsWith('-') && raw.length > 1) {
             filterExpr.pattern = raw.slice(1);
             filterExpr.not = true;
         } else {
             filterExpr.pattern = raw;
             filterExpr.not = false;
         }
-        if ( filterExpr.pattern !== '' ) {
+        if (filterExpr.pattern !== '') {
             filterExpr.pattern = new RegExp(escapeRegexStr(filterExpr.pattern), 'i');
         }
     };
 
-    const addRows = ( ) => {
+    const addRows = () => {
         const { not, pattern } = filterExpr;
         const topRow = qs$('#infoInspector .vscrollable > div');
         const topid = topRow !== null ? parseInt(topRow.dataset.id, 10) : 0;
         const fragment = new DocumentFragment();
-        for ( const entry of loggerEntries ) {
-            if ( entry.id <= topid ) { break; }
-            if ( entry.tabId !== selectedTabId ) { continue; }
-            if ( entry.realm !== 'message' ) { continue; }
-            if ( entry.voided ) { continue; }
+        for (const entry of loggerEntries) {
+            if (entry.id <= topid) { break; }
+            if (entry.tabId !== selectedTabId) { continue; }
+            if (entry.realm !== 'message') { continue; }
+            if (entry.voided) { continue; }
             const fields = entry.textContent.split('\x1F').slice(0, 2);
             const textContent = fields.join('\xA0');
-            if ( pattern instanceof RegExp ) {
-                if ( pattern.test(textContent) === not ) { continue; }
+            if (pattern instanceof RegExp) {
+                if (pattern.test(textContent) === not) { continue; }
             }
             const div = document.createElement('div');
             div.dataset.id = `${entry.id}`;
@@ -2044,48 +2044,48 @@ const consolePane = (( ) => {
     }
 
     const removeRows = (before = 0) => {
-        if ( before === 0 ) {
+        if (before === 0) {
             before = lastInfoEntry();
         }
         const rows = qsa$('#infoInspector .vscrollable > div');
         let i = rows.length;
-        while ( i-- ) {
+        while (i--) {
             const div = rows[i];
             const id = parseInt(div.dataset.id, 10);
-            if ( id > before ) { break; }
+            if (id > before) { break; }
             div.remove();
         }
     }
 
-    const updateContent = ( ) => {
-        if ( on === false ) { return; }
+    const updateContent = () => {
+        if (on === false) { return; }
         removeRows();
         addRows();
     };
 
-    const onTabIdChanged = ( ) => {
-        if ( on === false ) { return; }
+    const onTabIdChanged = () => {
+        if (on === false) { return; }
         removeRows(Number.MAX_SAFE_INTEGER);
         addRows();
     };
 
-    const toggleOn = ( ) => {
-        if ( on ) { return; }
+    const toggleOn = () => {
+        if (on) { return; }
         addRows();
         dom.on(document, 'tabIdChanged', onTabIdChanged);
         on = true;
     };
 
-    const toggleOff = ( ) => {
+    const toggleOff = () => {
         removeRows(Number.MAX_SAFE_INTEGER);
         dom.off(document, 'tabIdChanged', onTabIdChanged);
         on = false;
     };
 
     const resizeObserver = new self.ResizeObserver(entries => {
-        if ( entries.length === 0 ) { return; }
+        if (entries.length === 0) { return; }
         const rect = entries[0].contentRect;
-        if ( rect.width > 0 && rect.height > 0 ) {
+        if (rect.width > 0 && rect.height > 0) {
             toggleOn();
         } else {
             toggleOff();
@@ -2098,7 +2098,7 @@ const consolePane = (( ) => {
         dom.cl.toggle(ev.currentTarget, 'active', active);
     });
 
-    dom.on('#infoInspector button#clearConsole', 'click', ( ) => {
+    dom.on('#infoInspector button#clearConsole', 'click', () => {
         const ids = [];
         qsa$('#infoInspector .vscrollable > div').forEach(div => {
             ids.push(parseInt(div.dataset.id, 10));
@@ -2111,11 +2111,11 @@ const consolePane = (( ) => {
         broadcast({ what: 'loggerLevelChanged', level });
     });
 
-    const throttleFilter = vAPI.defer.create(( ) => {
+    const throttleFilter = vAPI.defer.create(() => {
         filterExprFromInput();
         updateContent();
     });
-    dom.on('#infoInspector .permatoolbar input', 'input', ( ) => {
+    dom.on('#infoInspector .permatoolbar input', 'input', () => {
         throttleFilter.offon(517);
     });
 
@@ -2125,30 +2125,30 @@ const consolePane = (( ) => {
 /******************************************************************************/
 /******************************************************************************/
 
-const rowFilterer = (( ) => {
+const rowFilterer = (() => {
     const userFilters = [];
     const builtinFilters = [];
 
     let masterFilterSwitch = true;
     let filters = [];
 
-    const parseInput = function() {
+    const parseInput = function () {
         userFilters.length = 0;
 
         const rawParts = qs$('#filterInput > input').value.trim().split(/\s+/);
         const n = rawParts.length;
         const reStrs = [];
         let not = false;
-        for ( let i = 0; i < n; i++ ) {
+        for (let i = 0; i < n; i++) {
             let rawPart = rawParts[i];
-            if ( rawPart.charAt(0) === '!' ) {
-                if ( reStrs.length === 0 ) {
+            if (rawPart.charAt(0) === '!') {
+                if (reStrs.length === 0) {
                     not = true;
                 }
                 rawPart = rawPart.slice(1);
             }
             let reStr = '';
-            if ( rawPart.startsWith('/') && rawPart.endsWith('/') ) {
+            if (rawPart.startsWith('/') && rawPart.endsWith('/')) {
                 reStr = rawPart.slice(1, -1);
                 try {
                     new RegExp(reStr);
@@ -2156,13 +2156,13 @@ const rowFilterer = (( ) => {
                     reStr = '';
                 }
             }
-            if ( reStr === '' ) {
+            if (reStr === '') {
                 const hardBeg = rawPart.startsWith('|');
-                if ( hardBeg ) {
+                if (hardBeg) {
                     rawPart = rawPart.slice(1);
                 }
                 const hardEnd = rawPart.endsWith('|');
-                if ( hardEnd ) {
+                if (hardEnd) {
                     rawPart = rawPart.slice(0, -1);
                 }
                 // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
@@ -2170,16 +2170,16 @@ const rowFilterer = (( ) => {
                 // https://github.com/orgs/uBlockOrigin/teams/ublock-issues-volunteers/discussions/51
                 //   Be more flexible when interpreting leading/trailing pipes,
                 //   as leading/trailing pipes are often used in static filters.
-                if ( hardBeg ) {
+                if (hardBeg) {
                     reStr = reStr !== '' ? '(?:^|\\s|\\|)' + reStr : '\\|';
                 }
-                if ( hardEnd ) {
+                if (hardEnd) {
                     reStr += '(?:\\||\\s|$)';
                 }
             }
-            if ( reStr === '' ) { continue; }
+            if (reStr === '') { continue; }
             reStrs.push(reStr);
-            if ( i < (n - 1) && rawParts[i + 1] === '||' ) {
+            if (i < (n - 1) && rawParts[i + 1] === '||') {
                 i += 1;
                 continue;
             }
@@ -2195,34 +2195,34 @@ const rowFilterer = (( ) => {
     };
 
     const filterOne = logEntry => {
-        if ( logEntry.dead ) { return false; }
-        if ( selectedTabId !== 0 ) {
-            if ( logEntry.tabId !== undefined && logEntry.tabId > 0 ) {
-                if (logEntry.tabId !== selectedTabId ) { return false; }
+        if (logEntry.dead) { return false; }
+        if (selectedTabId !== 0) {
+            if (logEntry.tabId !== undefined && logEntry.tabId > 0) {
+                if (logEntry.tabId !== selectedTabId) { return false; }
             }
         }
 
-        if ( masterFilterSwitch === false || filters.length === 0 ) {
+        if (masterFilterSwitch === false || filters.length === 0) {
             return true;
         }
 
         // Do not filter out tab load event, they help separate key sections
         // of logger.
-        if ( logEntry.type === 'tabLoad' ) { return true; }
+        if (logEntry.type === 'tabLoad') { return true; }
 
-        for ( const f of filters ) {
-            if ( f.re.test(logEntry.textContent) !== f.r ) { return false; }
+        for (const f of filters) {
+            if (f.re.test(logEntry.textContent) !== f.r) { return false; }
         }
         return true;
     };
 
-    const filterAll = function() {
+    const filterAll = function () {
         filteredLoggerEntries = [];
         filteredLoggerEntryVoidedCount = 0;
-        for ( const entry of loggerEntries ) {
-            if ( filterOne(entry) === false ) { continue; }
+        for (const entry of loggerEntries) {
+            if (filterOne(entry) === false) { continue; }
             filteredLoggerEntries.push(entry);
-            if ( entry.voided ) {
+            if (entry.voided) {
                 filteredLoggerEntryVoidedCount += 1;
             }
         }
@@ -2232,37 +2232,37 @@ const rowFilterer = (( ) => {
         dom.cl.toggle('#clear', 'disabled', filteredLoggerEntries.length === 0);
     };
 
-    const onFilterChangedAsync = (( ) => {
-        const commit = ( ) => {
+    const onFilterChangedAsync = (() => {
+        const commit = () => {
             parseInput();
             filterAll();
         };
         const timer = vAPI.defer.create(commit);
-        return ( ) => {
+        return () => {
             timer.offon(750);
         };
     })();
 
-    const onFilterButton = function() {
+    const onFilterButton = function () {
         masterFilterSwitch = !masterFilterSwitch;
         dom.cl.toggle('#netInspector', 'f', masterFilterSwitch);
-        filterAll();            
+        filterAll();
     };
 
-    const onToggleExtras = function(ev) {
+    const onToggleExtras = function (ev) {
         dom.cl.toggle(ev.target, 'expanded');
     };
 
-    const builtinFilterExpression = function() {
+    const builtinFilterExpression = function () {
         builtinFilters.length = 0;
         const filtexElems = qsa$('#filterExprPicker [data-filtex]');
         const orExprs = [];
         let not = false;
-        for ( const filtexElem of filtexElems ) {
+        for (const filtexElem of filtexElems) {
             const filtex = filtexElem.dataset.filtex;
             const active = dom.cl.has(filtexElem, 'on');
-            if ( filtex === '!' ) {
-                if ( orExprs.length !== 0 ) {
+            if (filtex === '!') {
+                if (orExprs.length !== 0) {
                     builtinFilters.push({
                         re: new RegExp(orExprs.join('|')),
                         r: !not
@@ -2270,11 +2270,11 @@ const rowFilterer = (( ) => {
                     orExprs.length = 0;
                 }
                 not = active;
-            } else if ( active ) {
+            } else if (active) {
                 orExprs.push(filtex);
             }
         }
-        if ( orExprs.length !== 0 ) {
+        if (orExprs.length !== 0) {
             builtinFilters.push({
                 re: new RegExp(orExprs.join('|')),
                 r: !not
@@ -2294,8 +2294,8 @@ const rowFilterer = (( ) => {
     });
     dom.on('#filterInput > input', 'drop', ev => {
         const dropItem = item => {
-            if ( item.kind !== 'string' ) { return false; }
-            if ( item.type !== 'text/plain' ) { return false; }
+            if (item.kind !== 'string') { return false; }
+            if (item.type !== 'text/plain') { return false; }
             item.getAsString(s => {
                 qs$('#filterInput > input').value = s;
                 parseInput();
@@ -2303,14 +2303,14 @@ const rowFilterer = (( ) => {
             });
             return true;
         };
-        for ( const item of ev.dataTransfer.items ) {
-            if ( dropItem(item) === false ) { continue; }
+        for (const item of ev.dataTransfer.items) {
+            if (dropItem(item) === false) { continue; }
             ev.preventDefault();
             break;
         }
     });
 
-    // https://github.com/gorhill/uBlock/issues/404
+    // https://github.com/Ablock/Ablock/issues/404
     //   Ensure page state is in sync with the state of its various widgets.
     parseInput();
     builtinFilterExpression();
@@ -2328,14 +2328,14 @@ const rowFilterer = (( ) => {
 // - Max number of entry per distinct tab
 // - Max entry age
 
-const rowJanitor = (( ) => {
+const rowJanitor = (() => {
     const tabIdToDiscard = new Set();
     const tabIdToLoadCountMap = new Map();
     const tabIdToEntryCountMap = new Map();
 
     let rowIndex = 0;
 
-    const discard = function(deadline) {
+    const discard = function (deadline) {
         const opts = loggerSettings.discard;
         const maxLoadCount = typeof opts.maxLoadCount === 'number'
             ? opts.maxLoadCount
@@ -2349,11 +2349,11 @@ const rowJanitor = (( ) => {
 
         let i = rowIndex;
         // TODO: below should not happen -- remove when confirmed.
-        if ( i >= loggerEntries.length ) {
+        if (i >= loggerEntries.length) {
             i = 0;
         }
 
-        if ( i === 0 ) {
+        if (i === 0) {
             tabIdToDiscard.clear();
             tabIdToLoadCountMap.clear();
             tabIdToEntryCountMap.clear();
@@ -2364,49 +2364,49 @@ const rowJanitor = (( ) => {
         let bufferedEntryCount = 0;
         let modified = false;
 
-        while ( i < loggerEntries.length ) {
+        while (i < loggerEntries.length) {
 
-            if ( i % 64 === 0 && deadline.timeRemaining() === 0 ) { break; }
+            if (i % 64 === 0 && deadline.timeRemaining() === 0) { break; }
 
             const entry = loggerEntries[i];
             const tabId = entry.tabId || 0;
 
-            if ( entry.dead || tabIdToDiscard.has(tabId) ) {
-                if ( idel === -1 ) { idel = i; }
+            if (entry.dead || tabIdToDiscard.has(tabId)) {
+                if (idel === -1) { idel = i; }
                 i += 1;
                 continue;
             }
 
-            if ( maxLoadCount !== 0 && entry.type === 'tabLoad' ) {
+            if (maxLoadCount !== 0 && entry.type === 'tabLoad') {
                 let count = (tabIdToLoadCountMap.get(tabId) || 0) + 1;
                 tabIdToLoadCountMap.set(tabId, count);
-                if ( count >= maxLoadCount ) {
+                if (count >= maxLoadCount) {
                     tabIdToDiscard.add(tabId);
                 }
             }
 
-            if ( maxEntryCount !== 0 ) {
-                if ( bufferedTabId !== tabId ) {
-                    if ( bufferedEntryCount !== 0 ) {
+            if (maxEntryCount !== 0) {
+                if (bufferedTabId !== tabId) {
+                    if (bufferedEntryCount !== 0) {
                         tabIdToEntryCountMap.set(bufferedTabId, bufferedEntryCount);
                     }
                     bufferedTabId = tabId;
                     bufferedEntryCount = tabIdToEntryCountMap.get(tabId) || 0;
                 }
                 bufferedEntryCount += 1;
-                if ( bufferedEntryCount >= maxEntryCount ) {
+                if (bufferedEntryCount >= maxEntryCount) {
                     tabIdToDiscard.add(bufferedTabId);
                 }
             }
 
             // Since entries in the logger are chronologically ordered,
             // everything below obsolete is to be discarded.
-            if ( obsolete !== 0 && entry.tstamp <= obsolete ) {
-                if ( idel === -1 ) { idel = i; }
+            if (obsolete !== 0 && entry.tstamp <= obsolete) {
+                if (idel === -1) { idel = i; }
                 break;
             }
 
-            if ( idel !== -1 ) {
+            if (idel !== -1) {
                 loggerEntries.copyWithin(idel, i);
                 loggerEntries.length -= i - idel;
                 idel = -1;
@@ -2416,28 +2416,28 @@ const rowJanitor = (( ) => {
             i += 1;
         }
 
-        if ( idel !== -1 ) {
+        if (idel !== -1) {
             loggerEntries.length = idel;
             modified = true;
         }
 
-        if ( i >= loggerEntries.length ) { i = 0; }
+        if (i >= loggerEntries.length) { i = 0; }
         rowIndex = i;
 
-        if ( rowIndex === 0 ) {
+        if (rowIndex === 0) {
             tabIdToDiscard.clear();
             tabIdToLoadCountMap.clear();
             tabIdToEntryCountMap.clear();
         }
 
-        if ( modified === false ) { return; }
+        if (modified === false) { return; }
 
         rowFilterer.filterAll();
         consolePane.updateContent();
     };
 
-    const discardAsync = function(deadline) {
-        if ( deadline ) {
+    const discardAsync = function (deadline) {
+        if (deadline) {
             discard(deadline);
         }
         janitorTimer.onidle(1889);
@@ -2450,18 +2450,18 @@ const rowJanitor = (( ) => {
     // Voided entries should be visible only from the "All" option of the
     // tab selector.
     //
-    const clean = function() {
-        if ( filteredLoggerEntries.length === 0 ) { return; }
+    const clean = function () {
+        if (filteredLoggerEntries.length === 0) { return; }
 
         let j = 0;
         let targetEntry = filteredLoggerEntries[0];
-        for ( const entry of loggerEntries ) {
-            if ( entry !== targetEntry ) { continue; }
-            if ( entry.voided ) {
+        for (const entry of loggerEntries) {
+            if (entry !== targetEntry) { continue; }
+            if (entry.voided) {
                 entry.dead = true;
             }
             j += 1;
-            if ( j === filteredLoggerEntries.length ) { break; }
+            if (j === filteredLoggerEntries.length) { break; }
             targetEntry = filteredLoggerEntries[j];
         }
         rowFilterer.filterAll();
@@ -2474,13 +2474,13 @@ const rowJanitor = (( ) => {
     // entries. In effect, this means clicking a second time on the eraser will
     // cause unrelated entries to also be cleared.
     //
-    const clear = function() {
-        if ( filteredLoggerEntries.length === 0 ) { return; }
+    const clear = function () {
+        if (filteredLoggerEntries.length === 0) { return; }
 
         let clearUnrelated = true;
-        if ( selectedTabId !== 0 ) {
-            for ( const entry of filteredLoggerEntries ) {
-                if ( entry.tabId === selectedTabId ) {
+        if (selectedTabId !== 0) {
+            for (const entry of filteredLoggerEntries) {
+                if (entry.tabId === selectedTabId) {
                     clearUnrelated = false;
                     break;
                 }
@@ -2489,13 +2489,13 @@ const rowJanitor = (( ) => {
 
         let j = 0;
         let targetEntry = filteredLoggerEntries[0];
-        for ( const entry of loggerEntries ) {
-            if ( entry !== targetEntry ) { continue; }
-            if ( entry.tabId === selectedTabId || clearUnrelated ) {
+        for (const entry of loggerEntries) {
+            if (entry !== targetEntry) { continue; }
+            if (entry.tabId === selectedTabId || clearUnrelated) {
                 entry.dead = true;
             }
             j += 1;
-            if ( j === filteredLoggerEntries.length ) { break; }
+            if (j === filteredLoggerEntries.length) { break; }
             targetEntry = filteredLoggerEntries[j];
         }
         rowFilterer.filterAll();
@@ -2508,19 +2508,19 @@ const rowJanitor = (( ) => {
 
     return {
         inserted(count) {
-            if ( rowIndex !== 0 ) {
+            if (rowIndex !== 0) {
                 rowIndex += count;
             }
         },
         removeSpecificRows(descendingIds) {
-            if ( descendingIds.length === 0 ) { return; }
+            if (descendingIds.length === 0) { return; }
             let i = loggerEntries.length;
             let id = descendingIds.pop();
-            while ( i-- ) {
+            while (i--) {
                 const entry = loggerEntries[i];
-                if ( entry.id !== id ) { continue; }
+                if (entry.id !== id) { continue; }
                 loggerEntries.splice(i, 1);
-                if ( descendingIds.length === 0 ) { break; }
+                if (descendingIds.length === 0) { break; }
                 id = descendingIds.pop();
             }
             rowFilterer.filterAll();
@@ -2531,36 +2531,36 @@ const rowJanitor = (( ) => {
 
 /******************************************************************************/
 
-const pauseNetInspector = function() {
+const pauseNetInspector = function () {
     netInspectorPaused = dom.cl.toggle('#netInspector', 'paused');
 };
 
 /******************************************************************************/
 
-const toggleVCompactView = function() {
+const toggleVCompactView = function () {
     dom.cl.toggle('#netInspector .vCompactToggler', 'vExpanded');
     viewPort.updateLayout();
 };
 
 /******************************************************************************/
 
-const popupManager = (( ) => {
+const popupManager = (() => {
     let realTabId = 0;
     let popup = null;
     let popupObserver = null;
 
-    const resizePopup = function() {
-        if ( popup === null ) { return; }
+    const resizePopup = function () {
+        if (popup === null) { return; }
         const popupBody = popup.contentWindow.document.body;
-        if ( popupBody.clientWidth !== 0 && popup.clientWidth !== popupBody.clientWidth ) {
+        if (popupBody.clientWidth !== 0 && popup.clientWidth !== popupBody.clientWidth) {
             popup.style.setProperty('width', popupBody.clientWidth + 'px');
         }
-        if ( popupBody.clientHeight !== 0 && popup.clientHeight !== popupBody.clientHeight ) {
+        if (popupBody.clientHeight !== 0 && popup.clientHeight !== popupBody.clientHeight) {
             popup.style.setProperty('height', popupBody.clientHeight + 'px');
         }
     };
 
-    const onLoad = function() {
+    const onLoad = function () {
         resizePopup();
         popupObserver.observe(popup.contentDocument.body, {
             subtree: true,
@@ -2568,21 +2568,21 @@ const popupManager = (( ) => {
         });
     };
 
-    const setTabId = function(tabId) {
-        if ( popup === null ) { return; }
+    const setTabId = function (tabId) {
+        if (popup === null) { return; }
         dom.attr(popup, 'src', `popup-fenix.html?portrait=1&tabId=${tabId}`);
     };
 
-    const onTabIdChanged = function() {
+    const onTabIdChanged = function () {
         const tabId = tabIdFromPageSelector();
-        if ( tabId === 0 ) { return toggleOff(); }
+        if (tabId === 0) { return toggleOff(); }
         realTabId = tabId;
         setTabId(realTabId);
     };
 
-    const toggleOn = function() {
+    const toggleOn = function () {
         const tabId = tabIdFromPageSelector();
-        if ( tabId === 0 ) { return; }
+        if (tabId === 0) { return; }
         realTabId = tabId;
 
         popup = qs$('#popupContainer');
@@ -2601,7 +2601,7 @@ const popupManager = (( ) => {
         dom.cl.add('#showpopup', 'active');
     };
 
-    const toggleOff = function() {
+    const toggleOff = function () {
         dom.cl.remove('#showpopup', 'active');
         dom.off(document, 'tabIdChanged', onTabIdChanged);
         dom.cl.remove('#inspectors', 'popupOn');
@@ -2609,20 +2609,20 @@ const popupManager = (( ) => {
         popupObserver.disconnect();
         popupObserver = null;
         dom.attr(popup, 'src', '');
-    
+
         realTabId = 0;
     };
 
     const api = {
         get tabId() { return realTabId || 0; },
-        toggleOff: function() {
-            if ( realTabId !== 0 ) {
+        toggleOff: function () {
+            if (realTabId !== 0) {
                 toggleOff();
             }
         }
     };
 
-    dom.on('#showpopup', 'click', ( ) => {
+    dom.on('#showpopup', 'click', () => {
         void (realTabId === 0 ? toggleOn() : toggleOff());
     });
 
@@ -2633,24 +2633,24 @@ const popupManager = (( ) => {
 
 // Filter hit stats' MVP ("minimum viable product")
 //
-const loggerStats = (( ) => {
+const loggerStats = (() => {
     const enabled = false;
     const filterHits = new Map();
     let dialog;
     let timer;
-    const makeRow = function() {
+    const makeRow = function () {
         const div = document.createElement('div');
         div.appendChild(document.createElement('span'));
         div.appendChild(document.createElement('span'));
         return div;
     };
 
-    const fillRow = function(div, entry) {
+    const fillRow = function (div, entry) {
         div.children[0].textContent = entry[1].toLocaleString();
         div.children[1].textContent = entry[0];
     };
 
-    const updateList = function() {
+    const updateList = function () {
         const sortedHits = Array.from(filterHits).sort((a, b) => {
             return b[1] - a[1];
         });
@@ -2660,16 +2660,16 @@ const loggerStats = (( ) => {
         let i = 0;
 
         // Reuse existing rows
-        for ( let iRow = 0; iRow < parent.childElementCount; iRow++ ) {
-            if ( i === sortedHits.length ) { break; }
+        for (let iRow = 0; iRow < parent.childElementCount; iRow++) {
+            if (i === sortedHits.length) { break; }
             fillRow(parent.children[iRow], sortedHits[i]);
             i += 1;
         }
 
         // Append new rows
-        if ( i < sortedHits.length ) {
+        if (i < sortedHits.length) {
             const list = doc.createDocumentFragment();
-            for ( ; i < sortedHits.length; i++ ) {
+            for (; i < sortedHits.length; i++) {
                 const div = makeRow();
                 fillRow(div, sortedHits[i]);
                 list.appendChild(div);
@@ -2682,12 +2682,12 @@ const loggerStats = (( ) => {
         //  bare-bone implementation]
     };
 
-    const toggleOn = function() {
+    const toggleOn = function () {
         dialog = modalDialog.create(
             '#loggerStatsDialog',
-            ( ) => {
+            () => {
                 dialog = undefined;
-                if ( timer !== undefined ) {
+                if (timer !== undefined) {
                     self.cancelIdleCallback(timer);
                     timer = undefined;
                 }
@@ -2700,15 +2700,15 @@ const loggerStats = (( ) => {
     dom.on('#loggerStats', 'click', toggleOn);
 
     return {
-        processFilter: function(filter) {
-            if ( enabled !== true ) { return; }
-            if ( filter.source !== 'static' && filter.source !== 'cosmetic' ) {
+        processFilter: function (filter) {
+            if (enabled !== true) { return; }
+            if (filter.source !== 'static' && filter.source !== 'cosmetic') {
                 return;
             }
             filterHits.set(filter.raw, (filterHits.get(filter.raw) || 0) + 1);
-            if ( dialog === undefined || timer !== undefined ) { return; }
+            if (dialog === undefined || timer !== undefined) { return; }
             timer = self.requestIdleCallback(
-                ( ) => {
+                () => {
                     timer = undefined;
                     updateList();
                 },
@@ -2720,7 +2720,7 @@ const loggerStats = (( ) => {
 
 /******************************************************************************/
 
-(( ) => {
+(() => {
     const lines = [];
     const options = {
         format: 'list',
@@ -2729,25 +2729,25 @@ const loggerStats = (( ) => {
     };
     let dialog;
 
-    const collectLines = function() {
+    const collectLines = function () {
         lines.length = 0;
         let t0 = filteredLoggerEntries.length !== 0
             ? filteredLoggerEntries[filteredLoggerEntries.length - 1].tstamp
             : 0;
-        for ( const entry of filteredLoggerEntries ) {
+        for (const entry of filteredLoggerEntries) {
             const text = entry.textContent;
             const fields = [];
             let beg = text.indexOf('\x1F');
-            if ( beg === 0 ) { continue; }
+            if (beg === 0) { continue; }
             let timeField = text.slice(0, beg);
-            if ( options.time === 'anonymous' ) {
+            if (options.time === 'anonymous') {
                 timeField = '+' + Math.round(entry.tstamp - t0).toString();
             }
             fields.push(timeField);
             beg += 1;
-            while ( beg < text.length ) {
+            while (beg < text.length) {
                 let end = text.indexOf('\x1F', beg);
-                if ( end === -1 ) { end = text.length; }
+                if (end === -1) { end = text.length; }
                 fields.push(text.slice(beg, end));
                 beg = end + 1;
             }
@@ -2755,60 +2755,60 @@ const loggerStats = (( ) => {
         }
     };
 
-    const formatAsPlainTextTable = function() {
+    const formatAsPlainTextTable = function () {
         const outputAll = [];
-        for ( const fields of lines ) {
+        for (const fields of lines) {
             outputAll.push(fields.join('\t'));
         }
         outputAll.push('');
         return outputAll.join('\n');
     };
 
-    const formatAsMarkdownTable = function() {
+    const formatAsMarkdownTable = function () {
         const outputAll = [];
         let fieldCount = 0;
-        for ( const fields of lines ) {
-            if ( fields.length <= 2 ) { continue; }
-            if ( fields.length > fieldCount ) {
+        for (const fields of lines) {
+            if (fields.length <= 2) { continue; }
+            if (fields.length > fieldCount) {
                 fieldCount = fields.length;
             }
             const outputOne = [];
-            for ( let i = 0; i < fields.length; i++ ) {
+            for (let i = 0; i < fields.length; i++) {
                 const field = fields[i];
                 const code = i === 1 || /\b(?:www\.|https?:\/\/)/.test(field) ? '`' : '';
                 outputOne.push(` ${code}${field.replace(/\|/g, '\\|')}${code} `);
             }
             outputAll.push(outputOne.join('|'));
         }
-        if ( fieldCount !== 0 ) {
+        if (fieldCount !== 0) {
             outputAll.unshift(
-                `${' |'.repeat(fieldCount-1)} `,
-                `${':--- |'.repeat(fieldCount-1)}:--- `
+                `${' |'.repeat(fieldCount - 1)} `,
+                `${':--- |'.repeat(fieldCount - 1)}:--- `
             );
         }
         return `<details><summary>Logger output</summary>\n\n|${outputAll.join('|\n|')}|\n</details>\n`;
     };
 
-    const formatAsTable = function() {
-        if ( options.encoding === 'plain' ) {
+    const formatAsTable = function () {
+        if (options.encoding === 'plain') {
             return formatAsPlainTextTable();
         }
         return formatAsMarkdownTable();
     };
 
-    const formatAsList = function() {
+    const formatAsList = function () {
         const outputAll = [];
-        for ( const fields of lines ) {
+        for (const fields of lines) {
             const outputOne = [];
-            for ( let i = 0; i < fields.length; i++ ) {
+            for (let i = 0; i < fields.length; i++) {
                 let str = fields[i];
-                if ( str.length === 0 ) { continue; }
+                if (str.length === 0) { continue; }
                 outputOne.push(str);
             }
             outputAll.push(outputOne.join('\n'));
         }
         let before, between, after;
-        if ( options.encoding === 'markdown' ) {
+        if (options.encoding === 'markdown') {
             const code = '```';
             before = `<details><summary>Logger output</summary>\n\n${code}\n`;
             between = `\n${code}\n${code}\n`;
@@ -2821,20 +2821,20 @@ const loggerStats = (( ) => {
         return `${before}${outputAll.join(between)}${after}`;
     };
 
-    const format = function() {
+    const format = function () {
         const output = qs$(dialog, '.output');
-        if ( options.format === 'list' ) {
+        if (options.format === 'list') {
             output.textContent = formatAsList();
         } else {
             output.textContent = formatAsTable();
         }
     };
 
-    const setRadioButton = function(group, value) {
-        if ( Object.hasOwn(options, group) === false ) { return; }
+    const setRadioButton = function (group, value) {
+        if (Object.hasOwn(options, group) === false) { return; }
         const groupEl = qs$(dialog, `[data-radio="${group}"]`);
         const buttonEls = qsa$(groupEl, '[data-radio-item]');
-        for ( const buttonEl of buttonEls ) {
+        for (const buttonEl of buttonEls) {
             dom.cl.toggle(
                 buttonEl,
                 'on',
@@ -2844,15 +2844,15 @@ const loggerStats = (( ) => {
         options[group] = value;
     };
 
-    const onOption = function(ev) {
+    const onOption = function (ev) {
         const target = ev.target.closest('span[data-i18n]');
-        if ( target === null ) { return; }
+        if (target === null) { return; }
 
         // Copy to clipboard
-        if ( target.matches('.pushbutton') ) {
+        if (target.matches('.pushbutton')) {
             const textarea = qs$(dialog, 'textarea');
             textarea.focus();
-            if ( textarea.selectionEnd === textarea.selectionStart ) {
+            if (textarea.selectionEnd === textarea.selectionStart) {
                 textarea.select();
             }
             document.execCommand('copy');
@@ -2862,10 +2862,10 @@ const loggerStats = (( ) => {
 
         // Radio buttons
         const group = target.closest('[data-radio]');
-        if ( group === null ) { return; }
-        if ( target.matches('span.on') ) { return; }
+        if (group === null) { return; }
+        if (target.matches('span.on')) { return; }
         const item = target.closest('[data-radio-item]');
-        if ( item === null ) { return; }
+        if (item === null) { return; }
         setRadioButton(
             dom.attr(group, 'data-radio'),
             dom.attr(item, 'data-radio-item')
@@ -2874,10 +2874,10 @@ const loggerStats = (( ) => {
         ev.stopPropagation();
     };
 
-    const toggleOn = function() {
+    const toggleOn = function () {
         dialog = modalDialog.create(
             '#loggerExportDialog',
-            ( ) => {
+            () => {
                 dialog = undefined;
                 lines.length = 0;
             }
@@ -2904,54 +2904,54 @@ const loggerStats = (( ) => {
 //   - an option to discard immediately filtered out new entries
 //   - max entry count _per load_
 //
-const loggerSettings = (( ) => {
+const loggerSettings = (() => {
     const settings = {
         discard: {
             maxAge: 240,            // global
             maxEntryCount: 2000,    // per-tab
             maxLoadCount: 20,       // per-tab
         },
-        columns: [ true, true, true, true, true, true, true, true, true ],
+        columns: [true, true, true, true, true, true, true, true, true],
         linesPerEntry: 4,
     };
 
     vAPI.localStorage.getItemAsync('loggerSettings').then(value => {
         try {
             const stored = JSON.parse(value);
-            if ( typeof stored.discard.maxAge === 'number' ) {
+            if (typeof stored.discard.maxAge === 'number') {
                 settings.discard.maxAge = stored.discard.maxAge;
             }
-            if ( typeof stored.discard.maxEntryCount === 'number' ) {
+            if (typeof stored.discard.maxEntryCount === 'number') {
                 settings.discard.maxEntryCount = stored.discard.maxEntryCount;
             }
-            if ( typeof stored.discard.maxLoadCount === 'number' ) {
+            if (typeof stored.discard.maxLoadCount === 'number') {
                 settings.discard.maxLoadCount = stored.discard.maxLoadCount;
             }
-            if ( typeof stored.linesPerEntry === 'number' ) {
+            if (typeof stored.linesPerEntry === 'number') {
                 settings.linesPerEntry = stored.linesPerEntry;
             }
-            if ( Array.isArray(stored.columns) ) {
+            if (Array.isArray(stored.columns)) {
                 settings.columns = stored.columns;
             }
         } catch {
         }
     });
 
-    const valueFromInput = function(input, def) {
+    const valueFromInput = function (input, def) {
         let value = parseInt(input.value, 10);
-        if ( isNaN(value) ) { value = def; }
+        if (isNaN(value)) { value = def; }
         const min = parseInt(dom.attr(input, 'min'), 10);
-        if ( isNaN(min) === false ) {
+        if (isNaN(min) === false) {
             value = Math.max(value, min);
         }
         const max = parseInt(dom.attr(input, 'max'), 10);
-        if ( isNaN(max) === false ) {
+        if (isNaN(max) === false) {
             value = Math.min(value, max);
         }
         return value;
     };
 
-    const toggleOn = function() {
+    const toggleOn = function () {
         const dialog = modalDialog.create(
             '#loggerSettingsDialog',
             dialog => {
@@ -2978,7 +2978,7 @@ const loggerSettings = (( ) => {
             viewPort.updateLayout();
         };
         inputs = qsa$(dialog, 'input[type="checkbox"][data-column]');
-        for ( const input of inputs ) {
+        for (const input of inputs) {
             const i = parseInt(dom.attr(input, 'data-column'), 10);
             input.checked = settings.columns[i] === false;
             dom.on(input, 'change', onColumnChanged);
@@ -2987,7 +2987,7 @@ const loggerSettings = (( ) => {
         modalDialog.show();
     };
 
-    const toggleOff = function(dialog) {
+    const toggleOff = function (dialog) {
         // Number inputs
         let inputs = qsa$(dialog, 'input[type="number"]');
         settings.discard.maxAge = valueFromInput(inputs[0], 240);
@@ -2997,7 +2997,7 @@ const loggerSettings = (( ) => {
 
         // Column checkboxs
         inputs = qsa$(dialog, 'input[type="checkbox"][data-column]');
-        for ( const input of inputs ) {
+        for (const input of inputs) {
             const i = parseInt(dom.attr(input, 'data-column'), 10);
             settings.columns[i] = input.checked !== true;
         }
@@ -3017,15 +3017,15 @@ const loggerSettings = (( ) => {
 
 /******************************************************************************/
 
-const grabView = function() {
-    if ( logger.ownerId === undefined ) {
+const grabView = function () {
+    if (logger.ownerId === undefined) {
         logger.ownerId = Date.now();
     }
     readLogBuffer();
 };
 
-const releaseView = function() {
-    if ( logger.ownerId === undefined ) { return; }
+const releaseView = function () {
+    if (logger.ownerId === undefined) { return; }
     vAPI.messaging.send('loggerUI', {
         what: 'releaseView',
         ownerId: logger.ownerId,
@@ -3047,12 +3047,12 @@ dom.on('#pause', 'click', pauseNetInspector);
 dom.on('#netInspector #vwContent', 'copy', ev => {
     const selection = document.getSelection();
     const text = selection.toString();
-    if ( /\x1F|\u200B/.test(text) === false ) { return; }
+    if (/\x1F|\u200B/.test(text) === false) { return; }
     ev.clipboardData.setData('text/plain', text.replace(/\x1F|\u200B/g, '\t'));
     ev.preventDefault();
 });
 
-// https://github.com/gorhill/uBlock/issues/507
+// https://github.com/Ablock/Ablock/issues/507
 //   Ensure tab selector is in sync with URL hash
 pageSelectorFromURLHash();
 dom.on(window, 'hashchange', pageSelectorFromURLHash);
@@ -3060,9 +3060,9 @@ dom.on(window, 'hashchange', pageSelectorFromURLHash);
 // Start to watch the current window geometry 2 seconds after the document
 // is loaded, to be sure no spurious geometry changes will be triggered due
 // to the window geometry pontentially not settling fast enough.
-if ( self.location.search.includes('popup=1') ) {
-    dom.on(window, 'load', ( ) => {
-        vAPI.defer.once(2000).then(( ) => {
+if (self.location.search.includes('popup=1')) {
+    dom.on(window, 'load', () => {
+        vAPI.defer.once(2000).then(() => {
             popupLoggerBox = {
                 x: self.screenX,
                 y: self.screenY,

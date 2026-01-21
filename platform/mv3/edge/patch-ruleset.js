@@ -16,13 +16,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 function patchRule(rule, out) {
     const { condition } = rule;
-    if ( Array.isArray(condition.responseHeaders) ) {
-        if ( condition.regexFilter === undefined ) { return; }
+    if (Array.isArray(condition.responseHeaders)) {
+        if (condition.regexFilter === undefined) { return; }
     }
     out.push(rule);
     return rule;
@@ -30,8 +30,8 @@ function patchRule(rule, out) {
 
 export function patchRuleset(ruleset) {
     const out = [];
-    for ( const rule of ruleset ) {
-        if ( patchRule(rule, out) ) { continue; }
+    for (const rule of ruleset) {
+        if (patchRule(rule, out)) { continue; }
         console.log(`\tReject ${JSON.stringify(rule)}`);
     }
     return out;

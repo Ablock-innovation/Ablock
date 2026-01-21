@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$ } from './dom.js';
@@ -34,8 +34,8 @@ const entries = await sendMessage({
 
 const fragment = new DocumentFragment();
 const template = qs$('#matchInfo');
-for ( const entry of (entries || []) ) {
-    if ( entry instanceof Object === false ) { continue; }
+for (const entry of (entries || [])) {
+    if (entry instanceof Object === false) { continue; }
     const row = template.content.cloneNode(true);
     qs$(row, '.requestInfo').textContent = JSON.stringify(entry.request, null, 2);
     qs$(row, '.ruleInfo').textContent = JSON.stringify(entry.rule, null, 2);

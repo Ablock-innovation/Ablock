@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -43,20 +43,20 @@ class CompiledListWriter {
         this.block.push(serialize(args));
     }
     pushMany(many) {
-        for ( const args of many ) {
+        for (const args of many) {
             this.block.push(serialize(args));
         }
     }
     last() {
-        if ( Array.isArray(this.block) && this.block.length !== 0 ) {
+        if (Array.isArray(this.block) && this.block.length !== 0) {
             return this.block[this.block.length - 1];
         }
     }
     select(blockId) {
-        if ( blockId === this.blockId ) { return; }
+        if (blockId === this.blockId) { return; }
         this.blockId = blockId;
         this.block = this.blocks.get(blockId);
-        if ( this.block === undefined ) {
+        if (this.block === undefined) {
             this.blocks.set(blockId, (this.block = []));
         }
         return this;
@@ -65,8 +65,8 @@ class CompiledListWriter {
         const result = [];
         const sortedBlocks =
             Array.from(this.blocks).sort((a, b) => a[0] - b[0]);
-        for ( const [ id, lines ] of sortedBlocks ) {
-            if ( lines.length === 0 ) { continue; }
+        for (const [id, lines] of sortedBlocks) {
+            if (lines.length === 0) { continue; }
             result.push(
                 blockStartPrefix + id,
                 lines.join('\n'),
@@ -90,7 +90,7 @@ class CompiledListReader {
         this.properties = new Map();
         const reBlockStart = new RegExp(`^${blockStartPrefix}([\\w:]+)\\n`, 'gm');
         let match = reBlockStart.exec(raw);
-        while ( match !== null ) {
+        while (match !== null) {
             const sectionId = match[1];
             const beg = match.index + match[0].length;
             const end = raw.indexOf(blockEndPrefix + sectionId, beg);
@@ -98,17 +98,17 @@ class CompiledListReader {
             reBlockStart.lastIndex = end;
             match = reBlockStart.exec(raw);
         }
-        if ( blockId !== undefined ) {
+        if (blockId !== undefined) {
             this.select(blockId);
         }
     }
     next() {
-        if ( this.offset === this.len ) {
+        if (this.offset === this.len) {
             this.line = '';
             return false;
         }
         let pos = this.block.indexOf('\n', this.offset);
-        if ( pos !== -1 ) {
+        if (pos !== -1) {
             this.line = this.block.slice(this.offset, pos);
             this.offset = pos + 1;
         } else {

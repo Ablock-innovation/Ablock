@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 'use strict';
@@ -28,7 +28,7 @@ import process from 'process';
 process.on('warning', warning => {
     // Ignore warnings about experimental features like
     // --experimental-vm-modules
-    if ( warning.name !== 'ExperimentalWarning' ) {
+    if (warning.name !== 'ExperimentalWarning') {
         console.warn(warning.stack);
     }
 });

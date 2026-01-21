@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -45,9 +45,9 @@ registerScriptlet(getRandomTokenFn, {
 export function getExceptionTokenFn() {
     const token = getRandomTokenFn();
     const oe = self.onerror;
-    self.onerror = function(msg, ...args) {
-        if ( typeof msg === 'string' && msg.includes(token) ) { return true; }
-        if ( oe instanceof Function ) {
+    self.onerror = function (msg, ...args) {
+        if (typeof msg === 'string' && msg.includes(token)) { return true; }
+        if (oe instanceof Function) {
             return oe.call(this, msg, ...args);
         }
     }.bind();
@@ -70,10 +70,10 @@ export function collateFetchArgumentsFn(resource, options) {
         'redirect', 'referrer', 'referrerPolicy', 'url'
     ];
     const out = {};
-    if ( collateFetchArgumentsFn.collateKnownProps === undefined ) {
+    if (collateFetchArgumentsFn.collateKnownProps === undefined) {
         collateFetchArgumentsFn.collateKnownProps = (src, out) => {
-            for ( const prop of props ) {
-                if ( src[prop] === undefined ) { continue; }
+            for (const prop of props) {
+                if (src[prop] === undefined) { continue; }
                 out[prop] = src[prop];
             }
         };
@@ -91,7 +91,7 @@ export function collateFetchArgumentsFn(resource, options) {
         }
         collateFetchArgumentsFn.collateKnownProps(clone || resource, out);
     }
-    if ( typeof options === 'object' && options !== null ) {
+    if (typeof options === 'object' && options !== null) {
         collateFetchArgumentsFn.collateKnownProps(options, out);
     }
     return out;
@@ -108,18 +108,18 @@ registerScriptlet(collateFetchArgumentsFn, {
 export function parsePropertiesToMatchFn(propsToMatch, implicit = '') {
     const safe = safeSelf();
     const needles = new Map();
-    if ( propsToMatch === undefined || propsToMatch === '' ) { return needles; }
+    if (propsToMatch === undefined || propsToMatch === '') { return needles; }
     const options = { canNegate: true };
-    for ( const needle of safe.String_split.call(propsToMatch, /\s+/) ) {
-        let [ prop, pattern ] = safe.String_split.call(needle, ':');
-        if ( prop === '' ) { continue; }
-        if ( pattern !== undefined && /[^$\w -]/.test(prop) ) {
+    for (const needle of safe.String_split.call(propsToMatch, /\s+/)) {
+        let [prop, pattern] = safe.String_split.call(needle, ':');
+        if (prop === '') { continue; }
+        if (pattern !== undefined && /[^$\w -]/.test(prop)) {
             prop = `${prop}:${pattern}`;
             pattern = undefined;
         }
-        if ( pattern !== undefined ) {
+        if (pattern !== undefined) {
             needles.set(prop, safe.initPattern(pattern, options));
-        } else if ( implicit !== '' ) {
+        } else if (implicit !== '') {
             needles.set(implicit, safe.initPattern(prop, options));
         }
     }
@@ -137,17 +137,17 @@ registerScriptlet(parsePropertiesToMatchFn, {
 export function matchObjectPropertiesFn(propNeedles, ...objs) {
     const safe = safeSelf();
     const matched = [];
-    for ( const obj of objs ) {
-        if ( obj instanceof Object === false ) { continue; }
-        for ( const [ prop, details ] of propNeedles ) {
+    for (const obj of objs) {
+        if (obj instanceof Object === false) { continue; }
+        for (const [prop, details] of propNeedles) {
             let value = obj[prop];
-            if ( value === undefined ) { continue; }
-            if ( typeof value !== 'string' ) {
+            if (value === undefined) { continue; }
+            if (typeof value !== 'string') {
                 try { value = safe.JSON_stringify(value); }
                 catch { }
-                if ( typeof value !== 'string' ) { continue; }
+                if (typeof value !== 'string') { continue; }
             }
-            if ( safe.testPattern(details, value) === false ) { return; }
+            if (safe.testPattern(details, value) === false) { return; }
             matched.push(`${prop}: ${value}`);
         }
     }
@@ -178,37 +178,37 @@ export function generateContentFn(trusted, directive) {
             chunks.push(s);
             textSize += s.length;
         }
-        while ( textSize < len );
+        while (textSize < len);
         return chunks.join(' ').slice(0, len);
     };
-    if ( directive === 'true' ) {
+    if (directive === 'true') {
         return randomize(10);
     }
-    if ( directive === 'emptyObj' ) {
+    if (directive === 'emptyObj') {
         return '{}';
     }
-    if ( directive === 'emptyArr' ) {
+    if (directive === 'emptyArr') {
         return '[]';
     }
-    if ( directive === 'emptyStr' ) {
+    if (directive === 'emptyStr') {
         return '';
     }
-    if ( directive.startsWith('length:') ) {
+    if (directive.startsWith('length:')) {
         const match = /^length:(\d+)(?:-(\d+))?$/.exec(directive);
-        if ( match === null ) { return ''; }
+        if (match === null) { return ''; }
         const min = parseInt(match[1], 10);
         const extent = safe.Math_max(parseInt(match[2], 10) || 0, min) - min;
         const len = safe.Math_min(min + extent * safe.Math_random(), 500000);
         return randomize(len | 0);
     }
-    if ( directive.startsWith('war:') ) {
-        if ( scriptletGlobals.warOrigin === undefined ) { return ''; }
+    if (directive.startsWith('war:')) {
+        if (scriptletGlobals.warOrigin === undefined) { return ''; }
         return new Promise(resolve => {
             const warOrigin = scriptletGlobals.warOrigin;
             const warName = directive.slice(4);
-            const fullpath = [ warOrigin, '/', warName ];
+            const fullpath = [warOrigin, '/', warName];
             const warSecret = scriptletGlobals.warSecret;
-            if ( warSecret !== undefined ) {
+            if (warSecret !== undefined) {
                 fullpath.push('?secret=', warSecret);
             }
             const warXHR = new safe.XMLHttpRequest();
@@ -218,9 +218,9 @@ export function generateContentFn(trusted, directive) {
             };
             warXHR.open('GET', fullpath.join(''));
             warXHR.send();
-        }).catch(( ) => '');
+        }).catch(() => '');
     }
-    if ( trusted ) {
+    if (trusted) {
         return directive;
     }
     return '';

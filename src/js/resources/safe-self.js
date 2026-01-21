@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -28,7 +28,7 @@ import { registerScriptlet } from './base.js';
 /* global scriptletGlobals */
 
 export function safeSelf() {
-    if ( scriptletGlobals.safeSelf ) {
+    if (scriptletGlobals.safeSelf) {
         return scriptletGlobals.safeSelf;
     }
     const self = globalThis;
@@ -72,29 +72,29 @@ export function safeSelf() {
             return this.sendToLogger && `[${args.join(' \u205D ')}]` || '';
         },
         uboLog(...args) {
-            if ( this.sendToLogger === undefined ) { return; }
-            if ( args === undefined || args[0] === '' ) { return; }
+            if (this.sendToLogger === undefined) { return; }
+            if (args === undefined || args[0] === '') { return; }
             return this.sendToLogger('info', ...args);
-            
+
         },
         uboErr(...args) {
-            if ( this.sendToLogger === undefined ) { return; }
-            if ( args === undefined || args[0] === '' ) { return; }
+            if (this.sendToLogger === undefined) { return; }
+            if (args === undefined || args[0] === '') { return; }
             return this.sendToLogger('error', ...args);
         },
         escapeRegexChars(s) {
             return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         },
         initPattern(pattern, options = {}) {
-            if ( pattern === '' ) {
+            if (pattern === '') {
                 return { matchAll: true, expect: true };
             }
             const expect = (options.canNegate !== true || pattern.startsWith('!') === false);
-            if ( expect === false ) {
+            if (expect === false) {
                 pattern = pattern.slice(1);
             }
             const match = /^\/(.+)\/([gimsu]*)$/.exec(pattern);
-            if ( match !== null ) {
+            if (match !== null) {
                 return {
                     re: new this.RegExp(
                         match[1],
@@ -103,7 +103,7 @@ export function safeSelf() {
                     expect,
                 };
             }
-            if ( options.flags !== undefined ) {
+            if (options.flags !== undefined) {
                 return {
                     re: new this.RegExp(this.escapeRegexChars(pattern),
                         options.flags
@@ -114,16 +114,16 @@ export function safeSelf() {
             return { pattern, expect };
         },
         testPattern(details, haystack) {
-            if ( details.matchAll ) { return true; }
-            if ( details.re ) {
+            if (details.matchAll) { return true; }
+            if (details.re) {
                 return this.RegExp_test.call(details.re, haystack) === details.expect;
             }
             return haystack.includes(details.pattern) === details.expect;
         },
         patternToRegex(pattern, flags = undefined, verbatim = false) {
-            if ( pattern === '' ) { return /^/; }
+            if (pattern === '') { return /^/; }
             const match = /^\/(.+)\/([gimsu]*)$/.exec(pattern);
-            if ( match === null ) {
+            if (match === null) {
                 const reStr = this.escapeRegexChars(pattern);
                 return new RegExp(verbatim ? `^${reStr}$` : reStr, flags);
             }
@@ -136,42 +136,42 @@ export function safeSelf() {
         },
         getExtraArgs(args, offset = 0) {
             const entries = args.slice(offset).reduce((out, v, i, a) => {
-                if ( (i & 1) === 0 ) {
-                    const rawValue = a[i+1];
+                if ((i & 1) === 0) {
+                    const rawValue = a[i + 1];
                     const value = /^\d+$/.test(rawValue)
                         ? parseInt(rawValue, 10)
                         : rawValue;
-                    out.push([ a[i], value ]);
+                    out.push([a[i], value]);
                 }
                 return out;
             }, []);
             return this.Object_fromEntries(entries);
         },
         onIdle(fn, options) {
-            if ( self.requestIdleCallback ) {
+            if (self.requestIdleCallback) {
                 return self.requestIdleCallback(fn, options);
             }
             return self.requestAnimationFrame(fn);
         },
         offIdle(id) {
-            if ( self.requestIdleCallback ) {
+            if (self.requestIdleCallback) {
                 return self.cancelIdleCallback(id);
             }
             return self.cancelAnimationFrame(id);
         }
     };
     scriptletGlobals.safeSelf = safe;
-    if ( scriptletGlobals.bcSecret === undefined ) { return safe; }
+    if (scriptletGlobals.bcSecret === undefined) { return safe; }
     // This is executed only when the logger is opened
     safe.logLevel = scriptletGlobals.logLevel || 1;
     let lastLogType = '';
     let lastLogText = '';
     let lastLogTime = 0;
     safe.toLogText = (type, ...args) => {
-        if ( args.length === 0 ) { return; }
+        if (args.length === 0) { return; }
         const text = `[${document.location.hostname || document.location.href}]${args.join(' ')}`;
-        if ( text === lastLogText && type === lastLogType ) {
-            if ( (Date.now() - lastLogTime) < 5000 ) { return; }
+        if (text === lastLogText && type === lastLogType) {
+            if ((Date.now() - lastLogTime) < 5000) { return; }
         }
         lastLogType = type;
         lastLogText = text;
@@ -183,35 +183,35 @@ export function safeSelf() {
         let bcBuffer = [];
         safe.sendToLogger = (type, ...args) => {
             const text = safe.toLogText(type, ...args);
-            if ( text === undefined ) { return; }
-            if ( bcBuffer === undefined ) {
+            if (text === undefined) { return; }
+            if (bcBuffer === undefined) {
                 return bc.postMessage({ what: 'messageToLogger', type, text });
             }
             bcBuffer.push({ type, text });
         };
         bc.onmessage = ev => {
             const msg = ev.data;
-            switch ( msg ) {
-            case 'iamready!':
-                if ( bcBuffer === undefined ) { break; }
-                bcBuffer.forEach(({ type, text }) =>
-                    bc.postMessage({ what: 'messageToLogger', type, text })
-                );
-                bcBuffer = undefined;
-                break;
-            case 'setScriptletLogLevelToOne':
-                safe.logLevel = 1;
-                break;
-            case 'setScriptletLogLevelToTwo':
-                safe.logLevel = 2;
-                break;
+            switch (msg) {
+                case 'iamready!':
+                    if (bcBuffer === undefined) { break; }
+                    bcBuffer.forEach(({ type, text }) =>
+                        bc.postMessage({ what: 'messageToLogger', type, text })
+                    );
+                    bcBuffer = undefined;
+                    break;
+                case 'setScriptletLogLevelToOne':
+                    safe.logLevel = 1;
+                    break;
+                case 'setScriptletLogLevelToTwo':
+                    safe.logLevel = 2;
+                    break;
             }
         };
         bc.postMessage('areyouready?');
     } catch {
         safe.sendToLogger = (type, ...args) => {
             const text = safe.toLogText(type, ...args);
-            if ( text === undefined ) { return; }
+            if (text === undefined) { return; }
             safe.log(`uBO ${text}`);
         };
     }

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -38,26 +38,26 @@ export function matchesStackTraceFn(
     // Normalize stack trace
     const reLine = /(.*?@)?(\S+)(:\d+):\d+\)?$/;
     const lines = [];
-    for ( let line of safe.String_split.call(error.stack, /[\n\r]+/) ) {
-        if ( line.includes(exceptionToken) ) { continue; }
+    for (let line of safe.String_split.call(error.stack, /[\n\r]+/)) {
+        if (line.includes(exceptionToken)) { continue; }
         line = line.trim();
         const match = safe.RegExp_exec.call(reLine, line);
-        if ( match === null ) { continue; }
+        if (match === null) { continue; }
         let url = match[2];
-        if ( url.startsWith('(') ) { url = url.slice(1); }
-        if ( url === docURL.href ) {
+        if (url.startsWith('(')) { url = url.slice(1); }
+        if (url === docURL.href) {
             url = 'inlineScript';
-        } else if ( url.startsWith('<anonymous>') ) {
+        } else if (url.startsWith('<anonymous>')) {
             url = 'injectedScript';
         }
         let fn = match[1] !== undefined
             ? match[1].slice(0, -1)
             : line.slice(0, match.index).trim();
-        if ( fn.startsWith('at') ) { fn = fn.slice(2).trim(); }
+        if (fn.startsWith('at')) { fn = fn.slice(2).trim(); }
         let rowcol = match[3];
         lines.push(' ' + `${fn} ${url}${rowcol}:1`.trim());
     }
-    lines[0] = `stackDepth:${lines.length-1}`;
+    lines[0] = `stackDepth:${lines.length - 1}`;
     const stack = lines.join('\t');
     const r = needleDetails.matchAll !== true &&
         safe.testPattern(needleDetails, stack);
@@ -84,26 +84,26 @@ function abortOnStackTrace(
     chain = '',
     needle = ''
 ) {
-    if ( typeof chain !== 'string' ) { return; }
+    if (typeof chain !== 'string') { return; }
     const safe = safeSelf();
     const needleDetails = safe.initPattern(needle, { canNegate: true });
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
-    if ( needle === '' ) { extraArgs.log = 'all'; }
-    const makeProxy = function(owner, chain) {
+    if (needle === '') { extraArgs.log = 'all'; }
+    const makeProxy = function (owner, chain) {
         const pos = chain.indexOf('.');
-        if ( pos === -1 ) {
+        if (pos === -1) {
             let v = owner[chain];
             Object.defineProperty(owner, chain, {
-                get: function() {
+                get: function () {
                     const log = safe.logLevel > 1 ? 'all' : 'match';
-                    if ( matchesStackTraceFn(needleDetails, log) ) {
+                    if (matchesStackTraceFn(needleDetails, log)) {
                         throw new ReferenceError(getExceptionTokenFn());
                     }
                     return v;
                 },
-                set: function(a) {
+                set: function (a) {
                     const log = safe.logLevel > 1 ? 'all' : 'match';
-                    if ( matchesStackTraceFn(needleDetails, log) ) {
+                    if (matchesStackTraceFn(needleDetails, log)) {
                         throw new ReferenceError(getExceptionTokenFn());
                     }
                     v = a;
@@ -114,17 +114,17 @@ function abortOnStackTrace(
         const prop = chain.slice(0, pos);
         let v = owner[prop];
         chain = chain.slice(pos + 1);
-        if ( v ) {
+        if (v) {
             makeProxy(v, chain);
             return;
         }
         const desc = Object.getOwnPropertyDescriptor(owner, prop);
-        if ( desc && desc.set !== undefined ) { return; }
+        if (desc && desc.set !== undefined) { return; }
         Object.defineProperty(owner, prop, {
-            get: function() { return v; },
-            set: function(a) {
+            get: function () { return v; },
+            set: function (a) {
                 v = a;
-                if ( a instanceof Object ) {
+                if (a instanceof Object) {
                     makeProxy(a, chain);
                 }
             }

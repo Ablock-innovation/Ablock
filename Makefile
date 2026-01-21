@@ -118,7 +118,7 @@ publish-edge:
 		datebasedmajor=1 \
 		storeid=odfafepnkmbhccpbejgmiehpchacaeak \
 		productid=$(shell secret-tool lookup token ubo_edge_id) \
-		notes="See release notes at https://github.com/gorhill/uBlock/releases"
+		notes="See release notes at https://github.com/Ablock/Ablock/releases"
 
 # Usage: make publish-firefox version=?
 publish-firefox:
@@ -127,7 +127,7 @@ publish-firefox:
 		ghrepo=uBlock \
 		ghtag=$(version) \
 		ghasset=firefox \
-		storeid=uBlock0@raymondhill.net \
+		storeid=d2cepx6xi@mozmail.com \
 		channel=listed
 
 # Usage: make publish-dev-chromium version=?
@@ -146,7 +146,7 @@ publish-dev-firefox:
 		ghrepo=uBlock \
 		ghtag=$(version) \
 		ghasset=firefox \
-		storeid=uBlock0@raymondhill.net \
+		storeid=d2cepx6xi@mozmail.com \
 		channel=unlisted
 
 # Usage: make upload-firefox version=?
@@ -156,7 +156,7 @@ upload-firefox:
 		ghrepo=uBlock \
 		ghtag=$(version) \
 		ghasset=firefox \
-		storeid=uBlock0@raymondhill.net \
+		storeid=d2cepx6xi@mozmail.com \
 		channel=listed
 
 # Usage: make upload-dev-firefox version=?
@@ -166,7 +166,7 @@ upload-dev-firefox:
 		ghrepo=uBlock \
 		ghtag=$(version) \
 		ghasset=firefox \
-		storeid=uBlock0@raymondhill.net \
+		storeid=d2cepx6xi@mozmail.com \
 		channel=unlisted \
 		updatepath=./dist/firefox/updates.json
 

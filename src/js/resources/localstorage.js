@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -29,7 +29,7 @@ import { safeSelf } from './safe-self.js';
 export function getAllLocalStorageFn(which = 'localStorage') {
     const storage = self[which];
     const out = [];
-    for ( let i = 0; i < storage.length; i++ ) {
+    for (let i = 0; i < storage.length; i++) {
         const key = storage.key(i);
         const value = storage.getItem(key);
         return { key, value };
@@ -49,12 +49,12 @@ export function setLocalStorageItemFn(
     value = '',
     options = {}
 ) {
-    if ( key === '' ) { return; }
+    if (key === '') { return; }
 
     // For increased compatibility with AdGuard
-    if ( value === 'emptyArr' ) {
+    if (value === 'emptyArr') {
         value = '[]';
-    } else if ( value === 'emptyObj' ) {
+    } else if (value === 'emptyObj') {
         value = '{}';
     }
 
@@ -66,24 +66,24 @@ export function setLocalStorageItemFn(
         ...getSafeCookieValuesFn(),
     ];
 
-    if ( trusted ) {
-        if ( value.includes('$now$') ) {
+    if (trusted) {
+        if (value.includes('$now$')) {
             value = value.replaceAll('$now$', Date.now());
         }
-        if ( value.includes('$currentDate$') ) {
+        if (value.includes('$currentDate$')) {
             value = value.replaceAll('$currentDate$', `${Date()}`);
         }
-        if ( value.includes('$currentISODate$') ) {
+        if (value.includes('$currentISODate$')) {
             value = value.replaceAll('$currentISODate$', (new Date()).toISOString());
         }
     } else {
         const normalized = value.toLowerCase();
         const match = /^("?)(.+)\1$/.exec(normalized);
         const unquoted = match && match[2] || normalized;
-        if ( trustedValues.includes(unquoted) === false ) {
-            if ( /^-?\d+$/.test(unquoted) === false ) { return; }
+        if (trustedValues.includes(unquoted) === false) {
+            if (/^-?\d+$/.test(unquoted) === false) { return; }
             const n = parseInt(unquoted, 10) || 0;
-            if ( n < -32767 || n > 32767 ) { return; }
+            if (n < -32767 || n > 32767) { return; }
         }
     }
 
@@ -91,16 +91,16 @@ export function setLocalStorageItemFn(
 
     try {
         const storage = self[`${which}Storage`];
-        if ( value === '$remove$' ) {
+        if (value === '$remove$') {
             const safe = safeSelf();
-            const pattern = safe.patternToRegex(key, undefined, true );
+            const pattern = safe.patternToRegex(key, undefined, true);
             const toRemove = [];
-            for ( let i = 0, n = storage.length; i < n; i++ ) {
+            for (let i = 0, n = storage.length; i < n; i++) {
                 const key = storage.key(i);
-                if ( pattern.test(key) ) { toRemove.push(key); }
+                if (pattern.test(key)) { toRemove.push(key); }
             }
             modified = toRemove.length !== 0;
-            for ( const key of toRemove ) {
+            for (const key of toRemove) {
                 storage.removeItem(key);
             }
         } else {
@@ -108,15 +108,15 @@ export function setLocalStorageItemFn(
             const before = storage.getItem(key);
             const after = `${value}`;
             modified = after !== before;
-            if ( modified ) {
+            if (modified) {
                 storage.setItem(key, after);
             }
         }
     } catch {
     }
 
-    if ( modified && typeof options.reload === 'number' ) {
-        setTimeout(( ) => { window.location.reload(); }, options.reload);
+    if (modified && typeof options.reload === 'number') {
+        setTimeout(() => { window.location.reload(); }, options.reload);
     }
 }
 registerScriptlet(setLocalStorageItemFn, {
@@ -133,35 +133,35 @@ export function removeCacheStorageItem(
     cacheNamePattern = '',
     requestPattern = ''
 ) {
-    if ( cacheNamePattern === '' ) { return; }
+    if (cacheNamePattern === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('remove-cache-storage-item', cacheNamePattern, requestPattern);
     const cacheStorage = self.caches;
-    if ( cacheStorage instanceof Object === false ) { return; }
+    if (cacheStorage instanceof Object === false) { return; }
     const reCache = safe.patternToRegex(cacheNamePattern, undefined, true);
     const reRequest = safe.patternToRegex(requestPattern, undefined, true);
     cacheStorage.keys().then(cacheNames => {
-        for ( const cacheName of cacheNames ) {
-            if ( reCache.test(cacheName) === false ) { continue; }
-            if ( requestPattern === '' ) {
+        for (const cacheName of cacheNames) {
+            if (reCache.test(cacheName) === false) { continue; }
+            if (requestPattern === '') {
                 cacheStorage.delete(cacheName).then(result => {
-                    if ( safe.logLevel > 1 ) {
+                    if (safe.logLevel > 1) {
                         safe.uboLog(logPrefix, `Deleting ${cacheName}`);
                     }
-                    if ( result !== true ) { return; }
+                    if (result !== true) { return; }
                     safe.uboLog(logPrefix, `Deleted ${cacheName}: ${result}`);
                 });
                 continue;
             }
             cacheStorage.open(cacheName).then(cache => {
                 cache.keys().then(requests => {
-                    for ( const request of requests ) {
-                        if ( reRequest.test(request.url) === false ) { continue; }
-                        if ( safe.logLevel > 1 ) {
+                    for (const request of requests) {
+                        if (reRequest.test(request.url) === false) { continue; }
+                        if (safe.logLevel > 1) {
                             safe.uboLog(logPrefix, `Deleting ${cacheName}/${request.url}`);
                         }
                         cache.delete(request).then(result => {
-                            if ( result !== true ) { return; }
+                            if (result !== true) { return; }
                             safe.uboLog(logPrefix, `Deleted ${cacheName}/${request.url}: ${result}`);
                         });
                     }

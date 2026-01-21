@@ -16,15 +16,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
     const signatures = [
-        [ 'blockadblock' ],
-        [ 'babasbm' ],
-        [ /getItem\('babn'\)/ ],
+        ['blockadblock'],
+        ['babasbm'],
+        [/getItem\('babn'\)/],
         [
             'getElementById',
             'String.fromCharCode',
@@ -43,38 +43,38 @@
             'random'
         ],
     ];
-    const check = function(s) {
-        for ( let i = 0; i < signatures.length; i++ ) {
+    const check = function (s) {
+        for (let i = 0; i < signatures.length; i++) {
             const tokens = signatures[i];
             let match = 0;
-            for ( let j = 0; j < tokens.length; j++ ) {
+            for (let j = 0; j < tokens.length; j++) {
                 const token = tokens[j];
                 const pos = token instanceof RegExp
                     ? s.search(token)
                     : s.indexOf(token);
-                if ( pos !== -1 ) { match += 1; }
+                if (pos !== -1) { match += 1; }
             }
-            if ( (match / tokens.length) >= 0.8 ) { return true; }
+            if ((match / tokens.length) >= 0.8) { return true; }
         }
         return false;
     };
     window.eval = new Proxy(window.eval, {              // jshint ignore: line
-        apply: function(target, thisArg, args) {
+        apply: function (target, thisArg, args) {
             const a = args[0];
-            if ( typeof a !== 'string' || !check(a) ) {
+            if (typeof a !== 'string' || !check(a)) {
                 return target.apply(thisArg, args);
             }
-            if ( document.body ) {
+            if (document.body) {
                 document.body.style.removeProperty('visibility');
             }
             let el = document.getElementById('babasbmsgx');
-            if ( el ) {
+            if (el) {
                 el.parentNode.removeChild(el);
             }
         }
     });
     window.setTimeout = new Proxy(window.setTimeout, {
-        apply: function(target, thisArg, args) {
+        apply: function (target, thisArg, args) {
             const a = args[0];
             if (
                 typeof a !== 'string' ||

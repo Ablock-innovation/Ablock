@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import {
@@ -48,13 +48,13 @@ export const process = {
 
 export async function loadRulesetConfig() {
     const sessionData = await sessionRead('rulesetConfig');
-    if ( sessionData ) {
+    if (sessionData) {
         Object.assign(rulesetConfig, sessionData);
         process.wakeupRun = true;
         return;
     }
     const localData = await localRead('rulesetConfig');
-    if ( localData ) {
+    if (localData) {
         Object.assign(rulesetConfig, localData)
         sessionWrite('rulesetConfig', rulesetConfig);
         return;

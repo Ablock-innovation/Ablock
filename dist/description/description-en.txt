@@ -26,8 +26,8 @@ You can help contribute by translating uBO on Crowdin.
 
 ***
 
-    [Documentation](https://github.com/gorhill/uBlock#ublock-origin-ubo)
-    [Release Notes](https://github.com/gorhill/uBlock/releases)
+    [Documentation](https://github.com/Ablock/Ablock#ublock-origin-ubo)
+    [Release Notes](https://github.com/Ablock/Ablock/releases)
     [Support Forum on Reddit](https://www.reddit.com/r/uBlockOrigin/)
-    [Contributors on GitHub](https://github.com/gorhill/uBlock/graphs/contributors)
+    [Contributors on GitHub](https://github.com/Ablock/Ablock/graphs/contributors)
     [Contribute on Crowdin](https://crowdin.com/project/ublock)

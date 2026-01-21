@@ -16,18 +16,18 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
-    const noopfn = function() {
+    const noopfn = function () {
     };
     window.pSUPERFLY = {
         activity: noopfn,
         virtualPage: noopfn
     };
-    for ( const hider of document.querySelectorAll('style[id^=chartbeat-flicker-control]') ) {
+    for (const hider of document.querySelectorAll('style[id^=chartbeat-flicker-control]')) {
         hider.remove();
     }
 })();

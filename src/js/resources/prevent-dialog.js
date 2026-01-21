@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -43,19 +43,19 @@ export function preventDialog(
 ) {
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('prevent-dialog', selector);
-    const prevent = ( ) => {
+    const prevent = () => {
         debouncer = undefined;
         const elems = document.querySelectorAll(`dialog${selector}`);
-        for ( const elem of elems ) {
-            if ( typeof elem.close !== 'function' ) { continue; }
-            if ( elem.open === false ) { continue; }
+        for (const elem of elems) {
+            if (typeof elem.close !== 'function') { continue; }
+            if (elem.open === false) { continue; }
             elem.close();
             safe.uboLog(logPrefix, 'Closed');
         }
     };
     let debouncer;
-    const observer = new MutationObserver(( ) => {
-        if ( debouncer !== undefined ) { return; }
+    const observer = new MutationObserver(() => {
+        if (debouncer !== undefined) { return; }
         debouncer = requestAnimationFrame(prevent);
     });
     observer.observe(document, {

@@ -16,15 +16,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
-    const noopfn = function() {
+    const noopfn = function () {
     };
     //
-    const Gaq = function() {
+    const Gaq = function () {
     };
     Gaq.prototype.Na = noopfn;
     Gaq.prototype.O = noopfn;
@@ -34,11 +34,11 @@
     Gaq.prototype._createAsyncTracker = noopfn;
     Gaq.prototype._getAsyncTracker = noopfn;
     Gaq.prototype._getPlugin = noopfn;
-    Gaq.prototype.push = function(a) {
-        if ( typeof a === 'function' ) {
+    Gaq.prototype.push = function (a) {
+        if (typeof a === 'function') {
             a(); return;
         }
-        if ( Array.isArray(a) === false ) { return; }
+        if (Array.isArray(a) === false) { return; }
         // https://developers.google.com/analytics/devguides/collection/gajs/methods/gaJSApiDomainDirectory#_gat.GA_Tracker_._link
         // https://github.com/uBlockOrigin/uBlock-issues/issues/1807
         if (
@@ -48,16 +48,16 @@
         ) {
             try {
                 window.location.assign(a[1]);
-            } catch(ex) {
+            } catch (ex) {
             }
         }
-        // https://github.com/gorhill/uBlock/issues/2162
-        if ( a[0] === '_set' && a[1] === 'hitCallback' && typeof a[2] === 'function' ) {
+        // https://github.com/Ablock/Ablock/issues/2162
+        if (a[0] === '_set' && a[1] === 'hitCallback' && typeof a[2] === 'function') {
             a[2]();
         }
     };
     //
-    const tracker = (function() {
+    const tracker = (function () {
         const out = {};
         const api = [
             '_addIgnoredOrganic _addIgnoredRef _addItem _addOrganic',
@@ -77,33 +77,33 @@
             '_trackPageview _trackSocial _trackTiming _trackTrans',
             '_visitCode'
         ].join(' ').split(/\s+/);
-        for ( const method of api ) {
+        for (const method of api) {
             out[method] = noopfn;
         }
-        out._getLinkerUrl = function(a) {
+        out._getLinkerUrl = function (a) {
             return a;
         };
         // https://github.com/AdguardTeam/Scriptlets/issues/154
-        out._link = function(a) {
-            if ( typeof a !== 'string' ) { return; }
+        out._link = function (a) {
+            if (typeof a !== 'string') { return; }
             try {
                 window.location.assign(a);
-            } catch(ex) {
+            } catch (ex) {
             }
         };
         return out;
     })();
     //
-    const Gat = function() {
+    const Gat = function () {
     };
     Gat.prototype._anonymizeIP = noopfn;
     Gat.prototype._createTracker = noopfn;
     Gat.prototype._forceSSL = noopfn;
     Gat.prototype._getPlugin = noopfn;
-    Gat.prototype._getTracker = function() {
+    Gat.prototype._getTracker = function () {
         return tracker;
     };
-    Gat.prototype._getTrackerByName = function() {
+    Gat.prototype._getTrackerByName = function () {
         return tracker;
     };
     Gat.prototype._getTrackers = noopfn;
@@ -118,10 +118,10 @@
     window._gat = gat;
     //
     const gaq = new Gaq();
-    (function() {
+    (function () {
         const aa = window._gaq || [];
-        if ( Array.isArray(aa) ) {
-            while ( aa[0] ) {
+        if (Array.isArray(aa)) {
+            while (aa[0]) {
                 gaq.push(aa.shift());
             }
         }

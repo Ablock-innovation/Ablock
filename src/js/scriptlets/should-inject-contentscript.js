@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 // If content scripts are already injected, we need to respond with `false`,
@@ -25,11 +25,11 @@
 // https://github.com/uBlockOrigin/uBlock-issues/issues/403
 //   If the content script was not bootstrapped, give it another try.
 
-(( ) => {
+(() => {
     try {
         const status = vAPI.uBO !== true;
-        if ( status === false && vAPI.bootstrap ) {
-            self.requestIdleCallback(( ) => vAPI?.bootstrap?.());
+        if (status === false && vAPI.bootstrap) {
+            self.requestIdleCallback(() => vAPI?.bootstrap?.());
         }
         return status;
     } catch {

@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "Blockera CSP-rapporter",
-    "description": "background information: https://github.com/gorhill/uBlock/issues/3150"
+    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Ta fram kanoniska namn",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Regelsyntax: <code>källa mål typ åtgärd</code> (<a href='https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-rule-syntax'>full dokumentation</a>).",
+    "message": "Regelsyntax: <code>källa mål typ åtgärd</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>full dokumentation</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

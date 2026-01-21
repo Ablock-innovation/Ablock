@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 body {
@@ -28,26 +28,27 @@ body {
     padding: 0 2px;
     position: relative;
     width: 100vw;
-    }
+}
 
 .logo {
     left: 0;
     padding: 2px 1px;
     position: absolute;
     top: 0;
-    }
+}
 
 #frameURL {
     font-family: monospace;
     font-size: 90%;
     overflow-y: auto;
     word-break: break-all;
-    }
-#frameURL > a {
+}
+
+#frameURL>a {
     font-size: 1rem;
-    }
-    
+}
+
 #clickToLoad {
     cursor: default;
     margin-bottom: 1em;
-    }
+}

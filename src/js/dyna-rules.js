@@ -82,13 +82,13 @@ let cleanEditText = '';
 
     dom.attr('.CodeMirror-merge-scrolllock', 'title', i18n$('genericMergeViewScrollLock'));
 
-    const translate = function() {
+    const translate = function () {
         let elems = qsa$(commitArrowSelector);
-        for ( const elem of elems ) {
+        for (const elem of elems) {
             dom.attr(elem, 'title', i18nCommitStr);
         }
         elems = qsa$(revertArrowSelector);
-        for ( const elem of elems ) {
+        for (const elem of elems) {
             dom.attr(elem, 'title', i18nRevertStr);
         }
     };
@@ -97,16 +97,16 @@ let cleanEditText = '';
 
     mergeGapObserver.observe(
         qs$('.CodeMirror-merge-copybuttons-left'),
-        { attributes: true, attributeFilter: [ 'title' ], subtree: true }
+        { attributes: true, attributeFilter: ['title'], subtree: true }
     );
 }
 
 /******************************************************************************/
 
-const getDiffer = (( ) => {
+const getDiffer = (() => {
     let differ;
-    return ( ) => {
-        if ( differ === undefined ) { differ = new diff_match_patch(); }
+    return () => {
+        if (differ === undefined) { differ = new diff_match_patch(); }
         return differ;
     };
 })();
@@ -117,15 +117,15 @@ const getDiffer = (( ) => {
 // https://github.com/codemirror/CodeMirror/blob/3e1bb5fff682f8f6cbfaef0e56c61d62403d4798/addon/search/search.js#L22
 // ... and modified as needed.
 
-const updateOverlay = (( ) => {
+const updateOverlay = (() => {
     let reFilter;
     const mode = {
-        token: function(stream) {
-            if ( reFilter !== undefined ) {
+        token: function (stream) {
+            if (reFilter !== undefined) {
                 reFilter.lastIndex = stream.pos;
                 let match = reFilter.exec(stream.string);
-                if ( match !== null ) {
-                    if ( match.index === stream.pos ) {
+                if (match !== null) {
+                    if (match.index === stream.pos) {
                         stream.pos += match[0].length || 1;
                         return 'searching';
                     }
@@ -136,7 +136,7 @@ const updateOverlay = (( ) => {
             stream.skipToEnd();
         }
     };
-    return function() {
+    return function () {
         const f = presentationState.filter;
         reFilter = typeof f === 'string' && f !== ''
             ? new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
@@ -145,16 +145,16 @@ const updateOverlay = (( ) => {
     };
 })();
 
-const toggleOverlay = (( ) => {
+const toggleOverlay = (() => {
     let overlay = null;
 
-    return function() {
-        if ( overlay !== null ) {
+    return function () {
+        if (overlay !== null) {
             mergeView.leftOriginal().removeOverlay(overlay);
             mergeView.editor().removeOverlay(overlay);
             overlay = null;
         }
-        if ( presentationState.filter !== '' ) {
+        if (presentationState.filter !== '') {
             overlay = updateOverlay();
             mergeView.leftOriginal().addOverlay(overlay);
             mergeView.editor().addOverlay(overlay);
@@ -176,8 +176,8 @@ function rulesToDoc(clearHistory) {
     orig.startOperation();
     edit.startOperation();
 
-    for ( const key in thePanes ) {
-        if ( Object.hasOwn(thePanes, key) === false ) { continue; }
+    for (const key in thePanes) {
+        if (Object.hasOwn(thePanes, key) === false) { continue; }
         const doc = thePanes[key].doc;
         const rules = filterRules(key);
         if (
@@ -196,18 +196,18 @@ function rulesToDoc(clearHistory) {
         //   be reported in the diff and thus appended if needed.
         let beforeText = doc.getValue();
         let afterText = rules.join('\n').trim();
-        if ( afterText !== '' ) { afterText += '\n'; }
+        if (afterText !== '') { afterText += '\n'; }
         const diffs = getDiffer().diff_main(beforeText, afterText);
         let i = diffs.length;
         let iedit = beforeText.length;
-        while ( i-- ) {
+        while (i--) {
             const diff = diffs[i];
-            if ( diff[0] === 0 ) {
+            if (diff[0] === 0) {
                 iedit -= diff[1].length;
                 continue;
             }
             const end = doc.posFromIndex(iedit);
-            if ( diff[0] === 1 ) {
+            if (diff[0] === 1) {
                 doc.replaceRange(diff[1], end, end);
                 continue;
             }
@@ -220,13 +220,13 @@ function rulesToDoc(clearHistory) {
 
     // Mark ellipses as read-only
     const marks = edit.getAllMarks();
-    for ( const mark of marks ) {
-        if ( mark.uboEllipsis !== true ) { continue; }
+    for (const mark of marks) {
+        if (mark.uboEllipsis !== true) { continue; }
         mark.clear();
     }
-    if ( presentationState.isCollapsed ) {
-        for ( let iline = 0, n = edit.lineCount(); iline < n; iline++ ) {
-            if ( edit.getLine(iline) !== '...' ) { continue; }
+    if (presentationState.isCollapsed) {
+        for (let iline = 0, n = edit.lineCount(); iline < n; iline++) {
+            if (edit.getLine(iline) !== '...') { continue; }
             const mark = edit.markText(
                 { line: iline, ch: 0 },
                 { line: iline + 1, ch: 0 },
@@ -241,11 +241,11 @@ function rulesToDoc(clearHistory) {
     cleanEditText = mergeView.editor().getValue().trim();
     cleanEditToken = mergeView.editor().changeGeneration();
 
-    if ( clearHistory !== true ) { return; }
+    if (clearHistory !== true) { return; }
 
     mergeView.editor().clearHistory();
     const chunks = mergeView.leftChunks();
-    if ( chunks.length === 0 ) { return; }
+    if (chunks.length === 0) { return; }
     const ldoc = thePanes.orig.doc;
     const { clientHeight } = ldoc.getScrollInfo();
     const line = Math.min(chunks[0].editFrom, chunks[0].origFrom);
@@ -261,10 +261,10 @@ function rulesToDoc(clearHistory) {
 function filterRules(key) {
     const filter = qs$('#ruleFilter input').value;
     const rules = thePanes[key].modified;
-    if ( filter === '' ) { return rules; }
+    if (filter === '') { return rules; }
     const out = [];
-    for ( const rule of rules ) {
-        if ( rule.indexOf(filter) === -1 ) { continue; }
+    for (const rule of rules) {
+        if (rule.indexOf(filter) === -1) { continue; }
         out.push(rule);
     }
     return out;
@@ -289,25 +289,25 @@ async function applyDiff(permanent, toAdd, toRemove) {
 // CodeMirror quirk: sometimes fromStart.ch and/or toStart.ch is undefined.
 // When this happens, use 0.
 
-mergeView.options.revertChunk = function(
+mergeView.options.revertChunk = function (
     mv,
     from, fromStart, fromEnd,
     to, toStart, toEnd
 ) {
-    // https://github.com/gorhill/uBlock/issues/3611
-    if ( dom.attr(dom.body, 'dir') === 'rtl' ) {
+    // https://github.com/Ablock/Ablock/issues/3611
+    if (dom.attr(dom.body, 'dir') === 'rtl') {
         let tmp = from; from = to; to = tmp;
         tmp = fromStart; fromStart = toStart; toStart = tmp;
         tmp = fromEnd; fromEnd = toEnd; toEnd = tmp;
     }
-    if ( typeof fromStart.ch !== 'number' ) { fromStart.ch = 0; }
-    if ( fromEnd.ch !== 0 ) { fromEnd.line += 1; }
+    if (typeof fromStart.ch !== 'number') { fromStart.ch = 0; }
+    if (fromEnd.ch !== 0) { fromEnd.line += 1; }
     const toAdd = from.getRange(
         { line: fromStart.line, ch: 0 },
         { line: fromEnd.line, ch: 0 }
     );
-    if ( typeof toStart.ch !== 'number' ) { toStart.ch = 0; }
-    if ( toEnd.ch !== 0 ) { toEnd.line += 1; }
+    if (typeof toStart.ch !== 'number') { toStart.ch = 0; }
+    if (toEnd.ch !== 0) { toEnd.line += 1; }
     const toRemove = to.getRange(
         { line: toStart.line, ch: 0 },
         { line: toEnd.line, ch: 0 }
@@ -318,22 +318,22 @@ mergeView.options.revertChunk = function(
 /******************************************************************************/
 
 function handleImportFilePicker() {
-    const fileReaderOnLoadHandler = function() {
-        if ( typeof this.result !== 'string' || this.result === '' ) { return; }
+    const fileReaderOnLoadHandler = function () {
+        if (typeof this.result !== 'string' || this.result === '') { return; }
         // https://github.com/chrisaljoudi/uBlock/issues/757
         // Support RequestPolicy rule syntax
         let result = this.result;
         let matches = /\[origins-to-destinations\]([^[]+)/.exec(result);
-        if ( matches && matches.length === 2 ) {
+        if (matches && matches.length === 2) {
             result = matches[1].trim()
-                               .replace(/\|/g, ' ')
-                               .replace(/\n/g, ' * noop\n');
+                .replace(/\|/g, ' ')
+                .replace(/\n/g, ' * noop\n');
         }
         applyDiff(false, result, '');
     };
     const file = this.files[0];
-    if ( file === undefined || file.name === '' ) { return; }
-    if ( file.type.indexOf('text') !== 0 ) { return; }
+    if (file === undefined || file.name === '') { return; }
+    if (file.type.indexOf('text') !== 0) { return; }
     const fr = new FileReader();
     fr.onload = fileReaderOnLoadHandler;
     fr.readAsText(file);
@@ -370,13 +370,13 @@ function exportUserRulesToFile() {
 {
     let timer;
 
-    dom.on('#ruleFilter input', 'input', ( ) => {
-        if ( timer !== undefined ) { self.cancelIdleCallback(timer); }
-        timer = self.requestIdleCallback(( ) => {
+    dom.on('#ruleFilter input', 'input', () => {
+        if (timer !== undefined) { self.cancelIdleCallback(timer); }
+        timer = self.requestIdleCallback(() => {
             timer = undefined;
-            if ( mergeView.editor().isClean(cleanEditToken) === false ) { return; }
+            if (mergeView.editor().isClean(cleanEditToken) === false) { return; }
             const filter = qs$('#ruleFilter input').value;
-            if ( filter === presentationState.filter ) { return; }
+            if (filter === presentationState.filter) { return; }
             presentationState.filter = filter;
             toggleOverlay();
         }, { timeout: 773 });
@@ -385,21 +385,21 @@ function exportUserRulesToFile() {
 
 /******************************************************************************/
 
-const onPresentationChanged = (( ) => {
+const onPresentationChanged = (() => {
     const reSwRule = /^([^/]+): ([^/ ]+) ([^ ]+)/;
-    const reRule   = /^([^ ]+) ([^/ ]+) ([^ ]+ [^ ]+)/;
+    const reRule = /^([^ ]+) ([^/ ]+) ([^ ]+ [^ ]+)/;
     const reUrlRule = /^([^ ]+) ([^ ]+) ([^ ]+ [^ ]+)/;
 
-    const sortNormalizeHn = function(hn) {
+    const sortNormalizeHn = function (hn) {
         let domain = hostnameToDomainMap.get(hn);
-        if ( domain === undefined ) {
+        if (domain === undefined) {
             domain = /(\d|\])$/.test(hn)
                 ? hn
                 : publicSuffixList.getDomain(hn);
             hostnameToDomainMap.set(hn, domain);
         }
         let normalized = domain || hn;
-        if ( hn.length !== domain.length ) {
+        if (hn.length !== domain.length) {
             const subdomains = hn.slice(0, hn.length - domain.length - 1);
             normalized += '.' + (
                 subdomains.includes('.')
@@ -413,26 +413,26 @@ const onPresentationChanged = (( ) => {
     const slotFromRule = rule => {
         let type, srcHn, desHn, extra;
         let match = reSwRule.exec(rule);
-        if ( match !== null ) {
+        if (match !== null) {
             type = ' ' + match[1];
             srcHn = sortNormalizeHn(match[2]);
             desHn = srcHn;
             extra = match[3];
-        } else if ( (match = reRule.exec(rule)) !== null ) {
+        } else if ((match = reRule.exec(rule)) !== null) {
             type = '\x10FFFE';
             srcHn = sortNormalizeHn(match[1]);
             desHn = sortNormalizeHn(match[2]);
             extra = match[3];
-        } else if ( (match = reUrlRule.exec(rule)) !== null ) {
+        } else if ((match = reUrlRule.exec(rule)) !== null) {
             type = '\x10FFFF';
             srcHn = sortNormalizeHn(match[1]);
             desHn = sortNormalizeHn(hostnameFromURI(match[2]));
             extra = match[3];
         }
-        if ( presentationState.sortType === 0 ) {
+        if (presentationState.sortType === 0) {
             return { rule, token: `${type} ${srcHn} ${desHn} ${extra}` };
         }
-        if ( presentationState.sortType === 1 ) {
+        if (presentationState.sortType === 1) {
             return { rule, token: `${srcHn} ${type} ${desHn} ${extra}` };
         }
         return { rule, token: `${desHn} ${type} ${srcHn} ${extra}` };
@@ -440,48 +440,48 @@ const onPresentationChanged = (( ) => {
 
     const sort = rules => {
         const slots = [];
-        for ( let i = 0; i < rules.length; i++ ) {
+        for (let i = 0; i < rules.length; i++) {
             slots.push(slotFromRule(rules[i], 1));
         }
         slots.sort((a, b) => a.token.localeCompare(b.token));
-        for ( let i = 0; i < rules.length; i++ ) {
+        for (let i = 0; i < rules.length; i++) {
             rules[i] = slots[i].rule;
         }
     };
 
-    const collapse = ( ) => {
-        if ( presentationState.isCollapsed !== true ) { return; }
+    const collapse = () => {
+        if (presentationState.isCollapsed !== true) { return; }
         const diffs = getDiffer().diff_main(
             thePanes.orig.modified.join('\n'),
             thePanes.edit.modified.join('\n')
         );
         const ll = []; let lellipsis = false;
         const rr = []; let rellipsis = false;
-        for ( let i = 0; i < diffs.length; i++ ) {
-            const diff =  diffs[i];
-            if ( diff[0] === 0 ) {
+        for (let i = 0; i < diffs.length; i++) {
+            const diff = diffs[i];
+            if (diff[0] === 0) {
                 lellipsis = rellipsis = true;
                 continue;
             }
-            if ( diff[0] < 0 ) {
-                if ( lellipsis ) {
+            if (diff[0] < 0) {
+                if (lellipsis) {
                     ll.push('...');
-                    if ( rellipsis ) { rr.push('...'); }
+                    if (rellipsis) { rr.push('...'); }
                     lellipsis = rellipsis = false;
                 }
                 ll.push(diff[1].trim());
                 continue;
             }
             /* diff[0] > 0 */
-            if ( rellipsis ) {
+            if (rellipsis) {
                 rr.push('...');
-                if ( lellipsis ) { ll.push('...'); }
+                if (lellipsis) { ll.push('...'); }
                 lellipsis = rellipsis = false;
             }
             rr.push(diff[1].trim());
         }
-        if ( lellipsis ) { ll.push('...'); }
-        if ( rellipsis ) { rr.push('...'); }
+        if (lellipsis) { ll.push('...'); }
+        if (rellipsis) { rr.push('...'); }
         thePanes.orig.modified = ll;
         thePanes.edit.modified = rr;
     };
@@ -524,7 +524,7 @@ const onPresentationChanged = (( ) => {
 
 /******************************************************************************/
 
-const onTextChanged = (( ) => {
+const onTextChanged = (() => {
     let timer;
 
     const process = details => {
@@ -546,7 +546,7 @@ const onTextChanged = (( ) => {
         dom.cl.toggle('#exportButton,#importButton', 'disabled', isClean === false);
         dom.cl.toggle('#revertButton,#commitButton', 'disabled', isClean === false || isDirty === false);
         const input = qs$('#ruleFilter input');
-        if ( isClean ) {
+        if (isClean) {
             dom.attr(input, 'disabled', null);
             CodeMirror.commands.save = undefined;
         } else {
@@ -556,7 +556,7 @@ const onTextChanged = (( ) => {
     };
 
     return function onTextChanged(now) {
-        if ( timer !== undefined ) { self.cancelIdleCallback(timer); }
+        if (timer !== undefined) { self.cancelIdleCallback(timer); }
         timer = now ? process() : self.requestIdleCallback(process, { timeout: 57 });
     };
 })();
@@ -567,7 +567,7 @@ function revertAllHandler() {
     const toAdd = [], toRemove = [];
     const left = mergeView.leftOriginal();
     const edit = mergeView.editor();
-    for ( const chunk of mergeView.leftChunks() ) {
+    for (const chunk of mergeView.leftChunks()) {
         const addedLines = left.getRange(
             { line: chunk.origFrom, ch: 0 },
             { line: chunk.origTo, ch: 0 }
@@ -588,7 +588,7 @@ function commitAllHandler() {
     const toAdd = [], toRemove = [];
     const left = mergeView.leftOriginal();
     const edit = mergeView.editor();
-    for ( const chunk of mergeView.leftChunks() ) {
+    for (const chunk of mergeView.leftChunks()) {
         const addedLines = edit.getRange(
             { line: chunk.editFrom, ch: 0 },
             { line: chunk.editTo, ch: 0 }
@@ -608,16 +608,16 @@ function commitAllHandler() {
 function editSaveHandler() {
     const editor = mergeView.editor();
     const editText = editor.getValue().trim();
-    if ( editText === cleanEditText ) {
+    if (editText === cleanEditText) {
         onTextChanged(true);
         return;
     }
     const toAdd = [], toRemove = [];
     const diffs = getDiffer().diff_main(cleanEditText, editText);
-    for ( const diff of diffs ) {
-        if ( diff[0] === 1 ) {
+    for (const diff of diffs) {
+        if (diff[0] === 1) {
             toAdd.push(diff[1]);
-        } else if ( diff[0] === -1 ) {
+        } else if (diff[0] === -1) {
             toRemove.push(diff[1]);
         }
     }
@@ -626,12 +626,12 @@ function editSaveHandler() {
 
 /******************************************************************************/
 
-self.cloud.onPush = function() {
+self.cloud.onPush = function () {
     return thePanes.orig.original.join('\n');
 };
 
-self.cloud.onPull = function(data, append) {
-    if ( typeof data !== 'string' ) { return; }
+self.cloud.onPull = function (data, append) {
+    if (typeof data !== 'string') { return; }
     applyDiff(
         false,
         data,
@@ -641,9 +641,9 @@ self.cloud.onPull = function(data, append) {
 
 /******************************************************************************/
 
-self.wikilink = 'https://github.com/gorhill/uBlock/wiki/Dashboard:-My-rules';
+self.wikilink = 'https://github.com/Ablock/Ablock/wiki/Dashboard:-My-rules';
 
-self.hasUnsavedData = function() {
+self.hasUnsavedData = function () {
     return mergeView.editor().isClean(cleanEditToken) === false;
 };
 
@@ -655,21 +655,21 @@ const presentationState = {
     filter: '',
 };
 
-const savePresentationState = ( ) => {
+const savePresentationState = () => {
     vAPI.localStorage.setItem('dynaRulesPresentationState', presentationState);
 };
 
 vAPI.localStorage.getItemAsync('dynaRulesPresentationState').then(details => {
-    if ( details instanceof Object === false ) { return; }
-    if ( typeof details.sortType === 'number' ) {
+    if (details instanceof Object === false) { return; }
+    if (typeof details.sortType === 'number') {
         presentationState.sortType = details.sortType;
         qs$('#ruleFilter select').value = `${details.sortType}`;
     }
-    if ( typeof details.isCollapsed === 'boolean' ) {
+    if (typeof details.isCollapsed === 'boolean') {
         presentationState.isCollapsed = details.isCollapsed;
         dom.cl.toggle('#ruleFilter #diffCollapse', 'active', details.isCollapsed);
     }
-    if ( typeof details.filter === 'string' ) {
+    if (typeof details.filter === 'string') {
         presentationState.filter = details.filter;
         qs$('#ruleFilter input').value = details.filter;
         toggleOverlay();
@@ -696,7 +696,7 @@ dom.on('#commitButton', 'click', commitAllHandler);
 dom.on('#editSaveButton', 'click', editSaveHandler);
 
 // https://groups.google.com/forum/#!topic/codemirror/UQkTrt078Vs
-mergeView.editor().on('updateDiff', ( ) => {
+mergeView.editor().on('updateDiff', () => {
     onTextChanged();
 });
 

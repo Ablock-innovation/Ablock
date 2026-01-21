@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import * as ut from './utils.js';
@@ -40,7 +40,7 @@ const resourceDetailPromises = new Map();
 
 function getScriptletDetails() {
     let promise = resourceDetailPromises.get('scriptlet');
-    if ( promise !== undefined ) { return promise; }
+    if (promise !== undefined) { return promise; }
     promise = fetchJSON('/rulesets/scriptlet-details').then(
         entries => new Map(entries)
     );
@@ -50,7 +50,7 @@ function getScriptletDetails() {
 
 function getGenericDetails() {
     let promise = resourceDetailPromises.get('generic');
-    if ( promise !== undefined ) { return promise; }
+    if (promise !== undefined) { return promise; }
     promise = fetchJSON('/rulesets/generic-details').then(
         entries => new Map(entries)
     );
@@ -61,9 +61,9 @@ function getGenericDetails() {
 /******************************************************************************/
 
 const normalizeMatches = matches => {
-    if ( matches.length <= 1 ) { return; }
-    if ( matches.includes('<all_urls>') === false ) {
-        if ( matches.includes('*://*/*') === false ) { return; }
+    if (matches.length <= 1) { return; }
+    if (matches.includes('<all_urls>') === false) {
+        if (matches.includes('*://*/*') === false) { return; }
     }
     matches.length = 0;
     matches.push('<all_urls>');
@@ -84,27 +84,27 @@ function registerHighGeneric(context, genericDetails) {
     const excludeHostnames = [];
     const includeHostnames = [];
     const css = [];
-    for ( const details of rulesetsDetails ) {
+    for (const details of rulesetsDetails) {
         const hostnames = genericDetails.get(details.id);
-        if ( hostnames ) {
-            if ( hostnames.unhide ) {
+        if (hostnames) {
+            if (hostnames.unhide) {
                 excludeHostnames.push(...hostnames.unhide);
             }
-            if ( hostnames.hide ) {
+            if (hostnames.hide) {
                 includeHostnames.push(...hostnames.hide);
             }
         }
         const count = details.css?.generichigh || 0;
-        if ( count === 0 ) { continue; }
+        if (count === 0) { continue; }
         css.push(`/rulesets/scripting/generichigh/${details.id}.css`);
     }
 
-    if ( css.length === 0 ) { return; }
+    if (css.length === 0) { return; }
 
     const { none, basic, optimal, complete } = filteringModeDetails;
     const matches = [];
     const excludeMatches = [];
-    if ( complete.has('all-urls') ) {
+    if (complete.has('all-urls')) {
         excludeMatches.push(...ut.matchesFromHostnames(none));
         excludeMatches.push(...ut.matchesFromHostnames(basic));
         excludeMatches.push(...ut.matchesFromHostnames(optimal));
@@ -120,7 +120,7 @@ function registerHighGeneric(context, genericDetails) {
             )
         );
     }
-    if ( matches.length === 0 ) { return; }
+    if (matches.length === 0) { return; }
 
     // https://github.com/w3c/webextensions/issues/414#issuecomment-1623992885
     // Once supported, add:
@@ -132,7 +132,7 @@ function registerHighGeneric(context, genericDetails) {
         allFrames: true,
         runAt: 'document_end',
     };
-    if ( excludeMatches.length !== 0 ) {
+    if (excludeMatches.length !== 0) {
         directive.excludeMatches = excludeMatches;
     }
 
@@ -148,31 +148,31 @@ function registerGeneric(context, genericDetails) {
     const excludedByFilter = [];
     const includedByFilter = [];
     const js = [];
-    for ( const details of rulesetsDetails ) {
+    for (const details of rulesetsDetails) {
         const hostnames = genericDetails.get(details.id);
-        if ( hostnames ) {
-            if ( hostnames.unhide ) {
+        if (hostnames) {
+            if (hostnames.unhide) {
                 excludedByFilter.push(...hostnames.unhide);
             }
-            if ( hostnames.hide ) {
+            if (hostnames.hide) {
                 includedByFilter.push(...hostnames.hide);
             }
         }
         const count = details.css?.generic || 0;
-        if ( count === 0 ) { continue; }
+        if (count === 0) { continue; }
         js.push(`/rulesets/scripting/generic/${details.id}.js`);
     }
 
-    if ( js.length === 0 ) { return; }
+    if (js.length === 0) { return; }
 
     js.unshift('/js/scripting/css-api.js', '/js/scripting/isolated-api.js');
     js.push('/js/scripting/css-generic.js');
 
     const { none, basic, optimal, complete } = filteringModeDetails;
-    const includedByMode = [ ...complete ];
-    const excludedByMode = [ ...none, ...basic, ...optimal ];
+    const includedByMode = [...complete];
+    const excludedByMode = [...none, ...basic, ...optimal];
 
-    if ( complete.has('all-urls') === false ) {
+    if (complete.has('all-urls') === false) {
         const matches = [
             ...ut.matchesFromHostnames(
                 ut.subtractHostnameIters(includedByMode, excludedByFilter)
@@ -181,7 +181,7 @@ function registerGeneric(context, genericDetails) {
                 ut.intersectHostnameIters(includedByMode, includedByFilter)
             ),
         ];
-        if ( matches.length === 0 ) { return; }
+        if (matches.length === 0) { return; }
         const directive = {
             id: 'css-generic-some',
             js,
@@ -201,10 +201,10 @@ function registerGeneric(context, genericDetails) {
         id: 'css-generic-all',
         js,
         allFrames: true,
-        matches: [ '<all_urls>' ],
+        matches: ['<all_urls>'],
         runAt: 'document_idle',
     };
-    if ( excludeMatches.length !== 0 ) {
+    if (excludeMatches.length !== 0) {
         directiveAll.excludeMatches = excludeMatches;
     }
     context.toAdd.push(directiveAll);
@@ -214,7 +214,7 @@ function registerGeneric(context, genericDetails) {
             ut.subtractHostnameIters(includedByFilter, excludedByMode)
         ),
     ];
-    if ( matches.length === 0 ) { return; }
+    if (matches.length === 0) { return; }
     const directiveSome = {
         id: 'css-generic-some',
         js,
@@ -236,23 +236,23 @@ async function registerCosmetic(realm, context) {
     }
 
     const rulesetIds = [];
-    for ( const rulesetDetails of rulesetsDetails ) {
+    for (const rulesetDetails of rulesetsDetails) {
         const count = rulesetDetails.css?.[realm] || 0;
-        if ( count === 0 ) { continue; }
+        if (count === 0) { continue; }
         rulesetIds.push(rulesetDetails.id);
     }
-    if ( rulesetIds.length === 0 ) { return; }
+    if (rulesetIds.length === 0) { return; }
 
     const { none, basic, optimal, complete } = filteringModeDetails;
     const matches = [
         ...ut.matchesFromHostnames(optimal),
         ...ut.matchesFromHostnames(complete),
     ];
-    if ( matches.length === 0 ) { return; }
+    if (matches.length === 0) { return; }
 
     {
         const promises = [];
-        for ( const id of rulesetIds ) {
+        for (const id of rulesetIds) {
             promises.push(
                 fetchJSON(`/rulesets/scripting/${realm}/${id}`).then(data => {
                     return localWrite(`css.${realm}.${id}`, data);
@@ -270,12 +270,12 @@ async function registerCosmetic(realm, context) {
     js.push(`/js/scripting/${realmid}.js`);
 
     const excludeMatches = [];
-    if ( none.has('all-urls') === false && basic.has('all-urls') === false ) {
+    if (none.has('all-urls') === false && basic.has('all-urls') === false) {
         const toExclude = [
             ...ut.matchesFromHostnames(none),
             ...ut.matchesFromHostnames(basic),
         ];
-        for ( const hn of toExclude ) {
+        for (const hn of toExclude) {
             excludeMatches.push(hn);
         }
     }
@@ -287,7 +287,7 @@ async function registerCosmetic(realm, context) {
         allFrames: true,
         runAt: 'document_start',
     };
-    if ( excludeMatches.length !== 0 ) {
+    if (excludeMatches.length !== 0) {
         directive.excludeMatches = excludeMatches;
     }
 
@@ -313,21 +313,21 @@ function registerScriptlet(context, scriptletDetails) {
         ...filteringModeDetails.complete,
     ];
 
-    for ( const rulesetId of rulesetsDetails.map(v => v.id) ) {
+    for (const rulesetId of rulesetsDetails.map(v => v.id)) {
         const worlds = scriptletDetails.get(rulesetId);
-        if ( worlds === undefined ) { continue; }
-        for ( const world of Object.keys(worlds) ) {
+        if (worlds === undefined) { continue; }
+        for (const world of Object.keys(worlds)) {
             const id = `${rulesetId}.${world.toLowerCase()}`;
 
             const matches = [];
             const excludeMatches = [];
             const hostnames = worlds[world];
             let targetHostnames = [];
-            if ( hasBroadHostPermission ) {
+            if (hasBroadHostPermission) {
                 excludeMatches.push(...permissionRevokedMatches);
                 targetHostnames = hostnames;
-            } else if ( permissionGrantedHostnames.length !== 0 ) {
-                if ( hostnames.includes('*') ) {
+            } else if (permissionGrantedHostnames.length !== 0) {
+                if (hostnames.includes('*')) {
                     targetHostnames = permissionGrantedHostnames;
                 } else {
                     targetHostnames = ut.intersectHostnameIters(
@@ -336,20 +336,20 @@ function registerScriptlet(context, scriptletDetails) {
                     );
                 }
             }
-            if ( targetHostnames.length === 0 ) { continue; }
+            if (targetHostnames.length === 0) { continue; }
             matches.push(...ut.matchesFromHostnames(targetHostnames));
             normalizeMatches(matches);
 
             const directive = {
                 id,
-                js: [ `/rulesets/scripting/scriptlet/${world.toLowerCase()}/${rulesetId}.js` ],
+                js: [`/rulesets/scripting/scriptlet/${world.toLowerCase()}/${rulesetId}.js`],
                 matches,
                 allFrames: true,
                 matchOriginAsFallback: true,
                 runAt: 'document_start',
                 world,
             };
-            if ( excludeMatches.length !== 0 ) {
+            if (excludeMatches.length !== 0) {
                 directive.excludeMatches = excludeMatches;
             }
 
@@ -365,9 +365,9 @@ function registerScriptlet(context, scriptletDetails) {
 // https://github.com/radiolondra/ExcludeMatches-Test
 
 export async function registerInjectables() {
-    if ( browser.scripting === undefined ) { return false; }
+    if (browser.scripting === undefined) { return false; }
 
-    if ( registerInjectables.barrier ) { return true; }
+    if (registerInjectables.barrier) { return true; }
     registerInjectables.barrier = true;
 
     const [
@@ -401,15 +401,15 @@ export async function registerInjectables() {
     ubolLog(`Unregistered all content (css/js)`);
     try {
         await browser.scripting.unregisterContentScripts();
-    } catch(reason) {
+    } catch (reason) {
         ubolErr(`unregisterContentScripts/${reason}`);
     }
 
-    if ( toAdd.length !== 0 ) {
+    if (toAdd.length !== 0) {
         ubolLog(`Registered ${toAdd.map(v => v.id)} content (css/js)`);
         try {
             await browser.scripting.registerContentScripts(toAdd);
-        } catch(reason) {
+        } catch (reason) {
             ubolErr(`registerContentScripts/${reason}`);
         }
     }
@@ -427,13 +427,13 @@ export async function onWakeupRun() {
     const cleanupTime = await sessionRead('scripting.manager.cleanup.time') || 0;
     const now = Date.now();
     const since = now - cleanupTime;
-    if ( since < (15 * 60 * 1000) ) { return; } // 15 minutes
+    if (since < (15 * 60 * 1000)) { return; } // 15 minutes
     const MAX_CACHE_ENTRY_LOW = 256;
     const MAX_CACHE_ENTRY_HIGH = MAX_CACHE_ENTRY_LOW +
         Math.max(Math.round(MAX_CACHE_ENTRY_LOW / 8), 8);
     const keys = await sessionKeys() || [];
     const cacheKeys = keys.filter(a => a.startsWith('cache.css.'));
-    if ( cacheKeys.length < MAX_CACHE_ENTRY_HIGH ) { return; }
+    if (cacheKeys.length < MAX_CACHE_ENTRY_HIGH) { return; }
     const entries = await Promise.all(cacheKeys.map(async a => {
         const entry = await sessionRead(a) || {};
         entry.key = a;

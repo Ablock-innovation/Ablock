@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$ } from './dom.js';
@@ -36,22 +36,23 @@ export const toolOverlay = {
         this.onmessage = onmessage;
         globalThis.addEventListener('message', ev => {
             const msg = ev.data || {};
-            if ( msg.what !== 'startOverlay' ) { return; }
-            if ( Array.isArray(ev.ports) === false ) { return; }
-            if ( ev.ports.length === 0 ) { return; }
+            if (msg.what !== 'startOverlay') { return; }
+            if (Array.isArray(ev.ports) === false) { return; }
+            if (ev.ports.length === 0) { return; }
             toolOverlay.port = ev.ports[0];
             toolOverlay.port.onmessage = ev => {
                 this.onMessage(ev.data || {});
             };
-            toolOverlay.port.onmessageerror = ( ) => {
+            toolOverlay.port.onmessageerror = () => {
                 this.onmessage({ what: 'stopTool' });
             };
             this.moveable = qs$('aside:has(#move)');
-            if ( this.moveable !== null ) {
+            if (this.moveable !== null) {
                 dom.on('aside #move', 'pointerdown', ev => { this.mover(ev); });
                 dom.on('aside #move', 'touchstart', this.eatTouchEvent);
             }
-            this.onMessage({ what: 'startTool',
+            this.onMessage({
+                what: 'startTool',
                 url: msg.url,
                 width: msg.width,
                 height: msg.height,
@@ -62,7 +63,7 @@ export const toolOverlay = {
 
     stop() {
         this.highlightElementUnderMouse(false);
-        if ( this.port ) {
+        if (this.port) {
             this.port.postMessage({ what: 'quitTool' });
             this.port.onmessage = null;
             this.port.onmessageerror = null;
@@ -72,37 +73,37 @@ export const toolOverlay = {
 
     onMessage(wrapped) {
         // Response to frame-initiated message?
-        if ( typeof wrapped?.fromFrameId === 'number' ) {
+        if (typeof wrapped?.fromFrameId === 'number') {
             const resolve = this.pendingMessages.get(wrapped.fromFrameId);
-            if ( resolve ) {
+            if (resolve) {
                 this.pendingMessages.delete(wrapped.fromFrameId);
                 resolve(wrapped.msg);
             }
             return;
         }
         const msg = wrapped.msg || wrapped;
-        switch ( msg.what ) {
-        case 'startTool': {
-            this.url.href = msg.url;
-            const ow = msg.width;
-            const oh = msg.height;
-            this.svgOcean.setAttribute('d', `M0 0h${ow}v${oh}h-${ow}z`);
-            break;
-        }
-        case 'svgPaths':
-            this.svgOcean.setAttribute('d', msg.ocean + msg.islands);
-            this.svgIslands.setAttribute('d', msg.islands || this.emptyPath);
-            break;
-        default:
-            break;
+        switch (msg.what) {
+            case 'startTool': {
+                this.url.href = msg.url;
+                const ow = msg.width;
+                const oh = msg.height;
+                this.svgOcean.setAttribute('d', `M0 0h${ow}v${oh}h-${ow}z`);
+                break;
+            }
+            case 'svgPaths':
+                this.svgOcean.setAttribute('d', msg.ocean + msg.islands);
+                this.svgIslands.setAttribute('d', msg.islands || this.emptyPath);
+                break;
+            default:
+                break;
         }
         const response = this.onmessage && this.onmessage(msg) || undefined;
         // Send response if this is script-initiated message
-        if ( wrapped?.fromScriptId && this.port ) {
+        if (wrapped?.fromScriptId && this.port) {
             const { fromScriptId } = wrapped;
-            if ( response instanceof Promise ) {
+            if (response instanceof Promise) {
                 response.then(response => {
-                    if ( this.port === null ) { return; }
+                    if (this.port === null) { return; }
                     this.port.postMessage({ fromScriptId, msg: response });
                 });
             } else {
@@ -111,7 +112,7 @@ export const toolOverlay = {
         }
     },
     postMessage(msg) {
-        if ( this.port === null ) { return; }
+        if (this.port === null) { return; }
         const wrapped = {
             fromFrameId: this.messageId++,
             msg,
@@ -129,21 +130,21 @@ export const toolOverlay = {
     },
 
     highlightElementUnderMouse(state) {
-        if ( dom.cl.has(dom.root, 'mobile') ) { return; }
-        if ( state === this.mstrackerOn ) { return; }
+        if (dom.cl.has(dom.root, 'mobile')) { return; }
+        if (state === this.mstrackerOn) { return; }
         this.mstrackerOn = state;
-        if ( this.mstrackerOn ) {
+        if (this.mstrackerOn) {
             dom.on(document, 'mousemove', this.onHover, { passive: true });
             return;
         }
         dom.off(document, 'mousemove', this.onHover, { passive: true });
-        if ( this.mstrackerTimer === undefined ) { return; }
+        if (this.mstrackerTimer === undefined) { return; }
         self.cancelAnimationFrame(this.mstrackerTimer);
         this.mstrackerTimer = undefined;
     },
     onTimer() {
         toolOverlay.mstrackerTimer = undefined;
-        if ( toolOverlay.port === null ) { return; }
+        if (toolOverlay.port === null) { return; }
         toolOverlay.port.postMessage({
             what: 'highlightElementAtPoint',
             mx: toolOverlay.mstrackerX,
@@ -153,7 +154,7 @@ export const toolOverlay = {
     onHover(ev) {
         toolOverlay.mstrackerX = ev.clientX;
         toolOverlay.mstrackerY = ev.clientY;
-        if ( toolOverlay.mstrackerTimer !== undefined ) { return; }
+        if (toolOverlay.mstrackerTimer !== undefined) { return; }
         toolOverlay.mstrackerTimer =
             self.requestAnimationFrame(toolOverlay.onTimer);
     },
@@ -163,8 +164,8 @@ export const toolOverlay = {
 
     mover(ev) {
         const target = ev.target;
-        if ( target.matches('#move') === false ) { return; }
-        if ( dom.cl.has(this.moveable, 'moving') ) { return; }
+        if (target.matches('#move') === false) { return; }
+        if (dom.cl.has(this.moveable, 'moving')) { return; }
         target.setPointerCapture(ev.pointerId);
         this.moverX0 = ev.pageX;
         this.moverY0 = ev.pageY;
@@ -188,31 +189,31 @@ export const toolOverlay = {
         const rootH = dom.root.clientHeight;
         const moveableW = this.moveable.clientWidth;
         const moveableH = this.moveable.clientHeight;
-        if ( cx1 < rootW / 2 ) {
-            this.moveable.style.setProperty('left', `${Math.max(cx1-moveableW/2,2)}px`);
+        if (cx1 < rootW / 2) {
+            this.moveable.style.setProperty('left', `${Math.max(cx1 - moveableW / 2, 2)}px`);
             this.moveable.style.removeProperty('right');
         } else {
             this.moveable.style.removeProperty('left');
-            this.moveable.style.setProperty('right', `${Math.max(rootW-cx1-moveableW/2,2)}px`);
+            this.moveable.style.setProperty('right', `${Math.max(rootW - cx1 - moveableW / 2, 2)}px`);
         }
-        if ( cy1 < rootH / 2 ) {
-            this.moveable.style.setProperty('top', `${Math.max(cy1-moveableH/2,2)}px`);
+        if (cy1 < rootH / 2) {
+            this.moveable.style.setProperty('top', `${Math.max(cy1 - moveableH / 2, 2)}px`);
             this.moveable.style.removeProperty('bottom');
         } else {
             this.moveable.style.removeProperty('top');
-            this.moveable.style.setProperty('bottom', `${Math.max(rootH-cy1-moveableH/2,2)}px`);
+            this.moveable.style.setProperty('bottom', `${Math.max(rootH - cy1 - moveableH / 2, 2)}px`);
         }
     },
     moverMoveAsync(ev) {
         toolOverlay.moverX1 = ev.pageX;
         toolOverlay.moverY1 = ev.pageY;
-        if ( toolOverlay.moverTimer !== undefined ) { return; }
-        toolOverlay.moverTimer = self.requestAnimationFrame(( ) => {
+        if (toolOverlay.moverTimer !== undefined) { return; }
+        toolOverlay.moverTimer = self.requestAnimationFrame(() => {
             toolOverlay.moverMove();
         });
     },
     moverStop(ev) {
-        if ( dom.cl.has(toolOverlay.moveable, 'moving') === false ) { return; }
+        if (dom.cl.has(toolOverlay.moveable, 'moving') === false) { return; }
         dom.cl.remove(toolOverlay.moveable, 'moving');
         self.removeEventListener('pointermove', toolOverlay.moverMoveAsync, {
             passive: true,
@@ -223,7 +224,7 @@ export const toolOverlay = {
         ev.preventDefault();
     },
     eatTouchEvent(ev) {
-        if ( ev.target !== qs$('aside #move') ) { return; }
+        if (ev.target !== qs$('aside #move')) { return; }
         ev.stopPropagation();
         ev.preventDefault();
     },

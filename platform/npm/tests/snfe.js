@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 'use strict';
@@ -30,7 +30,7 @@ import { createWorld } from 'esm-world';
 import './_common.js';
 
 describe('SNFE', () => {
-    for ( let wasm of [ false/*, true*/ ] ) {
+    for (let wasm of [false/*, true*/]) {
         context(`${wasm ? 'Wasm on' : 'Wasm off'}`, () => {
             let module = null;
             let engine = null;
@@ -38,7 +38,7 @@ describe('SNFE', () => {
             beforeEach(async () => {
                 module = await createWorld('./index.js', { globals: global });
 
-                if ( wasm ) {
+                if (wasm) {
                     assert(await module.enableWASM());
                 }
             });
@@ -232,7 +232,7 @@ describe('SNFE', () => {
                     await engine.deserialize(serialized);
                 });
 
-                // https://github.com/gorhill/uBlock/commit/8f461072f576cdf72c088a952ef342281a7c44d6
+                // https://github.com/Ablock/Ablock/commit/8f461072f576cdf72c088a952ef342281a7c44d6
                 it('should correctly remove query parameter following deserialization', async () => {
                     await engine.useLists([
                         { name: 'custom', raw: '*$removeparam=/^utm_/' },
@@ -329,7 +329,7 @@ describe('SNFE', () => {
                     assert.strictEqual(r, 0);
                 });
 
-                // https://github.com/gorhill/uBlock/commit/d66cd1116c0e
+                // https://github.com/Ablock/Ablock/commit/d66cd1116c0e
                 it('should not match on localhost', async () => {
                     await engine.useLists([
                         { name: 'test', raw: '.js$domain=foo.*|bar.*\n/^/$domain=example.*|foo.*' },

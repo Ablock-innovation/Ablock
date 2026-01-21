@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -35,8 +35,8 @@ import { ubologSet } from './console.js';
 
 // Not all platforms may have properly declared vAPI.webextFlavor.
 
-if ( vAPI.webextFlavor === undefined ) {
-    vAPI.webextFlavor = { major: 0, soup: new Set([ 'ublock' ]) };
+if (vAPI.webextFlavor === undefined) {
+    vAPI.webextFlavor = { major: 0, soup: new Set(['ublock']) };
 }
 
 /******************************************************************************/
@@ -91,7 +91,7 @@ const hiddenSettingsDefault = {
     userResourcesLocation: 'unset',
 };
 
-if ( vAPI.webextFlavor.soup.has('devbuild') ) {
+if (vAPI.webextFlavor.soup.has('devbuild')) {
     hiddenSettingsDefault.consoleLogLevel = 'info';
     hiddenSettingsDefault.cacheStorageAPI = 'unset';
     ubologSet(true);
@@ -140,7 +140,7 @@ const hostnameSwitchesDefault = [
     'no-large-media: behind-the-scene false',
 ];
 // https://github.com/LiCybora/NanoDefenderFirefox/issues/196
-if ( vAPI.webextFlavor.soup.has('firefox') ) {
+if (vAPI.webextFlavor.soup.has('firefox')) {
     hostnameSwitchesDefault.push('no-csp-reports: * true');
 }
 
@@ -236,7 +236,7 @@ const µBlock = {  // jshint ignore:line
     storageQuota: vAPI.storage.QUOTA_BYTES,
     storageUsed: 0,
 
-    noopFunc: function(){},
+    noopFunc: function () { },
 
     apiErrorCount: 0,
 
@@ -285,8 +285,8 @@ const µBlock = {  // jshint ignore:line
     }
 
     maybeFromDocumentURL(documentUrl) {
-        if ( documentUrl === undefined ) { return; }
-        if ( documentUrl.startsWith(this.tabOrigin) ) { return; }
+        if (documentUrl === undefined) { return; }
+        if (documentUrl.startsWith(this.tabOrigin)) { return; }
         this.tabOrigin = originFromURI(µBlock.normalizeTabURL(0, documentUrl));
         this.tabHostname = hostnameFromURI(this.tabOrigin);
         this.tabDomain = domainFromHostname(this.tabHostname);
@@ -299,7 +299,7 @@ const µBlock = {  // jshint ignore:line
         const tabId = details.tabId;
         this.type = details.type;
         const isMainFrame = this.itype === this.MAIN_FRAME;
-        if ( isMainFrame && tabId > 0 ) {
+        if (isMainFrame && tabId > 0) {
             µBlock.tabContextManager.push(tabId, details.url);
         }
         this.fromTabId(tabId); // Must be called AFTER tab context management
@@ -310,16 +310,16 @@ const µBlock = {  // jshint ignore:line
         this.aliasURL = details.aliasURL || undefined;
         this.redirectURL = undefined;
         this.filter = undefined;
-        if ( this.itype !== this.SUB_FRAME ) {
+        if (this.itype !== this.SUB_FRAME) {
             this.docId = details.frameId;
             this.frameId = -1;
         } else {
             this.docId = details.parentFrameId;
             this.frameId = details.frameId;
         }
-        if ( this.tabId > 0 ) {
-            if ( this.docId === 0 ) {
-                if ( isMainFrame === false ) {
+        if (this.tabId > 0) {
+            if (this.docId === 0) {
+                if (isMainFrame === false) {
                     this.maybeFromDocumentURL(details.documentUrl);
                 }
                 this.docOrigin = this.tabOrigin;
@@ -327,20 +327,20 @@ const µBlock = {  // jshint ignore:line
                 this.docDomain = this.tabDomain;
                 return this;
             }
-            if ( details.documentUrl !== undefined ) {
+            if (details.documentUrl !== undefined) {
                 this.setDocOriginFromURL(details.documentUrl);
                 return this;
             }
             const pageStore = µBlock.pageStoreFromTabId(this.tabId);
             const docStore = pageStore && pageStore.getFrameStore(this.docId);
-            if ( docStore ) {
+            if (docStore) {
                 this.setDocOriginFromURL(docStore.rawURL);
             } else {
                 this.setDocOrigin(this.tabOrigin);
             }
             return this;
         }
-        if ( details.documentUrl !== undefined ) {
+        if (details.documentUrl !== undefined) {
             const origin = originFromURI(
                 µBlock.normalizeTabURL(0, details.documentUrl)
             );
@@ -355,7 +355,7 @@ const µBlock = {  // jshint ignore:line
     }
 
     getTabOrigin() {
-        if ( this.tabOrigin === undefined ) {
+        if (this.tabOrigin === undefined) {
             const tabContext = µBlock.tabContextManager.mustLookup(this.tabId);
             this.tabOrigin = tabContext.origin;
             this.tabHostname = tabContext.rootHostname;
@@ -382,11 +382,11 @@ const µBlock = {  // jshint ignore:line
             filter: undefined,
         };
         // Many filters may have been applied to the current context
-        if ( Array.isArray(this.filter) === false ) {
+        if (Array.isArray(this.filter) === false) {
             details.filter = this.filter;
             return logger.writeOne(details);
         }
-        for ( const filter of this.filter ) {
+        for (const filter of this.filter) {
             details.filter = filter;
             logger.writeOne(details);
         }

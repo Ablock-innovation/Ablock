@@ -1,6 +1,6 @@
 Səmərəli bir əngəlləyici: yaddaş və prosessor yükünü artırmadığı halda digər məşhur əngəlləyicilərlə müqayisədə minlərlə daha çox filtri dəstəkləyir.
 
-Proqramın səmərəliliyinə dair ümumi əyani məlumat: https://github.com/gorhill/uBlock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Proqramın səmərəliliyinə dair ümumi əyani məlumat: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 İstifadə: Açılan pəncərədəki böyük açar düyməsi uBlock₀-u cari veb-saytda işə salmaq/dayandırmaq üçündür. Bu zaman uBlock₀ bütün veb-saytlarda deyil, yalnız cari veb-saytda işə düşür/dayandırılır.
 
@@ -38,7 +38,7 @@ Pulsuz.
 Ümumi lisenziyalı (GPLv3) açıq mənbə kodu.
 İstifadəçilər tərəfindən istifadəçilər üçün.
 
-Github-a qoşulan iştirakçılarımız: https://github.com/gorhill/uBlock/graphs/contributors
+Github-a qoşulan iştirakçılarımız: https://github.com/Ablock/Ablock/graphs/contributors
 Crowdin-ə qoşulan iştirakçılarımız: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@ Crowdin-ə qoşulan iştirakçılarımız: https://crowdin.net/project/ublock
 It's quite an early version, keep this in mind when you review.
 
 Layihəyə edilmiş dəyişikliklərin siyahısı:
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases

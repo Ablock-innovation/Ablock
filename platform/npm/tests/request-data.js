@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 'use strict';
@@ -63,14 +63,14 @@ describe('Request data', () => {
         texttrack: 'other',
     };
 
-    for ( let wasm of [ false, true ] ) {
+    for (let wasm of [false, true]) {
         context(`${wasm ? 'Wasm on' : 'Wasm off'}`, () => {
             let engine = null;
 
             before(async () => {
                 const { StaticNetFilteringEngine, enableWASM } = await createWorld('./index.js', { globals: global });
 
-                if ( wasm ) {
+                if (wasm) {
                     assert(await enableWASM());
                 }
 
@@ -102,7 +102,7 @@ describe('Request data', () => {
                 ]);
             });
 
-            for ( let i = 0; i < requests.length; i++ ) {
+            for (let i = 0; i < requests.length; i++) {
                 const { url, frameUrl, cpt } = requests[i];
                 const request = { url, originURL: frameUrl, type: typeMap[cpt] };
 

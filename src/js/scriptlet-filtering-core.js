@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { StaticExtFilteringHostnameDB } from './static-ext-filtering-db.js';
@@ -28,21 +28,21 @@ import { redirectEngine as reng } from './redirect-engine.js';
 // For debugging convenience: all the top function calls will appear
 // at the bottom of a generated content script
 const codeSorter = (a, b) => {
-    if ( a.startsWith('try') ) { return 1; }
-    if ( b.startsWith('try') ) { return -1; }
+    if (a.startsWith('try')) { return 1; }
+    if (b.startsWith('try')) { return -1; }
     return 0;
 };
 
 const normalizeRawFilter = (parser, sourceIsTrusted = false) => {
     const args = parser.getScriptletArgs();
-    if ( args.length !== 0 ) {
+    if (args.length !== 0) {
         let token = `${args[0]}.js`;
-        if ( reng.aliases.has(token) ) {
+        if (reng.aliases.has(token)) {
             token = reng.aliases.get(token);
         }
-        if ( parser.isException() !== true ) {
-            if ( sourceIsTrusted !== true ) {
-                if ( reng.tokenRequiresTrust(token) ) { return; }
+        if (parser.isException() !== true) {
+            if (sourceIsTrusted !== true) {
+                if (reng.tokenRequiresTrust(token)) { return; }
             }
         }
         args[0] = token.slice(0, -3);
@@ -51,57 +51,57 @@ const normalizeRawFilter = (parser, sourceIsTrusted = false) => {
 };
 
 const lookupScriptlet = (rawToken, mainMap, isolatedMap, debug = false) => {
-    if ( mainMap.has(rawToken) || isolatedMap.has(rawToken) ) { return; }
+    if (mainMap.has(rawToken) || isolatedMap.has(rawToken)) { return; }
     const args = JSON.parse(rawToken);
     const token = `${args[0]}.js`;
     const details = reng.contentFromName(token, 'text/javascript');
-    if ( details === undefined ) { return; }
+    if (details === undefined) { return; }
     const targetWorldMap = details.world !== 'ISOLATED' ? mainMap : isolatedMap;
     const match = /^function\s+([^(\s]+)\s*\(/.exec(details.js);
     const fname = match && match[1];
     const content = patchScriptlet(fname, details.js, args.slice(1));
-    if ( fname ) {
+    if (fname) {
         targetWorldMap.set(token, details.js);
     }
     const dependencies = details.dependencies || [];
-    while ( dependencies.length !== 0 ) {
+    while (dependencies.length !== 0) {
         const token = dependencies.shift();
-        if ( targetWorldMap.has(token) ) { continue; }
+        if (targetWorldMap.has(token)) { continue; }
         const details = reng.contentFromName(token, 'fn/javascript') ||
             reng.contentFromName(token, 'text/javascript');
-        if ( details === undefined ) { continue; }
+        if (details === undefined) { continue; }
         targetWorldMap.set(token, details.js);
-        if ( Array.isArray(details.dependencies) === false ) { continue; }
+        if (Array.isArray(details.dependencies) === false) { continue; }
         dependencies.push(...details.dependencies);
     }
     targetWorldMap.set(rawToken, [
         'try {',
-            `\t${content}`,
+        `\t${content}`,
         '} catch (e) {',
-            debug ? '\tconsole.error(e);' : '',
+        debug ? '\tconsole.error(e);' : '',
         '}',
     ].join('\n'));
 };
 
 // Fill-in scriptlet argument placeholders.
 const patchScriptlet = (fname, content, arglist) => {
-    if ( fname ) {
+    if (fname) {
         content = `${fname}({{args}});`;
     } else {
-        for ( let i = 0; i < arglist.length; i++ ) {
-            content = content.replace(`{{${i+1}}}`, arglist[i]);
+        for (let i = 0; i < arglist.length; i++) {
+            content = content.replace(`{{${i + 1}}}`, arglist[i]);
         }
     }
     return content.replace('{{args}}',
-        JSON.stringify(arglist).slice(1,-1).replace(/\$/g, '$$$')
+        JSON.stringify(arglist).slice(1, -1).replace(/\$/g, '$$$')
     );
 };
 
 const requote = s => {
-    if ( /^(["'`]).*\1$|,|^$/.test(s) === false ) { return s; }
-    if ( s.includes("'") === false ) { return `'${s}'`; }
-    if ( s.includes('"') === false ) { return `"${s}"`; }
-    if ( s.includes('`') === false ) { return `\`${s}\``; }
+    if (/^(["'`]).*\1$|,|^$/.test(s) === false) { return s; }
+    if (s.includes("'") === false) { return `'${s}'`; }
+    if (s.includes('"') === false) { return `"${s}"`; }
+    if (s.includes('`') === false) { return `\`${s}\``; }
     return `'${s.replace(/'/g, "\\'")}'`;
 };
 
@@ -147,26 +147,26 @@ export class ScriptletFilteringEngine {
         const normalized = normalizeRawFilter(parser, writer.properties.get('trustedSource'));
 
         // Can fail if there is a mismatch with trust requirement
-        if ( normalized === undefined ) { return; }
+        if (normalized === undefined) { return; }
 
         // Tokenless is meaningful only for exception filters.
-        if ( normalized === '[]' && isException === false ) { return; }
+        if (normalized === '[]' && isException === false) { return; }
 
-        if ( parser.hasOptions() === false ) {
-            if ( isException ) {
-                writer.push([ 32, '', `-${normalized}` ]);
+        if (parser.hasOptions() === false) {
+            if (isException) {
+                writer.push([32, '', `-${normalized}`]);
             }
             return;
         }
 
-        // https://github.com/gorhill/uBlock/issues/3375
+        // https://github.com/Ablock/Ablock/issues/3375
         //   Ignore instances of exception filter with negated hostnames,
         //   because there is no way to create an exception to an exception.
 
-        for ( const { hn, not, bad } of parser.getExtFilterDomainIterator() ) {
-            if ( bad ) { continue; }
+        for (const { hn, not, bad } of parser.getExtFilterDomainIterator()) {
+            if (bad) { continue; }
             const prefix = ((isException ? 1 : 0) ^ (not ? 1 : 0)) ? '-' : '+';
-            writer.push([ 32, hn, `${prefix}${normalized}` ]);
+            writer.push([32, hn, `${prefix}${normalized}`]);
         }
     }
 
@@ -174,10 +174,10 @@ export class ScriptletFilteringEngine {
     fromCompiledContent(reader) {
         reader.select('SCRIPTLET_FILTERS');
 
-        while ( reader.next() ) {
+        while (reader.next()) {
             this.acceptedCount += 1;
             const fingerprint = reader.fingerprint();
-            if ( this.duplicates.has(fingerprint) ) {
+            if (this.duplicates.has(fingerprint)) {
                 this.discardedCount += 1;
                 continue;
             }
@@ -197,7 +197,7 @@ export class ScriptletFilteringEngine {
     }
 
     retrieve(request, options = {}) {
-        if ( this.scriptletDB.size === 0 ) { return; }
+        if (this.scriptletDB.size === 0) { return; }
 
         const all = new Set();
         const { ancestors = [], domain, hostname } = request;
@@ -208,30 +208,30 @@ export class ScriptletFilteringEngine {
         this.scriptletDB.retrieveSpecificsByRegex(all, hostname, request.url);
         this.scriptletDB.retrieveGenerics(all);
         const visitedAncestors = [];
-        for ( const ancestor of ancestors ) {
+        for (const ancestor of ancestors) {
             const { domain, hostname } = ancestor;
-            if ( visitedAncestors.includes(hostname) ) { continue; }
+            if (visitedAncestors.includes(hostname)) { continue; }
             visitedAncestors.push(hostname);
             this.scriptletDB.retrieveSpecifics(all, `${hostname}>>`);
             const entity = entityFromHostname(hostname, domain);
-            if ( entity !== '' ) {
+            if (entity !== '') {
                 this.scriptletDB.retrieveSpecifics(all, `${entity}>>`);
             }
         }
-        if ( all.size === 0 ) { return; }
+        if (all.size === 0) { return; }
 
         // Wholly disable scriptlet injection?
-        if ( all.has('-[]') ) {
-            return { filters: [ '#@#+js()' ] };
+        if (all.has('-[]')) {
+            return { filters: ['#@#+js()'] };
         }
 
         // Split filters in different groups
         const scriptlets = new Set();
         const exceptions = new Set();
-        for ( const s of all ) {
-            if ( s.charCodeAt(0) === 0x2D /* - */ ) { continue; }
+        for (const s of all) {
+            if (s.charCodeAt(0) === 0x2D /* - */) { continue; }
             const selector = s.slice(1);
-            if ( all.has(`-${selector}`) ) {
+            if (all.has(`-${selector}`)) {
                 exceptions.add(selector);
             } else {
                 scriptlets.add(selector);
@@ -241,24 +241,24 @@ export class ScriptletFilteringEngine {
         const mainWorldMap = new Map();
         const isolatedWorldMap = new Map();
 
-        for ( const token of scriptlets ) {
+        for (const token of scriptlets) {
             lookupScriptlet(token, mainWorldMap, isolatedWorldMap, options.debug);
         }
 
-        if ( scriptlets.size !== 0 ) {
-            if ( mainWorldMap.size === 0 ) {
-                if ( isolatedWorldMap.size === 0 ) { return; }
+        if (scriptlets.size !== 0) {
+            if (mainWorldMap.size === 0) {
+                if (isolatedWorldMap.size === 0) { return; }
             }
         }
 
         const mainWorldCode = [];
-        for ( const js of mainWorldMap.values() ) {
+        for (const js of mainWorldMap.values()) {
             mainWorldCode.push(js);
         }
         mainWorldCode.sort(codeSorter);
 
         const isolatedWorldCode = [];
-        for ( const js of isolatedWorldMap.values() ) {
+        for (const js of isolatedWorldMap.values()) {
             isolatedWorldCode.push(js);
         }
         isolatedWorldCode.sort(codeSorter);
@@ -274,7 +274,7 @@ export class ScriptletFilteringEngine {
 
         const scriptletGlobals = options.scriptletGlobals || {};
 
-        if ( options.debug ) {
+        if (options.debug) {
             scriptletGlobals.canDebug = true;
         }
 

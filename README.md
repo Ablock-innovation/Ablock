@@ -11,19 +11,19 @@
 
 <h1 align="center">
 <sub>
-<img src="https://github.com/gorhill/uBlock/blob/master/src/img/ublock.svg" height="38" width="38">
+<img src="https://github.com/Ablock/Ablock/blob/master/src/img/ublock.svg" height="38" width="38">
 </sub>
 uBlock Origin (uBO)
 </h1>
 
 | Browser   | Install from ... | Status |
 | :-------: | ---------------- | ------ |
-| <img src="https://github.com/user-attachments/assets/b0136512-56a5-4856-8c50-4971c957a24f" alt="Get uBlock Origin for Firefox"> | <a href="https://addons.mozilla.org/addon/ublock-origin/">Firefox Add-ons</a> | [uBO works best on Firefox](https://github.com/gorhill/uBlock/wiki/uBlock-Origin-works-best-on-Firefox) |
+| <img src="https://github.com/user-attachments/assets/b0136512-56a5-4856-8c50-4971c957a24f" alt="Get uBlock Origin for Firefox"> | <a href="https://addons.mozilla.org/addon/ublock-origin/">Firefox Add-ons</a> | [uBO works best on Firefox](https://github.com/Ablock/Ablock/wiki/uBlock-Origin-works-best-on-Firefox) |
 | <img src="https://github.com/user-attachments/assets/3a7569f8-688b-4eb1-a643-8d0fe173aefe" alt="Get uBlock Origin for Microsoft Edge"> | <a href="https://microsoftedge.microsoft.com/addons/detail/ublock-origin/odfafepnkmbhccpbejgmiehpchacaeak">Edge Add-ons</a> |
 | <img src="https://github.com/user-attachments/assets/938f080c-fe64-4e48-8b89-4bfceabb56e6" alt="Get uBlock Origin for Opera"> | <a href="https://addons.opera.com/extensions/details/ublock/">Opera Add-ons</a> |
 | <img src="https://github.com/user-attachments/assets/5463ef88-873b-4516-8514-5277664cfde7" alt="Get uBlock Origin for Chromium"> | <a href="https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm">Chrome Web Store</a> | <a href="https://github.com/uBlockOrigin/uBlock-issues/wiki/About-Google-Chrome's-%22This-extension-may-soon-no-longer-be-supported%22">About Google Chrome's "This extension may soon no longer be supported"</a><br>End of support on Chrome 139 |
 | <img src="https://github.com/user-attachments/assets/2e9037c4-836d-44c1-a716-ba96e89daaff" alt="Get uBlock Origin for Thunderbird"> | <a href="https://addons.thunderbird.net/thunderbird/addon/ublock-origin/">Thunderbird Add-ons</a> | [No longer updated and stuck at 1.49.2.](https://github.com/uBlockOrigin/uBlock-issues/issues/2928) Later versions require "GitHub - Releases". |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" height="50" alt="Get uBlock Origin through GitHub"> | <a href="https://github.com/gorhill/uBlock/releases">GitHub - Releases</a> | Stable and development versions on Firefox, Chromium MV2, and Thunderbird. Must be placed manually into web browsers; the Chromium and Thunderbird versions usually won't auto-update.
+| <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" height="50" alt="Get uBlock Origin through GitHub"> | <a href="https://github.com/Ablock/Ablock/releases">GitHub - Releases</a> | Stable and development versions on Firefox, Chromium MV2, and Thunderbird. Must be placed manually into web browsers; the Chromium and Thunderbird versions usually won't auto-update.
 
 ***
 
@@ -59,12 +59,12 @@ Ads, "unintrusive" or not, are just the visible portion of the privacy-invading 
     </thead>
     <tbody>
         <tr>
-            <td>The <a href="https://github.com/gorhill/uBlock/wiki/Quick-guide:-popup-user-interface">simple popup user interface</a> for an install-it-and-forget-it type of installation that is configured optimally by default.</td>
-            <td>The <a href="https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-quick-guide">advanced popup user interface</a> includes a point-and-click firewall that is configurable on a per-site basis.</td>
+            <td>The <a href="https://github.com/Ablock/Ablock/wiki/Quick-guide:-popup-user-interface">simple popup user interface</a> for an install-it-and-forget-it type of installation that is configured optimally by default.</td>
+            <td>The <a href="https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-quick-guide">advanced popup user interface</a> includes a point-and-click firewall that is configurable on a per-site basis.</td>
         </tr>
         <tr>
-            <td align="center" valign="top"><a href="https://github.com/gorhill/uBlock/wiki/Quick-guide:-popup-user-interface"><img src="https://user-images.githubusercontent.com/585534/232531044-c4ac4dd5-0b60-4c1e-aabb-914be04b846c.png"/></a></td>
-            <td align="center" valign="top"><a href="https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-quick-guide"><img src="https://user-images.githubusercontent.com/585534/232531439-a8f81cc3-6622-45c4-8b32-7348cecf6e98.png"/></a></td>
+            <td align="center" valign="top"><a href="https://github.com/Ablock/Ablock/wiki/Quick-guide:-popup-user-interface"><img src="https://user-images.githubusercontent.com/585534/232531044-c4ac4dd5-0b60-4c1e-aabb-914be04b846c.png"/></a></td>
+            <td align="center" valign="top"><a href="https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-quick-guide"><img src="https://user-images.githubusercontent.com/585534/232531439-a8f81cc3-6622-45c4-8b32-7348cecf6e98.png"/></a></td>
         </tr>
     </tbody>
 </table>
@@ -159,24 +159,24 @@ If you ever want to contribute something, think about the people working hard to
 
 <!---------------------------------[ Internal ]-------------------------------->
 
-[Manual Installation]: https://github.com/gorhill/uBlock/tree/master/dist#install
-[Extended Syntax]: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#extended-syntax
-[Privacy Policy]: https://github.com/gorhill/uBlock/wiki/Privacy-policy
+[Manual Installation]: https://github.com/Ablock/Ablock/tree/master/dist#install
+[Extended Syntax]: https://github.com/Ablock/Ablock/wiki/Static-filter-syntax#extended-syntax
+[Privacy Policy]: https://github.com/Ablock/Ablock/wiki/Privacy-policy
 [uBO Filters]: https://github.com/uBlockOrigin/uAssets/tree/master/filters
-[Permissions]: https://github.com/gorhill/uBlock/wiki/Permissions
-[Commit Rate]: https://github.com/gorhill/uBlock/commits/master
-[Works Best]: https://github.com/gorhill/uBlock/wiki/uBlock-Origin-works-best-on-Firefox
-[Deployment]: https://github.com/gorhill/uBlock/wiki/Deploying-uBlock-Origin
-[Blocking]: https://github.com/gorhill/uBlock/wiki/Blocking-mode
-[Releases]: https://github.com/gorhill/uBlock/releases
+[Permissions]: https://github.com/Ablock/Ablock/wiki/Permissions
+[Commit Rate]: https://github.com/Ablock/Ablock/commits/master
+[Works Best]: https://github.com/Ablock/Ablock/wiki/uBlock-Origin-works-best-on-Firefox
+[Deployment]: https://github.com/Ablock/Ablock/wiki/Deploying-uBlock-Origin
+[Blocking]: https://github.com/Ablock/Ablock/wiki/Blocking-mode
+[Releases]: https://github.com/Ablock/Ablock/releases
 [Issues]: https://github.com/uBlockOrigin/uBlock-issues/issues
-[Beta]: https://github.com/gorhill/uBlock/blob/master/dist/README.md#for-beta-version
-[Wiki]: https://github.com/gorhill/uBlock/wiki
+[Beta]: https://github.com/Ablock/Ablock/blob/master/dist/README.md#for-beta-version
+[Wiki]: https://github.com/Ablock/Ablock/wiki
 
 <!----------------------------------[ Badges ]--------------------------------->
 
 [Badge Localization]: https://d322cqt584bo4o.cloudfront.net/ublock/localized.svg
-[Badge Commits]: https://img.shields.io/github/commit-activity/m/gorhill/ublock?label=Commits
+[Badge Commits]: https://img.shields.io/github/commit-activity/m/Ablock/Ablock?label=Commits
 [Badge Mozilla]: https://img.shields.io/amo/rating/ublock-origin?label=Firefox
 [Badge License]: https://img.shields.io/badge/License-GPLv3-blue.svg
 [Badge Chrome]: https://img.shields.io/chrome-web-store/rating/cjpalhdlnbpafiamejdnhcphjbkeiagm?label=Chrome

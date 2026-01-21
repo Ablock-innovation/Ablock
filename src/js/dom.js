@@ -16,21 +16,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 
 const normalizeTarget = target => {
-    if ( typeof target === 'string' ) { return Array.from(qsa$(target)); }
-    if ( target instanceof Element ) { return [ target ]; }
-    if ( target === null ) { return []; }
-    if ( Array.isArray(target) ) { return target; }
+    if (typeof target === 'string') { return Array.from(qsa$(target)); }
+    if (target instanceof Element) { return [target]; }
+    if (target === null) { return []; }
+    if (Array.isArray(target)) { return target; }
     return Array.from(target);
 };
 
 const makeEventHandler = (selector, callback) => {
-    return function(event) {
+    return function (event) {
         const dispatcher = event.currentTarget;
         if (
             dispatcher instanceof HTMLElement === false ||
@@ -54,11 +54,11 @@ const makeEventHandler = (selector, callback) => {
 
 class dom {
     static attr(target, attr, value = undefined) {
-        for ( const elem of normalizeTarget(target) ) {
-            if ( value === undefined ) {
+        for (const elem of normalizeTarget(target)) {
+            if (value === undefined) {
                 return elem.getAttribute(attr);
             }
-            if ( value === null ) {
+            if (value === null) {
                 elem.removeAttribute(attr);
             } else {
                 elem.setAttribute(attr, value);
@@ -67,8 +67,8 @@ class dom {
     }
 
     static clear(target) {
-        for ( const elem of normalizeTarget(target) ) {
-            while ( elem.firstChild !== null ) {
+        for (const elem of normalizeTarget(target)) {
+            while (elem.firstChild !== null) {
                 elem.removeChild(elem.firstChild);
             }
         }
@@ -76,42 +76,42 @@ class dom {
 
     static clone(target) {
         const elements = normalizeTarget(target);
-        if ( elements.length === 0 ) { return null; }
+        if (elements.length === 0) { return null; }
         return elements[0].cloneNode(true);
     }
 
     static create(a) {
-        if ( typeof a === 'string' ) {
+        if (typeof a === 'string') {
             return document.createElement(a);
         }
     }
 
     static prop(target, prop, value = undefined) {
-        for ( const elem of normalizeTarget(target) ) {
-            if ( value === undefined ) { return elem[prop]; }
+        for (const elem of normalizeTarget(target)) {
+            if (value === undefined) { return elem[prop]; }
             elem[prop] = value;
         }
     }
 
     static text(target, text) {
         const targets = normalizeTarget(target);
-        if ( text === undefined ) {
+        if (text === undefined) {
             return targets.length !== 0 ? targets[0].textContent : undefined;
         }
-        for ( const elem of targets ) {
+        for (const elem of targets) {
             elem.textContent = text;
         }
     }
 
     static remove(target) {
-        for ( const elem of normalizeTarget(target) ) {
+        for (const elem of normalizeTarget(target)) {
             elem.remove();
         }
     }
 
     static empty(target) {
-        for ( const elem of normalizeTarget(target) ) {
-            while ( elem.firstElementChild !== null ) {
+        for (const elem of normalizeTarget(target)) {
+            while (elem.firstElementChild !== null) {
                 elem.firstElementChild.remove();
             }
         }
@@ -119,47 +119,47 @@ class dom {
 
     // target, type, callback, [options]
     // target, type, subtarget, callback, [options]
-    
+
     static on(target, type, subtarget, callback, options) {
-        if ( typeof subtarget === 'function' ) {
+        if (typeof subtarget === 'function') {
             options = callback;
             callback = subtarget;
             subtarget = undefined;
-            if ( typeof options === 'boolean' ) {
+            if (typeof options === 'boolean') {
                 options = { capture: true };
             }
         } else {
             callback = makeEventHandler(subtarget, callback);
-            if ( options === undefined || typeof options === 'boolean' ) {
+            if (options === undefined || typeof options === 'boolean') {
                 options = { capture: true };
             } else {
                 options.capture = true;
             }
         }
         const targets = target instanceof Window || target instanceof Document
-            ? [ target ]
+            ? [target]
             : normalizeTarget(target);
-        for ( const elem of targets ) {
+        for (const elem of targets) {
             elem.addEventListener(type, callback, options);
         }
     }
 
     static off(target, type, callback, options) {
-        if ( typeof callback !== 'function' ) { return; }
-        if ( typeof options === 'boolean' ) {
+        if (typeof callback !== 'function') { return; }
+        if (typeof options === 'boolean') {
             options = { capture: true };
         }
         const targets = target instanceof Window || target instanceof Document
-            ? [ target ]
+            ? [target]
             : normalizeTarget(target);
-        for ( const elem of targets ) {
+        for (const elem of targets) {
             elem.removeEventListener(type, callback, options);
         }
     }
 
     static onFirstShown(fn, elem) {
         let observer = new IntersectionObserver(entries => {
-            if ( entries.every(a => a.isIntersecting === false) ) { return; }
+            if (entries.every(a => a.isIntersecting === false)) { return; }
             try { fn(); } catch { }
             observer.disconnect();
             observer = undefined;
@@ -170,28 +170,28 @@ class dom {
 
 dom.cl = class {
     static add(target, name) {
-        for ( const elem of normalizeTarget(target) ) {
+        for (const elem of normalizeTarget(target)) {
             elem.classList.add(name);
         }
     }
 
     static remove(target, ...names) {
-        for ( const elem of normalizeTarget(target) ) {
+        for (const elem of normalizeTarget(target)) {
             elem.classList.remove(...names);
         }
     }
 
     static toggle(target, name, state) {
         let r;
-        for ( const elem of normalizeTarget(target) ) {
+        for (const elem of normalizeTarget(target)) {
             r = elem.classList.toggle(name, state);
         }
         return r;
     }
 
     static has(target, name) {
-        for ( const elem of normalizeTarget(target) ) {
-            if ( elem.classList.contains(name) ) {
+        for (const elem of normalizeTarget(target)) {
+            if (elem.classList.contains(name)) {
                 return true;
             }
         }
@@ -202,18 +202,18 @@ dom.cl = class {
 /******************************************************************************/
 
 function qs$(a, b) {
-    if ( typeof a === 'string') {
+    if (typeof a === 'string') {
         return document.querySelector(a);
     }
-    if ( a === null ) { return null; }
+    if (a === null) { return null; }
     return a.querySelector(b);
 }
 
 function qsa$(a, b) {
-    if ( typeof a === 'string') {
+    if (typeof a === 'string') {
         return document.querySelectorAll(a);
     }
-    if ( a === null ) { return []; }
+    if (a === null) { return []; }
     return a.querySelectorAll(b);
 }
 

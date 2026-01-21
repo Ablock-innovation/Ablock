@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* global CodeMirror, uBlockDashboard */
@@ -31,15 +31,15 @@ let beforeHash = '';
 
 /******************************************************************************/
 
-CodeMirror.defineMode('raw-settings', function() {
+CodeMirror.defineMode('raw-settings', function () {
     let lastSetting = '';
 
     return {
-        token: function(stream) {
-            if ( stream.sol() ) {
+        token: function (stream) {
+            if (stream.sol()) {
                 stream.eatSpace();
                 const match = stream.match(/\S+/);
-                if ( match !== null && defaultSettings.has(match[0]) ) {
+                if (match !== null && defaultSettings.has(match[0])) {
                     lastSetting = match[0];
                     return adminSettings.has(match[0])
                         ? 'readonly keyword'
@@ -50,11 +50,11 @@ CodeMirror.defineMode('raw-settings', function() {
             }
             stream.eatSpace();
             const match = stream.match(/.*$/);
-            if ( match !== null ) {
-                if ( match[0].trim() !== defaultSettings.get(lastSetting) ) {
+            if (match !== null) {
+                if (match[0].trim() !== defaultSettings.get(lastSetting)) {
                     return 'line-cm-strong';
                 }
-                if ( adminSettings.has(lastSetting) ) {
+                if (adminSettings.has(lastSetting)) {
                     return 'readonly';
                 }
             }
@@ -75,7 +75,7 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
 
 /******************************************************************************/
 
-const hashFromAdvancedSettings = function(raw) {
+const hashFromAdvancedSettings = function (raw) {
     const aa = typeof raw === 'string'
         ? arrayFromString(raw)
         : arrayFromObject(raw);
@@ -85,46 +85,46 @@ const hashFromAdvancedSettings = function(raw) {
 
 /******************************************************************************/
 
-const arrayFromObject = function(o) {
+const arrayFromObject = function (o) {
     const out = [];
-    for ( const k in o ) {
-        if ( Object.hasOwn(o, k) === false ) { continue; }
-        out.push([ k, `${o[k]}` ]);
+    for (const k in o) {
+        if (Object.hasOwn(o, k) === false) { continue; }
+        out.push([k, `${o[k]}`]);
     }
     return out;
 };
 
-const arrayFromString = function(s) {
+const arrayFromString = function (s) {
     const out = [];
-    for ( let line of s.split(/[\n\r]+/) ) {
+    for (let line of s.split(/[\n\r]+/)) {
         line = line.trim();
-        if ( line === '' ) { continue; }
+        if (line === '') { continue; }
         const pos = line.indexOf(' ');
         let k, v;
-        if ( pos !== -1 ) {
+        if (pos !== -1) {
             k = line.slice(0, pos);
             v = line.slice(pos + 1);
         } else {
             k = line;
             v = '';
         }
-        out.push([ k.trim(), v.trim() ]);
+        out.push([k.trim(), v.trim()]);
     }
     return out;
 };
 
 /******************************************************************************/
 
-const advancedSettingsChanged = (( ) => {
-    const handler = ( ) => {
+const advancedSettingsChanged = (() => {
+    const handler = () => {
         const changed = hashFromAdvancedSettings(cmEditor.getValue()) !== beforeHash;
         qs$('#advancedSettingsApply').disabled = !changed;
-        CodeMirror.commands.save = changed ? applyChanges : function(){};
+        CodeMirror.commands.save = changed ? applyChanges : function () { };
     };
 
     const timer = vAPI.defer.create(handler);
 
-    return function() {
+    return function () {
         timer.offon(200);
     };
 })();
@@ -133,7 +133,7 @@ cmEditor.on('changes', advancedSettingsChanged);
 
 /******************************************************************************/
 
-const renderAdvancedSettings = async function(first) {
+const renderAdvancedSettings = async function (first) {
     const details = await vAPI.messaging.send('dashboard', {
         what: 'readHiddenSettings',
     });
@@ -144,22 +144,22 @@ const renderAdvancedSettings = async function(first) {
     const roLines = [];
     const entries = arrayFromObject(details.current);
     let max = 0;
-    for ( const [ k ] of entries ) {
-        if ( k.length > max ) { max = k.length; }
+    for (const [k] of entries) {
+        if (k.length > max) { max = k.length; }
     }
-    for ( let i = 0; i < entries.length; i++ ) {
-        const [ k, v ] = entries[i];
+    for (let i = 0; i < entries.length; i++) {
+        const [k, v] = entries[i];
         pretty.push(' '.repeat(max - k.length) + `${k} ${v}`);
-        if ( adminSettings.has(k) ) {
+        if (adminSettings.has(k)) {
             roLines.push(i);
         }
     }
     pretty.push('');
     cmEditor.setValue(pretty.join('\n'));
-    if ( first ) {
+    if (first) {
         cmEditor.clearHistory();
     }
-    for ( const line of roLines ) {
+    for (const line of roLines) {
         cmEditor.markText(
             { line, ch: 0 },
             { line: line + 1, ch: 0 },
@@ -172,7 +172,7 @@ const renderAdvancedSettings = async function(first) {
 
 /******************************************************************************/
 
-const applyChanges = async function() {
+const applyChanges = async function () {
     await vAPI.messaging.send('dashboard', {
         what: 'writeHiddenSettings',
         content: cmEditor.getValue(),
@@ -183,7 +183,7 @@ const applyChanges = async function() {
 /******************************************************************************/
 
 dom.on('#advancedSettings', 'input', advancedSettingsChanged);
-dom.on('#advancedSettingsApply', 'click', ( ) => {
+dom.on('#advancedSettingsApply', 'click', () => {
     applyChanges();
 });
 

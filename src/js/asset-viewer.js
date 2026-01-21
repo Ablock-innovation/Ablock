@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* global CodeMirror, uBlockDashboard */
@@ -26,16 +26,16 @@ import { dom, qs$ } from './dom.js';
 
 /******************************************************************************/
 
-(async ( ) => {
+(async () => {
     const subscribeURL = new URL(document.location);
     const subscribeParams = subscribeURL.searchParams;
     const assetKey = subscribeParams.get('url');
-    if ( assetKey === null ) { return; }
+    if (assetKey === null) { return; }
 
     const subscribeElem = subscribeParams.get('subscribe') !== null
         ? qs$('#subscribe')
         : null;
-    if ( subscribeElem !== null && subscribeURL.hash !== '#subscribed' ) {
+    if (subscribeElem !== null && subscribeURL.hash !== '#subscribed') {
         const title = subscribeParams.get('title');
         const promptElem = qs$('#subscribePrompt');
         dom.text(promptElem.children[0], title);
@@ -68,7 +68,7 @@ import { dom, qs$ } from './dom.js';
     vAPI.messaging.send('dashboard', {
         what: 'getAutoCompleteDetails'
     }).then(hints => {
-        if ( hints instanceof Object === false ) { return; }
+        if (hints instanceof Object === false) { return; }
         cmEditor.setOption('uboHints', hints);
     });
 
@@ -79,19 +79,19 @@ import { dom, qs$ } from './dom.js';
     });
 
     const details = await vAPI.messaging.send('default', {
-        what : 'getAssetContent',
+        what: 'getAssetContent',
         url: assetKey,
     });
     cmEditor.setOption('trustedSource', details.trustedSource === true);
     cmEditor.setValue(details && details.content || '');
 
-    if ( subscribeElem !== null ) {
-        dom.on('#subscribeButton', 'click', ( ) => {
+    if (subscribeElem !== null) {
+        dom.on('#subscribeButton', 'click', () => {
             dom.cl.add(subscribeElem, 'hide');
             vAPI.messaging.send('scriptlets', {
                 what: 'applyFilterListSelection',
                 toImport: assetKey,
-            }).then(( ) => {
+            }).then(() => {
                 vAPI.messaging.send('scriptlets', {
                     what: 'reloadAllFilters'
                 });
@@ -99,7 +99,7 @@ import { dom, qs$ } from './dom.js';
         }, { once: true });
     }
 
-    if ( details.sourceURL ) {
+    if (details.sourceURL) {
         const a = qs$('.cm-search-widget .sourceURL');
         dom.attr(a, 'href', details.sourceURL);
         dom.attr(a, 'title', details.sourceURL);

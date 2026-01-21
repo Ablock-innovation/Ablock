@@ -70,23 +70,23 @@
 
 'use strict';
 
-(function(context) {
+(function (context) {
 
     // CodeMirror expect these globals:
     context.DIFF_INSERT = 1;
     context.DIFF_DELETE = -1;
     context.DIFF_EQUAL = 0;
-    context.diff_match_patch = function(){};
+    context.diff_match_patch = function () { };
 
-    context.diff_match_patch.prototype.diff_main = function(a, b) {
-        if ( a === b ) { return [ [ 0, a ] ]; }
+    context.diff_match_patch.prototype.diff_main = function (a, b) {
+        if (a === b) { return [[0, a]]; }
         const aa = a.match(/\n|[^\n]+\n?/g) || [];
         const bb = b.match(/\n|[^\n]+\n?/g) || [];
         const d = new Diff(aa, bb);
         return d.editscript();
     };
 
-    context.diff_match_patch.prototype.diff = function(a, b) {
+    context.diff_match_patch.prototype.diff = function (a, b) {
         const d = new Diff(a, b);
         return d.editscript();
     };
@@ -116,22 +116,22 @@
         while (astart < aend || bstart < bend) {
             if (astart < aend && bstart < bend) {
                 if (!moda[astart] && !modb[bstart]) {
-                    result.push([ 0, this.a[astart] ]);
+                    result.push([0, this.a[astart]]);
                     astart++; bstart++;
                     continue;
                 } else if (moda[astart] && modb[bstart]) {
-                    result.push([ -1, this.a[astart] ]);
-                    result.push([ 1, this.b[bstart] ]);
+                    result.push([-1, this.a[astart]]);
+                    result.push([1, this.b[bstart]]);
                     astart++; bstart++;
                     continue;
                 }
             }
             if (astart < aend && (bstart >= bend || moda[astart])) {
-                result.push([ -1, this.a[astart] ]);
+                result.push([-1, this.a[astart]]);
                 astart++;
             }
             if (bstart < bend && (astart >= aend || modb[bstart])) {
-                result.push([ 1, this.b[bstart] ]);
+                result.push([1, this.b[bstart]]);
                 bstart++;
             }
         }
@@ -176,7 +176,7 @@
         const M = bend - bstart;
 
         const kdown = astart - bstart;
-        const kup   = aend   - bend;
+        const kup = aend - bend;
 
         const delta = N - M;
         const deltaOdd = delta & 1;
@@ -211,8 +211,8 @@
                     return {
                         x: down[k],
                         y: down[k] - k,
-                    //    u: up[k],
-                    //    v: up[k] - k,
+                        //    u: up[k],
+                        //    v: up[k] - k,
                     };
                 }
             }
@@ -240,8 +240,8 @@
                     return {
                         x: down[k],
                         y: down[k] - k,
-                    //    u: up[k],
-                    //    v: up[k] - k,
+                        //    u: up[k],
+                        //    v: up[k] - k,
                     };
                 }
             }
@@ -264,7 +264,7 @@
     - Remove the following code
     - Add code beyond the following code
     Reason:
-    - https://github.com/gorhill/uBlock/pull/3721
+    - https://github.com/Ablock/Ablock/pull/3721
     - uBO never uses the return value from injected content scripts
 
 **/

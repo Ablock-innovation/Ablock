@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 // For background page or non-background pages
@@ -51,10 +51,10 @@ vAPI.defer = {
             this.callback = callback;
         }
         on(delay, ...args) {
-            if ( this.timer !== null ) { return; }
+            if (this.timer !== null) { return; }
             const delayInMs = vAPI.defer.normalizeDelay(delay);
             this.type = 0;
-            this.timer = vAPI.setTimeout(( ) => {
+            this.timer = vAPI.setTimeout(() => {
                 this.timer = null;
                 this.callback(...args);
             }, delayInMs || 1);
@@ -64,11 +64,11 @@ vAPI.defer = {
             this.on(delay, ...args);
         }
         onvsync(delay, ...args) {
-            if ( this.timer !== null ) { return; }
+            if (this.timer !== null) { return; }
             const delayInMs = vAPI.defer.normalizeDelay(delay);
-            if ( delayInMs !== 0 ) {
+            if (delayInMs !== 0) {
                 this.type = 0;
-                this.timer = vAPI.setTimeout(( ) => {
+                this.timer = vAPI.setTimeout(() => {
                     this.timer = null;
                     this.onraf(...args);
                 }, delayInMs);
@@ -77,11 +77,11 @@ vAPI.defer = {
             }
         }
         onidle(delay, options, ...args) {
-            if ( this.timer !== null ) { return; }
+            if (this.timer !== null) { return; }
             const delayInMs = vAPI.defer.normalizeDelay(delay);
-            if ( delayInMs !== 0 ) {
+            if (delayInMs !== 0) {
                 this.type = 0;
-                this.timer = vAPI.setTimeout(( ) => {
+                this.timer = vAPI.setTimeout(() => {
                     this.timer = null;
                     this.onric(options, ...args);
                 }, delayInMs);
@@ -90,32 +90,32 @@ vAPI.defer = {
             }
         }
         off() {
-            if ( this.timer === null ) { return; }
-            switch ( this.type ) {
-            case 0:
-                self.clearTimeout(this.timer);
-                break;
-            case 1:
-                self.cancelAnimationFrame(this.timer);
-                break;
-            case 2:
-                self.cancelIdleCallback(this.timer);
-                break;
-            default:
-                break;
+            if (this.timer === null) { return; }
+            switch (this.type) {
+                case 0:
+                    self.clearTimeout(this.timer);
+                    break;
+                case 1:
+                    self.cancelAnimationFrame(this.timer);
+                    break;
+                case 2:
+                    self.cancelIdleCallback(this.timer);
+                    break;
+                default:
+                    break;
             }
             this.timer = null;
         }
         onraf(...args) {
-            if ( this.timer !== null ) { return; }
+            if (this.timer !== null) { return; }
             this.type = 1;
-            this.timer = requestAnimationFrame(( ) => {
+            this.timer = requestAnimationFrame(() => {
                 this.timer = null;
                 this.callback(...args);
             });
         }
         onric(options, ...args) {
-            if ( this.timer !== null ) { return; }
+            if (this.timer !== null) { return; }
             this.type = 2;
             this.timer = self.requestIdleCallback(deadline => {
                 this.timer = null;
@@ -127,12 +127,12 @@ vAPI.defer = {
         }
     },
     normalizeDelay(delay = 0) {
-        if ( typeof delay === 'object' ) {
-            if ( delay.sec !== undefined ) {
+        if (typeof delay === 'object') {
+            if (delay.sec !== undefined) {
                 return delay.sec * 1000;
-            } else if ( delay.min !== undefined ) {
+            } else if (delay.min !== undefined) {
                 return delay.min * 60000;
-            } else if ( delay.hr !== undefined ) {
+            } else if (delay.hr !== undefined) {
                 return delay.hr * 3600000;
             }
         }
@@ -153,11 +153,11 @@ vAPI.webextFlavor = {
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1858743
 //   Add support for native `:has()` for Firefox 121+
 
-(( ) => {
+(() => {
     const ua = navigator.userAgent;
     const flavor = vAPI.webextFlavor;
     const soup = flavor.soup;
-    const dispatch = function() {
+    const dispatch = function () {
         window.dispatchEvent(new CustomEvent('webextFlavor'));
     };
 
@@ -168,15 +168,15 @@ vAPI.webextFlavor = {
     // Whether this is a dev build.
     const manifest = browser.runtime.getManifest();
     const version = manifest.version_name || manifest.version;
-    if ( /^\d+\.\d+\.\d+\D/.test(version) ) {
+    if (/^\d+\.\d+\.\d+\D/.test(version)) {
         soup.add('devbuild');
     }
 
-    if ( /\bMobile\b/.test(ua) ) {
+    if (/\bMobile\b/.test(ua)) {
         soup.add('mobile');
     }
 
-    if ( CSS.supports('selector(a:has(b))') ) {
+    if (CSS.supports('selector(a:has(b))')) {
         soup.add('native_css_has');
     }
 
@@ -184,7 +184,7 @@ vAPI.webextFlavor = {
 
     // Order of tests is important
     flavor.isGecko = extensionOrigin.startsWith('moz-extension://');
-    if ( flavor.isGecko ) {
+    if (flavor.isGecko) {
         soup.add('firefox')
             .add('user_stylesheet')
             .add('html_filtering');
@@ -192,7 +192,7 @@ vAPI.webextFlavor = {
         flavor.major = match && parseInt(match[1], 10) || 115;
     } else {
         const match = /\bChrom(?:e|ium)\/(\d+)/.exec(ua);
-        if ( match !== null ) {
+        if (match !== null) {
             soup.add('chromium')
                 .add('user_stylesheet');
         }
@@ -205,8 +205,8 @@ vAPI.webextFlavor = {
 
 /******************************************************************************/
 
-vAPI.download = function(details) {
-    if ( !details.url ) { return; }
+vAPI.download = function (details) {
+    if (!details.url) { return; }
     const a = document.createElement('a');
     a.href = details.url;
     a.setAttribute('download', details.filename || '');
@@ -220,19 +220,19 @@ vAPI.getURL = browser.runtime.getURL;
 
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/3057
+// https://github.com/Ablock/Ablock/issues/3057
 // - webNavigation.onCreatedNavigationTarget become broken on Firefox when we
 //   try to make the popup panel close itself using the original
 //   `window.open('', '_self').close()`. 
 
-vAPI.closePopup = function() {
-    if ( vAPI.webextFlavor.soup.has('firefox') ) {
+vAPI.closePopup = function () {
+    if (vAPI.webextFlavor.soup.has('firefox')) {
         window.close();
         return;
     }
 
     // TODO: try to figure why this was used instead of a plain window.close().
-    // https://github.com/gorhill/uBlock/commit/b301ac031e0c2e9a99cb6f8953319d44e22f33d2#diff-bc664f26b9c453e0d43a9379e8135c6a
+    // https://github.com/Ablock/Ablock/commit/b301ac031e0c2e9a99cb6f8953319d44e22f33d2#diff-bc664f26b9c453e0d43a9379e8135c6a
     window.open('', '_self').close();
 };
 
@@ -245,31 +245,31 @@ vAPI.closePopup = function() {
 //   Convert into asynchronous access API.
 
 vAPI.localStorage = {
-    clear: function() {
+    clear: function () {
         vAPI.messaging.send('vapi', {
             what: 'localStorage',
             fn: 'clear',
         });
     },
-    getItemAsync: function(key) {
+    getItemAsync: function (key) {
         return vAPI.messaging.send('vapi', {
             what: 'localStorage',
             fn: 'getItemAsync',
-            args: [ key ],
+            args: [key],
         });
     },
-    removeItem: function(key) {
+    removeItem: function (key) {
         return vAPI.messaging.send('vapi', {
             what: 'localStorage',
             fn: 'removeItem',
-            args: [ key ],
+            args: [key],
         });
     },
-    setItem: function(key, value = undefined) {
+    setItem: function (key, value = undefined) {
         return vAPI.messaging.send('vapi', {
             what: 'localStorage',
             fn: 'setItem',
-            args: [ key, value ]
+            args: [key, value]
         });
     },
 };
@@ -287,7 +287,7 @@ vAPI.localStorage = {
     - Remove the following code
     - Add code beyond the following code
     Reason:
-    - https://github.com/gorhill/uBlock/pull/3721
+    - https://github.com/Ablock/Ablock/pull/3721
     - uBO never uses the return value from injected content scripts
 
 **/

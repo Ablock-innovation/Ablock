@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -24,12 +24,12 @@
 // https://github.com/uBlockOrigin/uBlock-issues/issues/756
 //   Keep in mind CPU usage with large DOM and/or filterset.
 
-(( ) => {
-    if ( typeof vAPI !== 'object' ) { return; }
+(() => {
+    if (typeof vAPI !== 'object') { return; }
 
     const t0 = Date.now();
 
-    if ( vAPI.domSurveyElements instanceof Object === false ) {
+    if (vAPI.domSurveyElements instanceof Object === false) {
         vAPI.domSurveyElements = {
             busy: false,
             hiddenElementCount: Number.NaN,
@@ -38,17 +38,17 @@
     }
     const surveyResults = vAPI.domSurveyElements;
 
-    if ( surveyResults.busy ) { return; }
+    if (surveyResults.busy) { return; }
     surveyResults.busy = true;
 
-    if ( surveyResults.surveyTime < vAPI.domMutationTime ) {
+    if (surveyResults.surveyTime < vAPI.domMutationTime) {
         surveyResults.hiddenElementCount = Number.NaN;
     }
     surveyResults.surveyTime = t0;
 
-    if ( isNaN(surveyResults.hiddenElementCount) ) {
-        surveyResults.hiddenElementCount = (( ) => {
-            if ( vAPI.domFilterer instanceof Object === false ) { return 0; }
+    if (isNaN(surveyResults.hiddenElementCount)) {
+        surveyResults.hiddenElementCount = (() => {
+            if (vAPI.domFilterer instanceof Object === false) { return 0; }
             const details = vAPI.domFilterer.getAllSelectors(0b11);
             if (
                 Array.isArray(details.declarative) === false ||

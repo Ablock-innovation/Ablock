@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -26,17 +26,17 @@ import process from 'process';
 
 /******************************************************************************/
 
-const commandLineArgs = (( ) => {
+const commandLineArgs = (() => {
     const args = new Map();
     let name, value;
-    for ( const arg of process.argv.slice(2) ) {
+    for (const arg of process.argv.slice(2)) {
         const pos = arg.indexOf('=');
-        if ( pos === -1 ) {
+        if (pos === -1) {
             name = arg;
             value = '';
         } else {
             name = arg.slice(0, pos);
-            value = arg.slice(pos+1);
+            value = arg.slice(pos + 1);
         }
         args.set(name, value);
     }
@@ -46,7 +46,7 @@ const commandLineArgs = (( ) => {
 const beforeDir = commandLineArgs.get('before') || '';
 const afterDir = commandLineArgs.get('after') || '';
 
-if ( beforeDir === '' || afterDir === '' ) {
+if (beforeDir === '' || afterDir === '') {
     process.exit(0);
 }
 
@@ -61,44 +61,44 @@ async function main() {
         'removeparam',
     ];
     const writePromises = [];
-    for ( const folder of folders ) {
-        const afterFiles = await fs.readdir(`${afterDir}/rulesets/${folder}`).catch(( ) => { });
-        if ( afterFiles === undefined ) { continue; }
-        for ( const file of afterFiles ) {
-            let raw = await fs.readFile(`${beforeDir}/rulesets/${folder}/${file}`, 'utf-8').catch(( ) => '');
+    for (const folder of folders) {
+        const afterFiles = await fs.readdir(`${afterDir}/rulesets/${folder}`).catch(() => { });
+        if (afterFiles === undefined) { continue; }
+        for (const file of afterFiles) {
+            let raw = await fs.readFile(`${beforeDir}/rulesets/${folder}/${file}`, 'utf-8').catch(() => '');
             let beforeRules;
             try { beforeRules = JSON.parse(raw); } catch { }
-            if ( Array.isArray(beforeRules) === false ) { continue; }
-            raw = await fs.readFile(`${afterDir}/rulesets/${folder}/${file}`, 'utf-8').catch(( ) => '');
+            if (Array.isArray(beforeRules) === false) { continue; }
+            raw = await fs.readFile(`${afterDir}/rulesets/${folder}/${file}`, 'utf-8').catch(() => '');
             let afterRules;
             try { afterRules = JSON.parse(raw); } catch { }
-            if ( Array.isArray(afterRules) === false ) { continue; }
+            if (Array.isArray(afterRules) === false) { continue; }
             const beforeMap = new Map(beforeRules.map(a => {
                 const id = a.id;
                 a.id = 0;
-                return [ JSON.stringify(a), id ];
+                return [JSON.stringify(a), id];
             }));
             const reusedIds = new Set();
-            for ( const afterRule of afterRules ) {
+            for (const afterRule of afterRules) {
                 afterRule.id = 0;
                 const key = JSON.stringify(afterRule);
                 const beforeId = beforeMap.get(key);
-                if ( beforeId === undefined ) { continue; }
-                if ( reusedIds.has(beforeId) ) { continue; }
+                if (beforeId === undefined) { continue; }
+                if (reusedIds.has(beforeId)) { continue; }
                 afterRule.id = beforeId;
                 reusedIds.add(beforeId);
             }
             // Assign new ids to unmatched rules
             let ruleIdGenerator = 1;
-            for ( const afterRule of afterRules ) {
-                if ( afterRule.id !== 0 ) { continue; }
-                while ( reusedIds.has(ruleIdGenerator) ) { ruleIdGenerator += 1; }
+            for (const afterRule of afterRules) {
+                if (afterRule.id !== 0) { continue; }
+                while (reusedIds.has(ruleIdGenerator)) { ruleIdGenerator += 1; }
                 afterRule.id = ruleIdGenerator++;
             }
             afterRules.sort((a, b) => a.id - b.id);
             const indent = afterRules.length > 10 ? undefined : 1;
             const lines = [];
-            for ( const afterRule of afterRules ) {
+            for (const afterRule of afterRules) {
                 lines.push(JSON.stringify(afterRule, null, indent));
             }
             const path = `${afterDir}/rulesets/${folder}/${file}`;

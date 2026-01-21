@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { deepEquals } from './utils.js';
@@ -27,7 +27,7 @@ export const dnr = webext.declarativeNetRequest || {};
 /******************************************************************************/
 
 export function normalizeDNRRules(rules, ruleIds) {
-    if ( Array.isArray(rules) === false ) { return rules; }
+    if (Array.isArray(rules) === false) { return rules; }
     return Array.isArray(ruleIds)
         ? rules.filter(rule => ruleIds.includes(rule.id))
         : rules;
@@ -35,51 +35,51 @@ export function normalizeDNRRules(rules, ruleIds) {
 
 /******************************************************************************/
 
-dnr.setAllowAllRules = async function(id, allowed, notAllowed, reverse, priority) {
+dnr.setAllowAllRules = async function (id, allowed, notAllowed, reverse, priority) {
     const [
         beforeDynamicRules,
         beforeSessionRules,
     ] = await Promise.all([
-        dnr.getDynamicRules({ ruleIds: [ id+0 ] }),
-        dnr.getSessionRules({ ruleIds: [ id+1 ] }),
+        dnr.getDynamicRules({ ruleIds: [id + 0] }),
+        dnr.getSessionRules({ ruleIds: [id + 1] }),
     ]);
     const addDynamicRules = [];
     const addSessionRules = [];
-    if ( reverse || allowed.length || notAllowed.length ) {
+    if (reverse || allowed.length || notAllowed.length) {
         const rule0 = {
-            id: id+0,
+            id: id + 0,
             action: { type: 'allowAllRequests' },
             condition: {
-                resourceTypes: [ 'main_frame' ],
+                resourceTypes: ['main_frame'],
             },
             priority,
         };
-        if ( allowed.length ) {
+        if (allowed.length) {
             rule0.condition.requestDomains = allowed.slice();
-        } else if ( notAllowed.length ) {
+        } else if (notAllowed.length) {
             rule0.condition.excludedRequestDomains = notAllowed.slice();
         }
         addDynamicRules.push(rule0);
         // https://github.com/uBlockOrigin/uBOL-home/issues/114
         // https://github.com/uBlockOrigin/uBOL-home/issues/247
         const rule1 = {
-            id: id+1,
+            id: id + 1,
             action: { type: 'allow' },
             condition: {
-                tabIds: [ webext.tabs.TAB_ID_NONE ],
+                tabIds: [webext.tabs.TAB_ID_NONE],
             },
             priority,
         };
-        if ( allowed.length ) {
+        if (allowed.length) {
             rule1.condition.initiatorDomains = allowed.slice();
-        } else if ( notAllowed.length ) {
+        } else if (notAllowed.length) {
             rule1.condition.excludedInitiatorDomains = notAllowed.slice();
         }
         addSessionRules.push(rule1);
     }
     const promises = [];
     const modified = deepEquals(addDynamicRules, beforeDynamicRules) === false;
-    if ( modified ) {
+    if (modified) {
         promises.push(
             dnr.updateDynamicRules({
                 addRules: addDynamicRules,
@@ -87,7 +87,7 @@ dnr.setAllowAllRules = async function(id, allowed, notAllowed, reverse, priority
             })
         );
     }
-    if ( deepEquals(addSessionRules, beforeSessionRules) === false ) {
+    if (deepEquals(addSessionRules, beforeSessionRules) === false) {
         promises.push(
             dnr.updateSessionRules({
                 addRules: addSessionRules,
@@ -95,5 +95,5 @@ dnr.setAllowAllRules = async function(id, allowed, notAllowed, reverse, priority
             })
         );
     }
-    return Promise.all(promises).then(( ) => modified).catch(( ) => false);
+    return Promise.all(promises).then(() => modified).catch(() => false);
 };

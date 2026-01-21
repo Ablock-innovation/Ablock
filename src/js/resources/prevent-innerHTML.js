@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -47,27 +47,27 @@ export function preventInnerHTML(
     const logPrefix = safe.makeLogPrefix('prevent-innerHTML', selector, pattern);
     const matcher = safe.initPattern(pattern, { canNegate: true });
     const current = safe.Object_getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
-    if ( current === undefined ) { return; }
+    if (current === undefined) { return; }
     const shouldPreventSet = (elem, a) => {
-        if ( selector !== '' ) {
-            if ( typeof elem.matches !== 'function' ) { return false; }
-            if ( elem.matches(selector) === false ) { return false; }
+        if (selector !== '') {
+            if (typeof elem.matches !== 'function') { return false; }
+            if (elem.matches(selector) === false) { return false; }
         }
         return safe.testPattern(matcher, `${a}`);
     };
     Object.defineProperty(Element.prototype, 'innerHTML', {
-        get: function() {
+        get: function () {
             return current.get
                 ? current.get.call(this)
                 : current.value;
         },
-        set: function(a) {
-            if ( shouldPreventSet(this, a) ) {
+        set: function (a) {
+            if (shouldPreventSet(this, a)) {
                 safe.uboLog(logPrefix, 'Prevented');
-            } else if ( current.set ) {
+            } else if (current.set) {
                 current.set.call(this, a);
             }
-            if ( safe.logLevel > 1 ) {
+            if (safe.logLevel > 1) {
                 safe.uboLog(logPrefix, `Assigned:\n${a}`);
             }
             current.value = a;

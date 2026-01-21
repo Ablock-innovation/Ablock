@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import * as sfp from './static-filtering-parser.js';
@@ -46,28 +46,28 @@ const reEscapeSequence = /\\([0-9A-Fa-f]+ |.)/g;
 const keyFromSelector = selector => {
     let key = '';
     let matches = rePlainSelector.exec(selector);
-    if ( matches ) {
+    if (matches) {
         key = matches[0];
     } else {
         matches = rePlainSelectorEx.exec(selector);
-        if ( matches === null ) { return; }
+        if (matches === null) { return; }
         key = matches[1] || matches[2];
     }
-    if ( key.indexOf('\\') === -1 ) { return key; }
+    if (key.indexOf('\\') === -1) { return key; }
     matches = rePlainSelectorEscaped.exec(selector);
-    if ( matches === null ) { return; }
+    if (matches === null) { return; }
     key = '';
     const escaped = matches[0];
     let beg = 0;
     reEscapeSequence.lastIndex = 0;
-    for (;;) {
+    for (; ;) {
         matches = reEscapeSequence.exec(escaped);
-        if ( matches === null ) {
+        if (matches === null) {
             return key + escaped.slice(beg);
         }
         key += escaped.slice(beg, matches.index);
         beg = reEscapeSequence.lastIndex;
-        if ( matches[1].length === 1 ) {
+        if (matches[1].length === 1) {
             key += matches[1];
         } else {
             key += String.fromCharCode(parseInt(matches[1], 16));
@@ -78,18 +78,18 @@ const keyFromSelector = selector => {
 /******************************************************************************/
 
 function addGenericCosmeticFilter(context, selector, isException) {
-    if ( selector === undefined ) { return; }
-    if ( selector.length <= 1 ) { return; }
-    if ( selector.charCodeAt(0) === 0x7B /* '{' */ ) { return; }
+    if (selector === undefined) { return; }
+    if (selector.length <= 1) { return; }
+    if (selector.charCodeAt(0) === 0x7B /* '{' */) { return; }
     const key = keyFromSelector(selector);
-    if ( isException ) {
-        if ( context.genericCosmeticExceptions === undefined ) {
+    if (isException) {
+        if (context.genericCosmeticExceptions === undefined) {
             context.genericCosmeticExceptions = [];
         }
         context.genericCosmeticExceptions.push({ key, selector });
         return;
     }
-    if ( context.genericCosmeticFilters === undefined ) {
+    if (context.genericCosmeticFilters === undefined) {
         context.genericCosmeticFilters = [];
     }
     context.genericCosmeticFilters.push({ key, selector });
@@ -98,40 +98,40 @@ function addGenericCosmeticFilter(context, selector, isException) {
 /******************************************************************************/
 
 function addExtendedToDNR(context, parser) {
-    if ( parser.isExtendedFilter() === false ) { return false; }
+    if (parser.isExtendedFilter() === false) { return false; }
 
     // Scriptlet injection
-    if ( parser.isScriptletFilter() ) {
-        if ( parser.hasOptions() === false ) { return; }
-        if ( context.scriptletFilters === undefined ) {
+    if (parser.isScriptletFilter()) {
+        if (parser.hasOptions() === false) { return; }
+        if (context.scriptletFilters === undefined) {
             context.scriptletFilters = new Map();
         }
         const exception = parser.isException();
         const args = parser.getScriptletArgs();
         const argsToken = JSON.stringify(args);
-        for ( const { hn, not, bad } of parser.getExtFilterDomainIterator() ) {
-            if ( bad ) { continue; }
-            if ( exception ) { continue; }
+        for (const { hn, not, bad } of parser.getExtFilterDomainIterator()) {
+            if (bad) { continue; }
+            if (exception) { continue; }
             let details = context.scriptletFilters.get(argsToken);
-            if ( details === undefined ) {
+            if (details === undefined) {
                 context.scriptletFilters.set(argsToken, details = { args });
-                if ( context.trustedSource ) {
+                if (context.trustedSource) {
                     details.trustedSource = true;
                 }
             }
-            if ( not ) {
-                if ( details.excludeMatches === undefined ) {
+            if (not) {
+                if (details.excludeMatches === undefined) {
                     details.excludeMatches = [];
                 }
                 details.excludeMatches.push(hn);
                 continue;
             }
-            if ( details.matches === undefined ) {
+            if (details.matches === undefined) {
                 details.matches = [];
             }
-            if ( details.matches.includes('*') ) { continue; }
-            if ( hn === '*' ) {
-                details.matches = [ '*' ];
+            if (details.matches.includes('*')) { continue; }
+            if (hn === '*') {
+                details.matches = ['*'];
                 continue;
             }
             details.matches.push(hn);
@@ -140,17 +140,17 @@ function addExtendedToDNR(context, parser) {
     }
 
     // Response header filtering
-    if ( parser.isResponseheaderFilter() ) {
-        if ( parser.hasError() ) { return; }
-        if ( parser.hasOptions() === false ) { return; }
-        if ( parser.isException() ) { return; }
+    if (parser.isResponseheaderFilter()) {
+        if (parser.hasError()) { return; }
+        if (parser.hasOptions() === false) { return; }
+        if (parser.isException()) { return; }
         const node = parser.getBranchFromType(sfp.NODE_TYPE_EXT_PATTERN_RESPONSEHEADER);
-        if ( node === 0 ) { return; }
+        if (node === 0) { return; }
         const header = parser.getNodeString(node);
-        if ( context.responseHeaderRules === undefined ) {
+        if (context.responseHeaderRules === undefined) {
             context.responseHeaderRules = [];
         }
-        const rule =  {
+        const rule = {
             action: {
                 responseHeaders: [
                     {
@@ -167,23 +167,23 @@ function addExtendedToDNR(context, parser) {
                 ]
             },
         };
-        for ( const { hn, not, bad } of parser.getExtFilterDomainIterator() ) {
-            if ( bad ) { continue; }
-            if ( isRegexOrPath(hn) ) { continue; }
-            if ( not ) {
-                if ( rule.condition.excludedInitiatorDomains === undefined ) {
+        for (const { hn, not, bad } of parser.getExtFilterDomainIterator()) {
+            if (bad) { continue; }
+            if (isRegexOrPath(hn)) { continue; }
+            if (not) {
+                if (rule.condition.excludedInitiatorDomains === undefined) {
                     rule.condition.excludedInitiatorDomains = [];
                 }
                 rule.condition.excludedInitiatorDomains.push(hn);
                 continue;
             }
-            if ( hn === '*' ) {
-                if ( rule.condition.initiatorDomains !== undefined ) {
+            if (hn === '*') {
+                if (rule.condition.initiatorDomains !== undefined) {
                     rule.condition.initiatorDomains = undefined;
                 }
                 continue;
             }
-            if ( rule.condition.initiatorDomains === undefined ) {
+            if (rule.condition.initiatorDomains === undefined) {
                 rule.condition.initiatorDomains = [];
             }
             rule.condition.initiatorDomains.push(hn);
@@ -193,14 +193,14 @@ function addExtendedToDNR(context, parser) {
     }
 
     // HTML filtering
-    if ( (parser.flavorBits & parser.BITFlavorExtHTML) !== 0 ) {
+    if ((parser.flavorBits & parser.BITFlavorExtHTML) !== 0) {
         return;
     }
 
     // Cosmetic filtering
 
     // Generic cosmetic filtering
-    if ( parser.hasOptions() === false ) {
+    if (parser.hasOptions() === false) {
         const { compiled, exception } = parser.result;
         addGenericCosmeticFilter(context, compiled, exception);
         return;
@@ -210,11 +210,11 @@ function addExtendedToDNR(context, parser) {
     // https://github.com/chrisaljoudi/uBlock/issues/151
     //   Negated hostname means the filter applies to all non-negated hostnames
     //   of same filter OR globally if there is no non-negated hostnames.
-    if ( context.specificCosmeticFilters === undefined ) {
+    if (context.specificCosmeticFilters === undefined) {
         context.specificCosmeticFilters = new Map();
     }
     const { compiled, exception, raw } = parser.result;
-    if ( compiled === undefined ) {
+    if (compiled === undefined) {
         context.specificCosmeticFilters.set(`Invalid filter: ...##${raw}`, {
             rejected: true
         });
@@ -222,41 +222,41 @@ function addExtendedToDNR(context, parser) {
     }
     const matches = [];
     const excludeMatches = [];
-    for ( const { hn, not, bad } of parser.getExtFilterDomainIterator() ) {
-        if ( bad ) { continue; }
-        if ( not && exception ) { continue; }
-        if ( not || exception ) {
+    for (const { hn, not, bad } of parser.getExtFilterDomainIterator()) {
+        if (bad) { continue; }
+        if (not && exception) { continue; }
+        if (not || exception) {
             excludeMatches.push(hn);
-        } else if ( hn !== '*' ) {
+        } else if (hn !== '*') {
             matches.push(hn);
         }
     }
     // This should not happen
-    if ( matches.length === 0 && excludeMatches.length === 0 ) { return; }
+    if (matches.length === 0 && excludeMatches.length === 0) { return; }
     // Only negated hostnames => generic cosmetic filter
-    if ( exception === false && matches.length === 0 && excludeMatches.length !== 0 ) {
+    if (exception === false && matches.length === 0 && excludeMatches.length !== 0) {
         addGenericCosmeticFilter(context, compiled, false);
     }
     const key = compiled.startsWith('{') === false && keyFromSelector(compiled);
     let details = context.specificCosmeticFilters.get(compiled);
-    if ( details === undefined ) {
+    if (details === undefined) {
         context.specificCosmeticFilters.set(compiled, details = {});
-        if ( key ) {
+        if (key) {
             details.key = key;
         }
     }
-    if ( matches.length ) {
-        if ( details.matches === undefined ) {
+    if (matches.length) {
+        if (details.matches === undefined) {
             details.matches = [];
         }
-        if ( matches.includes('*') ) {
-            details.matches = [ '*' ];
-        } else if ( details.matches.includes('*') === false ) {
+        if (matches.includes('*')) {
+            details.matches = ['*'];
+        } else if (details.matches.includes('*') === false) {
             details.matches.push(...matches);
         }
     }
-    if ( excludeMatches.length ) {
-        if ( details.excludeMatches === undefined ) {
+    if (excludeMatches.length) {
+        if (details.excludeMatches === undefined) {
             details.excludeMatches = [];
         }
         details.excludeMatches.push(...excludeMatches);
@@ -274,7 +274,7 @@ function addToDNR(context, list) {
     const parser = new sfp.AstFilterParser({
         toDNR: true,
         nativeCssHas: env.includes('native_css_has'),
-        badTypes: [ sfp.NODE_TYPE_NET_OPTION_NAME_REDIRECTRULE ],
+        badTypes: [sfp.NODE_TYPE_NET_OPTION_NAME_REDIRECTRULE],
         trustedSource: list.trustedSource || undefined,
     });
     const compiler = staticNetFilteringEngine.createCompiler();
@@ -282,29 +282,29 @@ function addToDNR(context, list) {
     writer.properties.set('name', list.name);
     compiler.start(writer);
 
-    while ( lineIter.eot() === false ) {
+    while (lineIter.eot() === false) {
         let line = lineIter.next();
-        while ( line.endsWith(' \\') ) {
-            if ( lineIter.peek(4) !== '    ' ) { break; }
+        while (line.endsWith(' \\')) {
+            if (lineIter.peek(4) !== '    ') { break; }
             line = line.slice(0, -2).trim() + lineIter.next().trim();
         }
 
         parser.parse(line);
 
-        if ( parser.isComment() ) {
-            if ( line === `!#trusted on ${context.secret}` ) {
+        if (parser.isComment()) {
+            if (line === `!#trusted on ${context.secret}`) {
                 parser.options.trustedSource = true;
                 context.trustedSource = true;
-            } else if ( line === `!#trusted off ${context.secret}` ) {
+            } else if (line === `!#trusted off ${context.secret}`) {
                 parser.options.trustedSource = false;
                 context.trustedSource = false;
             }
             continue;
         }
 
-        if ( parser.isFilter() === false ) { continue; }
-        if ( parser.hasError() ) {
-            if ( parser.astError === sfp.AST_ERROR_OPTION_EXCLUDED ) {
+        if (parser.isFilter() === false) { continue; }
+        if (parser.hasError()) {
+            if (parser.astError === sfp.AST_ERROR_OPTION_EXCLUDED) {
                 context.invalid.add(`Incompatible with DNR: ${line}`);
             } else {
                 context.invalid.add(`Rejected filter: ${line}`);
@@ -312,15 +312,15 @@ function addToDNR(context, list) {
             continue;
         }
 
-        if ( parser.isExtendedFilter() ) {
+        if (parser.isExtendedFilter()) {
             addExtendedToDNR(context, parser);
             continue;
         }
-        if ( parser.isNetworkFilter() === false ) { continue; }
+        if (parser.isNetworkFilter() === false) { continue; }
 
-        if ( compiler.compile(parser, writer) ) { continue; }
+        if (compiler.compile(parser, writer)) { continue; }
 
-        if ( compiler.error !== undefined ) {
+        if (compiler.error !== undefined) {
             context.invalid.add(compiler.error);
         }
     }
@@ -343,12 +343,12 @@ function addToDNR(context, list) {
 
 function mergeRules(rulesetMap, mergeTarget) {
     const sorter = (_, v) => {
-        if ( Array.isArray(v) ) {
+        if (Array.isArray(v)) {
             return typeof v[0] === 'string' ? v.sort() : v;
         }
-        if ( v instanceof Object ) {
+        if (v instanceof Object) {
             const sorted = {};
-            for ( const kk of Object.keys(v).sort() ) {
+            for (const kk of Object.keys(v).sort()) {
                 sorted[kk] = v[kk];
             }
             return sorted;
@@ -357,51 +357,51 @@ function mergeRules(rulesetMap, mergeTarget) {
     };
     const ruleHasher = (rule, target) => {
         return JSON.stringify(rule, (k, v) => {
-            if ( k.startsWith('_') ) { return; }
-            if ( k === target ) { return; }
+            if (k.startsWith('_')) { return; }
+            if (k === target) { return; }
             return sorter(k, v);
         });
     };
     const extractTargetValue = (obj, target) => {
-        for ( const [ k, v ] of Object.entries(obj) ) {
-            if ( Array.isArray(v) && k === target ) { return v; }
-            if ( v instanceof Object ) {
+        for (const [k, v] of Object.entries(obj)) {
+            if (Array.isArray(v) && k === target) { return v; }
+            if (v instanceof Object) {
                 const r = extractTargetValue(v, target);
-                if ( r !== undefined ) { return r; }
+                if (r !== undefined) { return r; }
             }
         }
     };
     const extractTargetOwner = (obj, target) => {
-        for ( const [ k, v ] of Object.entries(obj) ) {
-            if ( Array.isArray(v) && k === target ) { return obj; }
-            if ( v instanceof Object ) {
+        for (const [k, v] of Object.entries(obj)) {
+            if (Array.isArray(v) && k === target) { return obj; }
+            if (v instanceof Object) {
                 const r = extractTargetOwner(v, target);
-                if ( r !== undefined ) { return r; }
+                if (r !== undefined) { return r; }
             }
         }
     };
     const mergeMap = new Map();
-    for ( const [ id, rule ] of rulesetMap ) {
-        if ( rule._error !== undefined ) { continue; }
+    for (const [id, rule] of rulesetMap) {
+        if (rule._error !== undefined) { continue; }
         const hash = ruleHasher(rule, mergeTarget);
-        if ( mergeMap.has(hash) === false ) {
+        if (mergeMap.has(hash) === false) {
             mergeMap.set(hash, []);
         }
         mergeMap.get(hash).push(id);
     }
-    for ( const ids of mergeMap.values() ) {
-        if ( ids.length === 1 ) { continue; }
+    for (const ids of mergeMap.values()) {
+        if (ids.length === 1) { continue; }
         const leftHand = rulesetMap.get(ids[0]);
         const leftHandSet = new Set(
             extractTargetValue(leftHand, mergeTarget) || []
         );
-        for ( let i = 1; i < ids.length; i++ ) {
+        for (let i = 1; i < ids.length; i++) {
             const rightHandId = ids[i];
             const rightHand = rulesetMap.get(rightHandId);
-            const rightHandArray =  extractTargetValue(rightHand, mergeTarget);
-            if ( rightHandArray !== undefined ) {
-                if ( leftHandSet.size !== 0 ) {
-                    for ( const item of rightHandArray ) {
+            const rightHandArray = extractTargetValue(rightHand, mergeTarget);
+            if (rightHandArray !== undefined) {
+                if (leftHandSet.size !== 0) {
+                    for (const item of rightHandArray) {
                         leftHandSet.add(item);
                     }
                 }
@@ -411,11 +411,11 @@ function mergeRules(rulesetMap, mergeTarget) {
             rulesetMap.delete(rightHandId);
         }
         const leftHandOwner = extractTargetOwner(leftHand, mergeTarget);
-        if ( leftHandSet.size > 1 ) {
+        if (leftHandSet.size > 1) {
             //if ( leftHandOwner === undefined ) { debugger; }
             leftHandOwner[mergeTarget] = Array.from(leftHandSet).sort();
-        } else if ( leftHandSet.size === 0 ) {
-            if ( leftHandOwner !== undefined ) {
+        } else if (leftHandSet.size === 0) {
+            if (leftHandOwner !== undefined) {
                 leftHandOwner[mergeTarget] = undefined;
             }
         }
@@ -431,7 +431,7 @@ function finalizeRuleset(context, network) {
     const rulesetMap = new Map();
     {
         let ruleId = 1;
-        for ( const rule of ruleset ) {
+        for (const rule of ruleset) {
             rulesetMap.set(ruleId++, rule);
         }
     }
@@ -445,12 +445,12 @@ function finalizeRuleset(context, network) {
     // https://github.com/uBlockOrigin/uBOL-home/issues/327
     // TODO: Remove when (if) Safari is changed to interpret requestDomains as
     //       in other browsers.
-    for ( const rule of rulesetMap.values() ) {
+    for (const rule of rulesetMap.values()) {
         const { condition } = rule;
-        if ( condition?.requestDomains === undefined ) { continue; }
-        if ( condition.requestDomains.length !== 1 ) { continue; }
-        if ( condition.urlFilter !== undefined ) { continue; }
-        if ( condition.regexFilter !== undefined ) { continue; }
+        if (condition?.requestDomains === undefined) { continue; }
+        if (condition.requestDomains.length !== 1) { continue; }
+        if (condition.urlFilter !== undefined) { continue; }
+        if (condition.regexFilter !== undefined) { continue; }
         condition.urlFilter = `||${condition.requestDomains[0]}^`;
         condition.requestDomains = undefined;
     }
@@ -459,16 +459,16 @@ function finalizeRuleset(context, network) {
     const rulesetFinal = [];
     {
         let ruleId = 1;
-        for ( const rule of rulesetMap.values() ) {
-            if ( rule._error === undefined ) {
+        for (const rule of rulesetMap.values()) {
+            if (rule._error === undefined) {
                 rule.id = ruleId++;
             } else {
                 rule.id = 0;
             }
             rulesetFinal.push(rule);
         }
-        for ( const invalid of context.invalid ) {
-            rulesetFinal.push({ _error: [ invalid ] });
+        for (const invalid of context.invalid) {
+            rulesetFinal.push({ _error: [invalid] });
         }
     }
 
@@ -484,8 +484,8 @@ async function dnrRulesetFromRawLists(lists, options = {}) {
     context.extensionPaths = new Map(context.extensionPaths || []);
     const toLoad = [];
     const toDNR = (context, list) => addToDNR(context, list);
-    for ( const list of lists ) {
-        if ( list instanceof Promise ) {
+    for (const list of lists) {
+        if (list instanceof Promise) {
             toLoad.push(list.then(list => toDNR(context, list)));
         } else {
             toLoad.push(toDNR(context, list));
@@ -500,7 +500,7 @@ async function dnrRulesetFromRawLists(lists, options = {}) {
         specificCosmetic: context.specificCosmeticFilters,
         scriptlet: context.scriptletFilters,
     };
-    if ( context.responseHeaderRules ) {
+    if (context.responseHeaderRules) {
         result.network.ruleset.push(...context.responseHeaderRules);
     }
     finalizeRuleset(context, result.network);

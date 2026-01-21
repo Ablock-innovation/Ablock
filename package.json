@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gorhill/uBlock.git"
+    "url": "git+https://github.com/Ablock/Ablock.git"
   },
   "author": "Raymond Hill",
   "license": "GPLv3",
   "bugs": {
-    "url": "https://github.com/gorhill/uBlock/issues"
+    "url": "https://github.com/Ablock/Ablock/issues"
   },
-  "homepage": "https://github.com/gorhill/uBlock#readme",
+  "homepage": "https://github.com/Ablock/Ablock#readme",
   "engines": {
     "node": ">=22",
     "npm": ">=11"

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$ } from './dom.js';
@@ -40,7 +40,7 @@ function urlToFragment(raw) {
         const i = raw.indexOf(hn);
         const b = document.createElement('b');
         b.append(hn);
-        fragment.append(raw.slice(0,i), b, raw.slice(i+hn.length));
+        fragment.append(raw.slice(0, i), b, raw.slice(i + hn.length));
         return fragment;
     } catch {
     }
@@ -69,7 +69,7 @@ async function proceed() {
     // directive to another site is in effect.
     // TODO: what if the urlskip directive leads to a different subdomain on
     //       same site?
-    if ( toFinalURL.hostname !== toURL.hostname && permanent !== true ) {
+    if (toFinalURL.hostname !== toURL.hostname && permanent !== true) {
         return window.location.replace(toFinalURL.href);
     }
     await sendMessage({
@@ -85,15 +85,15 @@ async function proceed() {
 function fragmentFromTemplate(template, placeholder, text, details) {
     const fragment = new DocumentFragment();
     const pos = template.indexOf(placeholder);
-    if ( pos === -1 ) {
+    if (pos === -1) {
         fragment.append(template);
         return fragment;
     }
     const elem = document.createElement(details.tag);
     const { attributes } = details;
-    if ( attributes ) {
-        for ( let i = 0; i < attributes.length; i+= 2 ) {
-            elem.setAttribute(attributes[i+0], attributes[i+1]);
+    if (attributes) {
+        for (let i = 0; i < attributes.length; i += 2) {
+            elem.setAttribute(attributes[i + 0], attributes[i + 1]);
         }
     }
     elem.append(text);
@@ -107,14 +107,14 @@ function fragmentFromTemplate(template, placeholder, text, details) {
 
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/691
+// https://github.com/Ablock/Ablock/issues/691
 //   Parse URL to extract as much useful information as possible. This is
 //   useful to assist the user in deciding whether to navigate to the web page.
-(( ) => {
+(() => {
     const reURL = /^https?:\/\//;
 
-    const liFromParam = function(name, value) {
-        if ( value === '' ) {
+    const liFromParam = function (name, value) {
+        if (value === '') {
             value = name;
             name = '';
         }
@@ -122,11 +122,11 @@ function fragmentFromTemplate(template, placeholder, text, details) {
         let span = dom.create('span');
         dom.text(span, name);
         li.appendChild(span);
-        if ( name !== '' && value !== '' ) {
+        if (name !== '' && value !== '') {
             li.appendChild(document.createTextNode(' = '));
         }
         span = dom.create('span');
-        if ( reURL.test(value) ) {
+        if (reURL.test(value)) {
             const a = dom.create('a');
             dom.attr(a, 'href', value);
             dom.text(a, value);
@@ -140,7 +140,7 @@ function fragmentFromTemplate(template, placeholder, text, details) {
 
     // https://github.com/uBlockOrigin/uBlock-issues/issues/1649
     //   Limit recursion.
-    const renderParams = function(parentNode, rawURL, depth = 0) {
+    const renderParams = function (parentNode, rawURL, depth = 0) {
         let url;
         try {
             url = new URL(rawURL);
@@ -149,16 +149,16 @@ function fragmentFromTemplate(template, placeholder, text, details) {
         }
 
         const search = url.search.slice(1);
-        if ( search === '' ) { return false; }
+        if (search === '') { return false; }
 
         url.search = '';
         const li = liFromParam(i18n$('strictblockNoParamsPrompt'), url.href);
         parentNode.appendChild(li);
 
         const params = new self.URLSearchParams(search);
-        for ( const [ name, value ] of params ) {
+        for (const [name, value] of params) {
             const li = liFromParam(name, value);
-            if ( depth < 2 && reURL.test(value) ) {
+            if (depth < 2 && reURL.test(value)) {
                 const ul = dom.create('ul');
                 renderParams(ul, value, depth + 1);
                 li.appendChild(ul);
@@ -169,11 +169,11 @@ function fragmentFromTemplate(template, placeholder, text, details) {
         return true;
     };
 
-    if ( renderParams(qs$('#parsed'), toURL.href) === false ) { return; }
+    if (renderParams(qs$('#parsed'), toURL.href) === false) { return; }
 
     dom.cl.remove('#toggleParse', 'hidden');
 
-    dom.on('#toggleParse', 'click', ( ) => {
+    dom.on('#toggleParse', 'click', () => {
         dom.cl.toggle('#theURL', 'collapsed');
     });
 })();
@@ -181,45 +181,45 @@ function fragmentFromTemplate(template, placeholder, text, details) {
 /******************************************************************************/
 
 // Find which list caused the blocking.
-(async ( ) => {
+(async () => {
     const rulesetDetails = await rulesetDetailsPromise;
     let iList = -1;
     const searchInList = async i => {
-        if ( iList !== -1 ) { return; }
+        if (iList !== -1) { return; }
         const rules = await fetchJSON(`/rulesets/strictblock/${rulesetDetails[i].id}`);
-        if ( iList !== -1 ) { return; }
+        if (iList !== -1) { return; }
         const toHref = toURL.href;
-        for ( const rule of rules ) {
+        for (const rule of rules) {
             const { regexFilter, requestDomains } = rule.condition;
             let matchesDomain = requestDomains === undefined;
-            if ( requestDomains ) {
+            if (requestDomains) {
                 let hn = toURL.hostname;
-                for (;;) {
-                    if ( requestDomains.includes(hn) ) {
+                for (; ;) {
+                    if (requestDomains.includes(hn)) {
                         matchesDomain = true;
                         break;
                     }
                     const pos = hn.indexOf('.');
-                    if ( pos === -1 ) { break; }
-                    hn = hn.slice(pos+1);
+                    if (pos === -1) { break; }
+                    hn = hn.slice(pos + 1);
                 }
-                if ( matchesDomain === false ) { continue; }
+                if (matchesDomain === false) { continue; }
             }
             const re = new RegExp(regexFilter);
             const matchesRegex = re.test(toHref);
-            if ( matchesDomain && matchesRegex ) {
+            if (matchesDomain && matchesRegex) {
                 iList = i;
             }
         }
     };
     const toFetch = [];
-    for ( let i = 0; i < rulesetDetails.length; i++ ) {
-        if ( rulesetDetails[i].rules.strictblock === 0 ) { continue; }
+    for (let i = 0; i < rulesetDetails.length; i++) {
+        if (rulesetDetails[i].rules.strictblock === 0) { continue; }
         toFetch.push(searchInList(i));
     }
-    if ( toFetch.length === 0 ) { return; }
+    if (toFetch.length === 0) { return; }
     await Promise.all(toFetch);
-    if ( iList === -1 ) { return; }
+    if (iList === -1) { return; }
     const fragment = fragmentFromTemplate(
         i18n$('strictblockReasonSentence1'),
         '{{listname}}', rulesetDetails[iList].name,
@@ -232,37 +232,37 @@ function fragmentFromTemplate(template, placeholder, text, details) {
 /******************************************************************************/
 
 // Offer to skip redirection whenever possible
-(async ( ) => {
+(async () => {
     const rulesetDetails = await rulesetDetailsPromise;
     const toFetch = [];
-    for ( const details of rulesetDetails ) {
-        if ( details.rules.urlskip === 0 ) { continue; }
+    for (const details of rulesetDetails) {
+        if (details.rules.urlskip === 0) { continue; }
         toFetch.push(fetchJSON(`/rulesets/urlskip/${details.id}`));
     }
-    if ( toFetch.length === 0 ) { return; }
+    if (toFetch.length === 0) { return; }
     const urlskipLists = await Promise.all(toFetch);
     const toHn = toURL.hostname;
     const matchesHn = hn => {
-        if ( toHn.endsWith(hn) === false ) { return false; }
-        if ( hn.length === toHn.length ) { return true; }
+        if (toHn.endsWith(hn) === false) { return false; }
+        if (hn.length === toHn.length) { return true; }
         return toHn.charAt(toHn.length - hn.length - 1) === '.';
     };
-    for ( const urlskips of urlskipLists ) {
-        for ( const urlskip of urlskips ) {
+    for (const urlskips of urlskipLists) {
+        for (const urlskip of urlskips) {
             const re = new RegExp(urlskip.re, urlskip.c ? undefined : 'i');
-            if ( re.test(toURL.href) === false ) { continue; }
-            if ( urlskip.hostnames ) {
-                if ( urlskip.hostnames.some(hn => matchesHn(hn)) === false ) {
+            if (re.test(toURL.href) === false) { continue; }
+            if (urlskip.hostnames) {
+                if (urlskip.hostnames.some(hn => matchesHn(hn)) === false) {
                     continue;
                 }
             }
             const finalURL = urlSkip(toURL.href, false, urlskip.steps);
-            if ( finalURL === undefined ) { continue; }
+            if (finalURL === undefined) { continue; }
             toFinalURL.href = finalURL;
             const fragment = fragmentFromTemplate(
                 i18n$('strictblockRedirectSentence1'),
                 '{{url}}', urlToFragment(finalURL),
-                { tag: 'a', attributes: [ 'href', finalURL, 'class', 'code' ] }
+                { tag: 'a', attributes: ['href', finalURL, 'class', 'code'] }
             );
             qs$('#urlskip').append(fragment);
             dom.attr('#urlskip', 'hidden', null);
@@ -274,11 +274,11 @@ function fragmentFromTemplate(template, placeholder, text, details) {
 /******************************************************************************/
 
 // https://www.reddit.com/r/uBlockOrigin/comments/breeux/
-if ( window.history.length > 1 ) {
-    dom.on('#back', 'click', ( ) => { window.history.back(); });
+if (window.history.length > 1) {
+    dom.on('#back', 'click', () => { window.history.back(); });
     qs$('#bye').style.display = 'none';
 } else {
-    dom.on('#bye', 'click', ( ) => { window.close(); });
+    dom.on('#bye', 'click', () => { window.close(); });
     qs$('#back').style.display = 'none';
 }
 
@@ -288,7 +288,7 @@ dom.on('#disableWarning', 'change', ev => {
     dom.cl.toggle('[data-i18n="strictblockClose"]', 'disabled', checked);
 });
 
-dom.on('#proceed', 'click', ( ) => { proceed(); });
+dom.on('#proceed', 'click', () => { proceed(); });
 
 dom.cl.remove(dom.body, 'loading');
 

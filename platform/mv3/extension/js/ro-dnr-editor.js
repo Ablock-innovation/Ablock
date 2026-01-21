@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { runtime, sendMessage } from './ext.js';
@@ -29,37 +29,37 @@ import { textFromRules } from './dnr-parser.js';
 
 export class ReadOnlyDNREditor extends DNREditor {
     async getText(hint) {
-        if ( hint === 'dnr.ro.dynamic' ) {
+        if (hint === 'dnr.ro.dynamic') {
             const rules = await sendMessage({ what: 'getEffectiveDynamicRules' });
-            if ( Array.isArray(rules) === false ) { return; }
+            if (Array.isArray(rules) === false) { return; }
             this.id = 'dynamic';
             this.count = rules.length;
             return textFromRules(rules, { keepId: true });
         }
-        if ( hint === 'dnr.ro.session' ) {
+        if (hint === 'dnr.ro.session') {
             const rules = await sendMessage({ what: 'getEffectiveSessionRules' });
-            if ( Array.isArray(rules) === false ) { return; }
+            if (Array.isArray(rules) === false) { return; }
             this.id = 'session';
             this.count = rules.length;
             return textFromRules(rules, { keepId: true });
         }
         const match = /^dnr\.ro\.(.+)$/.exec(hint);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         this.id = match[1];
         const allRulesetDetails = await sendMessage({ what: 'getRulesetDetails' });
         const rulesetDetails = allRulesetDetails.find(a => a.id === this.id);
-        if ( rulesetDetails === undefined ) { return; }
+        if (rulesetDetails === undefined) { return; }
         const manifestRulesets = runtime.getManifest().declarative_net_request.rule_resources;
         const mainPathMap = new Map(
-            manifestRulesets.map(({ id, path }) => [ id, path ])
+            manifestRulesets.map(({ id, path }) => [id, path])
         );
         const realms = {
             plain: 'main',
             regex: 'regex',
         };
         const promises = [];
-        for ( const [ realm, dir ] of Object.entries(realms) ) {
-            if ( Boolean(rulesetDetails.rules?.[realm]) === false ) { continue; }
+        for (const [realm, dir] of Object.entries(realms)) {
+            if (Boolean(rulesetDetails.rules?.[realm]) === false) { continue; }
             const url = dir === 'main'
                 ? mainPathMap.get(this.id)
                 : `./rulesets/${dir}/${this.id}.json`;
@@ -73,8 +73,8 @@ export class ReadOnlyDNREditor extends DNREditor {
         }
         const parts = await Promise.all(promises);
         const allRules = [];
-        for ( const rules of parts ) {
-            for ( const rule of rules ) {
+        for (const rules of parts) {
+            for (const rule of rules) {
                 allRules.push(rule);
             }
         }
@@ -83,7 +83,7 @@ export class ReadOnlyDNREditor extends DNREditor {
     }
 
     on(editor) {
-        if ( typeof this.count !== 'number' ) {
+        if (typeof this.count !== 'number') {
             return editor.updateSummaryPanel(null);
         }
         const template = document.querySelector('template.ro-summary-panel');

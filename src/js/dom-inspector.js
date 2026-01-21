@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -24,7 +24,7 @@
 const svgRoot = document.querySelector('svg');
 let inspectorContentPort;
 
-const shutdown = ( ) => {
+const shutdown = () => {
     inspectorContentPort.close();
     inspectorContentPort.onmessage = inspectorContentPort.onmessageerror = null;
     inspectorContentPort = undefined;
@@ -32,30 +32,30 @@ const shutdown = ( ) => {
 
 const contentInspectorChannel = ev => {
     const msg = ev.data || {};
-    switch ( msg.what ) {
-    case 'quitInspector': {
-        shutdown();
-        break;
-    }
-    case 'svgPaths': {
-        const paths = svgRoot.children;
-        paths[0].setAttribute('d', msg.paths[0]);
-        paths[1].setAttribute('d', msg.paths[1]);
-        paths[2].setAttribute('d', msg.paths[2]);
-        paths[3].setAttribute('d', msg.paths[3]);
-        break;
-    }
-    default:
-        break;
+    switch (msg.what) {
+        case 'quitInspector': {
+            shutdown();
+            break;
+        }
+        case 'svgPaths': {
+            const paths = svgRoot.children;
+            paths[0].setAttribute('d', msg.paths[0]);
+            paths[1].setAttribute('d', msg.paths[1]);
+            paths[2].setAttribute('d', msg.paths[2]);
+            paths[3].setAttribute('d', msg.paths[3]);
+            break;
+        }
+        default:
+            break;
     }
 };
 
 // Wait for the content script to establish communication
 globalThis.addEventListener('message', ev => {
     const msg = ev.data || {};
-    if ( msg.what !== 'startInspector' ) { return; }
-    if ( Array.isArray(ev.ports) === false ) { return; }
-    if ( ev.ports.length === 0 ) { return; }
+    if (msg.what !== 'startInspector') { return; }
+    if (Array.isArray(ev.ports) === false) { return; }
+    if (ev.ports.length === 0) { return; }
     inspectorContentPort = ev.ports[0];
     inspectorContentPort.onmessage = contentInspectorChannel;
     inspectorContentPort.onmessageerror = shutdown;

@@ -16,26 +16,26 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 // Important!
 // Isolate from global scope
 (async function uBOL_cssSpecific() {
 
-/******************************************************************************/
+    /******************************************************************************/
 
-const specificImports = self.specificImports || [];
-self.specificImports = undefined;
+    const specificImports = self.specificImports || [];
+    self.specificImports = undefined;
 
-/******************************************************************************/
+    /******************************************************************************/
 
-const selectors = await self.cosmeticAPI.getSelectors('specific', specificImports);
-self.cosmeticAPI.release();
-if ( selectors.length === 0 ) { return; }
-self.cssAPI.insert(`${selectors.join(',\n')}{display:none!important;}`);
+    const selectors = await self.cosmeticAPI.getSelectors('specific', specificImports);
+    self.cosmeticAPI.release();
+    if (selectors.length === 0) { return; }
+    self.cssAPI.insert(`${selectors.join(',\n')}{display:none!important;}`);
 
-/******************************************************************************/
+    /******************************************************************************/
 
 })();
 

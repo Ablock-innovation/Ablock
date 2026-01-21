@@ -16,14 +16,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
-    const visitorId = (( ) => {
+    const visitorId = (() => {
         let id = '';
-        for ( let i = 0; i < 8; i++ ) {
+        for (let i = 0; i < 8; i++) {
             id += (Math.random() * 0x10000 + 0x1000 | 0).toString(16).slice(-4);
         }
         return id;

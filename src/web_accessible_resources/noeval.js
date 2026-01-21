@@ -16,14 +16,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
     const log = console.log.bind(console);
     window.eval = new Proxy(window.eval, {          // jshint ignore: line
-        apply: function(target, thisArg, args) {
+        apply: function (target, thisArg, args) {
             log(`Document tried to eval... ${args[0]}\n`);
         }
     });

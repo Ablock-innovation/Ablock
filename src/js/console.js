@@ -16,14 +16,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 
 function ubologSet(state = false) {
-    if ( state ) {
-        if ( ubolog.process instanceof Function ) {
+    if (state) {
+        if (ubolog.process instanceof Function) {
             ubolog.process();
         }
         ubolog = ubologDo;
@@ -39,13 +39,13 @@ function ubologDo(...args) {
 function ubologIgnore() {
 }
 
-let ubolog = (( ) => {
+let ubolog = (() => {
     const pending = [];
-    const store = function(...args) {
+    const store = function (...args) {
         pending.push(args);
     };
-    store.process = function() {
-        for ( const args of pending ) {
+    store.process = function () {
+        for (const args of pending) {
             ubologDo(...args);
         }
     };

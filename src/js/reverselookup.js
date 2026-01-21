@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import * as sfp from './static-filtering-parser.js';
@@ -37,20 +37,20 @@ let worker = null;
 let needLists = true;
 let messageId = 1;
 
-const onWorkerMessage = function(e) {
+const onWorkerMessage = function (e) {
     const msg = e.data;
     const resolver = pendingResponses.get(msg.id);
     pendingResponses.delete(msg.id);
     resolver(msg.response);
 };
 
-const stopWorker = function() {
+const stopWorker = function () {
     workerTTLTimer.off();
-    if ( worker === null ) { return; }
+    if (worker === null) { return; }
     worker.terminate();
     worker = null;
     needLists = true;
-    for ( const resolver of pendingResponses.values() ) {
+    for (const resolver of pendingResponses.values()) {
         resolver();
     }
     pendingResponses.clear();
@@ -59,8 +59,8 @@ const stopWorker = function() {
 const workerTTLTimer = vAPI.defer.create(stopWorker);
 const workerTTL = { min: 1.5 };
 
-const initWorker = function() {
-    if ( worker === null ) {
+const initWorker = function () {
+    if (worker === null) {
         worker = new Worker('js/reverselookup-worker.js');
         worker.onmessage = onWorkerMessage;
     }
@@ -68,17 +68,17 @@ const initWorker = function() {
     // The worker will be shutdown after n minutes without being used.
     workerTTLTimer.offon(workerTTL);
 
-    if ( needLists === false ) {
+    if (needLists === false) {
         return Promise.resolve();
     }
     needLists = false;
 
     const entries = new Map();
 
-    const onListLoaded = function(details) {
+    const onListLoaded = function (details) {
         const entry = entries.get(details.assetKey);
 
-        // https://github.com/gorhill/uBlock/issues/536
+        // https://github.com/Ablock/Ablock/issues/536
         // Use assetKey when there is no filter list title.
 
         worker.postMessage({
@@ -92,12 +92,12 @@ const initWorker = function() {
         });
     };
 
-    for ( const listKey in µb.availableFilterLists ) {
-        if ( Object.hasOwn(µb.availableFilterLists, listKey) === false ) {
+    for (const listKey in µb.availableFilterLists) {
+        if (Object.hasOwn(µb.availableFilterLists, listKey) === false) {
             continue;
         }
         const entry = µb.availableFilterLists[listKey];
-        if ( entry.off === true ) { continue; }
+        if (entry.off === true) { continue; }
         entries.set(listKey, {
             title: listKey !== µb.userFiltersPath ?
                 entry.title :
@@ -105,12 +105,12 @@ const initWorker = function() {
             supportURL: entry.supportURL || ''
         });
     }
-    if ( entries.size === 0 ) {
+    if (entries.size === 0) {
         return Promise.resolve();
     }
 
     const promises = [];
-    for ( const listKey of entries.keys() ) {
+    for (const listKey of entries.keys()) {
         promises.push(
             µb.getCompiledFilterList(listKey).then(details => {
                 onListLoaded(details);
@@ -120,8 +120,8 @@ const initWorker = function() {
     return Promise.all(promises);
 };
 
-const fromNetFilter = async function(rawFilter) {
-    if ( typeof rawFilter !== 'string' || rawFilter === '' ) { return; }
+const fromNetFilter = async function (rawFilter) {
+    if (typeof rawFilter !== 'string' || rawFilter === '') { return; }
 
     const writer = new CompiledListWriter();
     const parser = new sfp.AstFilterParser({
@@ -132,7 +132,7 @@ const fromNetFilter = async function(rawFilter) {
     parser.parse(rawFilter);
 
     const compiler = staticNetFilteringEngine.createCompiler();
-    if ( compiler.compile(parser, writer) === false ) { return; }
+    if (compiler.compile(parser, writer) === false) { return; }
 
     await initWorker();
 
@@ -149,7 +149,7 @@ const fromNetFilter = async function(rawFilter) {
     });
 };
 
-const fromExtendedFilter = async function(details) {
+const fromExtendedFilter = async function (details) {
     if (
         typeof details.rawFilter !== 'string' ||
         details.rawFilter === ''
@@ -168,9 +168,9 @@ const fromExtendedFilter = async function(details) {
     });
     parser.parse(details.rawFilter);
     let needle;
-    if ( parser.isScriptletFilter() ) {
+    if (parser.isScriptletFilter()) {
         needle = JSON.stringify(parser.getScriptletArgs());
-    } else if ( parser.isResponseheaderFilter() ) {
+    } else if (parser.isResponseheaderFilter()) {
         needle = parser.getResponseheaderName();
     }
 
@@ -200,9 +200,9 @@ const fromExtendedFilter = async function(details) {
 
 // This tells the worker that filter lists may have changed.
 
-const resetLists = function() {
+const resetLists = function () {
     needLists = true;
-    if ( worker === null ) { return; }
+    if (worker === null) { return; }
     worker.postMessage({ what: 'resetLists' });
 };
 

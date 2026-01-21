@@ -16,28 +16,28 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 
-(( ) => {
-    if ( typeof vAPI !== 'object' ) { return; }
+(() => {
+    if (typeof vAPI !== 'object') { return; }
 
-    if ( vAPI.dynamicReloadToken === undefined ) {
+    if (vAPI.dynamicReloadToken === undefined) {
         vAPI.dynamicReloadToken = vAPI.randomToken();
     }
 
-    for ( const sheet of Array.from(document.styleSheets) ) {
+    for (const sheet of Array.from(document.styleSheets)) {
         let loaded = false;
         try {
             loaded = sheet.rules.length !== 0;
         } catch {
         }
-        if ( loaded ) { continue; }
+        if (loaded) { continue; }
         const link = sheet.ownerNode || null;
-        if ( link === null || link.localName !== 'link' ) { continue; }
-        if ( link.hasAttribute(vAPI.dynamicReloadToken) ) { continue; }
+        if (link === null || link.localName !== 'link') { continue; }
+        if (link.hasAttribute(vAPI.dynamicReloadToken)) { continue; }
         const clone = link.cloneNode(true);
         clone.setAttribute(vAPI.dynamicReloadToken, '');
         link.replaceWith(clone);
@@ -57,7 +57,7 @@
     - Remove the following code
     - Add code beyond the following code
     Reason:
-    - https://github.com/gorhill/uBlock/pull/3721
+    - https://github.com/Ablock/Ablock/pull/3721
     - uBO never uses the return value from injected content scripts
 
 **/

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* global CodeMirror, uBlockDashboard */
@@ -37,27 +37,27 @@ function directiveFromLine(line) {
 
 /******************************************************************************/
 
-CodeMirror.defineMode("ubo-whitelist-directives", function() {
+CodeMirror.defineMode("ubo-whitelist-directives", function () {
     const reRegex = /^\/.+\/$/;
 
     return {
         token: function token(stream) {
             const line = stream.string.trim();
             stream.skipToEnd();
-            if ( reBadHostname === undefined ) {
+            if (reBadHostname === undefined) {
                 return null;
             }
-            if ( reComment.test(line) ) {
+            if (reComment.test(line)) {
                 return 'comment';
             }
-            if ( line.indexOf('/') === -1 ) {
-                if ( reBadHostname.test(line) ) { return 'error'; }
-                if ( whitelistDefaultSet.has(line.trim()) ) {
+            if (line.indexOf('/') === -1) {
+                if (reBadHostname.test(line)) { return 'error'; }
+                if (whitelistDefaultSet.has(line.trim())) {
                     return 'keyword';
                 }
                 return null;
             }
-            if ( reRegex.test(line) ) {
+            if (reRegex.test(line)) {
                 try {
                     new RegExp(line.slice(1, -1));
                 } catch {
@@ -65,10 +65,10 @@ CodeMirror.defineMode("ubo-whitelist-directives", function() {
                 }
                 return null;
             }
-            if ( reHostnameExtractor.test(line) === false ) {
+            if (reHostnameExtractor.test(line) === false) {
                 return 'error';
             }
-            if ( whitelistDefaultSet.has(line.trim()) ) {
+            if (whitelistDefaultSet.has(line.trim())) {
                 return 'keyword';
             }
             return null;
@@ -83,7 +83,7 @@ let whitelistDefaultSet = new Set();
 /******************************************************************************/
 
 const messaging = vAPI.messaging;
-const noopFunc = function(){};
+const noopFunc = function () { };
 
 let cachedWhitelist = '';
 
@@ -129,26 +129,26 @@ async function renderWhitelist() {
     });
 
     const first = reBadHostname === undefined;
-    if ( first ) {
+    if (first) {
         reBadHostname = new RegExp(details.reBadHostname);
         reHostnameExtractor = new RegExp(details.reHostnameExtractor);
         whitelistDefaultSet = new Set(details.whitelistDefault);
     }
     const toAdd = new Set(whitelistDefaultSet);
-    for ( const line of details.whitelist ) {
+    for (const line of details.whitelist) {
         const directive = directiveFromLine(line);
-        if ( whitelistDefaultSet.has(directive) === false ) { continue; }
+        if (whitelistDefaultSet.has(directive) === false) { continue; }
         toAdd.delete(directive);
-        if ( toAdd.size === 0 ) { break; }
+        if (toAdd.size === 0) { break; }
     }
-    if ( toAdd.size !== 0 ) {
+    if (toAdd.size !== 0) {
         details.whitelist.push(...Array.from(toAdd).map(a => `# ${a}`));
     }
     details.whitelist.sort((a, b) => {
         const ad = directiveFromLine(a);
         const bd = directiveFromLine(b);
         const abuiltin = whitelistDefaultSet.has(ad);
-        if ( abuiltin !== whitelistDefaultSet.has(bd) ) {
+        if (abuiltin !== whitelistDefaultSet.has(bd)) {
             return abuiltin ? -1 : 1;
         }
         return ad.localeCompare(bd);
@@ -156,7 +156,7 @@ async function renderWhitelist() {
     const whitelistStr = details.whitelist.join('\n').trim();
     cachedWhitelist = whitelistStr;
     setEditorText(whitelistStr);
-    if ( first ) {
+    if (first) {
         cmEditor.clearHistory();
     }
 }
@@ -165,11 +165,11 @@ async function renderWhitelist() {
 
 function handleImportFilePicker() {
     const file = this.files[0];
-    if ( file === undefined || file.name === '' ) { return; }
-    if ( file.type.indexOf('text') !== 0 ) { return; }
+    if (file === undefined || file.name === '') { return; }
+    if (file.type.indexOf('text') !== 0) { return; }
     const fr = new FileReader();
     fr.onload = ev => {
-        if ( ev.type !== 'load' ) { return; }
+        if (ev.type !== 'load') { return; }
         const content = uBlockDashboard.mergeNewLines(
             getEditorText().trim(),
             fr.result.trim()
@@ -194,7 +194,7 @@ function startImportFilePicker() {
 
 function exportWhitelistToFile() {
     const val = getEditorText();
-    if ( val === '' ) { return; }
+    if (val === '') { return; }
     const filename =
         i18n$('whitelistExportFilename')
             .replace('{{datetime}}', uBlockDashboard.dateNowToSensibleString())
@@ -227,8 +227,8 @@ function getCloudData() {
 }
 
 function setCloudData(data, append) {
-    if ( typeof data !== 'string' ) { return; }
-    if ( append ) {
+    if (typeof data !== 'string') { return; }
+    if (append) {
         data = uBlockDashboard.mergeNewLines(getEditorText().trim(), data);
     }
     setEditorText(data.trim());
@@ -239,9 +239,9 @@ self.cloud.onPull = setCloudData;
 
 /******************************************************************************/
 
-self.wikilink = 'https://github.com/gorhill/uBlock/wiki/Dashboard:-Trusted-sites';
+self.wikilink = 'https://github.com/Ablock/Ablock/wiki/Dashboard:-Trusted-sites';
 
-self.hasUnsavedData = function() {
+self.hasUnsavedData = function () {
     return getEditorText().trim() !== cachedWhitelist;
 };
 
@@ -250,7 +250,7 @@ self.hasUnsavedData = function() {
 dom.on('#importWhitelistFromFile', 'click', startImportFilePicker);
 dom.on('#importFilePicker', 'change', handleImportFilePicker);
 dom.on('#exportWhitelistToFile', 'click', exportWhitelistToFile);
-dom.on('#whitelistApply', 'click', ( ) => { applyChanges(); });
+dom.on('#whitelistApply', 'click', () => { applyChanges(); });
 dom.on('#whitelistRevert', 'click', revertChanges);
 
 renderWhitelist();

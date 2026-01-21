@@ -16,19 +16,19 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 
 // Scriptlets to count the number of script tags in a document.
 
-(( ) => {
-    if ( typeof vAPI !== 'object' ) { return; }
+(() => {
+    if (typeof vAPI !== 'object') { return; }
 
     const t0 = Date.now();
 
-    if ( vAPI.domSurveyScripts instanceof Object === false ) {
+    if (vAPI.domSurveyScripts instanceof Object === false) {
         vAPI.domSurveyScripts = {
             busy: false,
             scriptCount: -1,
@@ -37,28 +37,28 @@
     }
     const surveyResults = vAPI.domSurveyScripts;
 
-    if ( surveyResults.busy ) { return; }
+    if (surveyResults.busy) { return; }
     surveyResults.busy = true;
 
-    if ( surveyResults.surveyTime < vAPI.domMutationTime ) {
+    if (surveyResults.surveyTime < vAPI.domMutationTime) {
         surveyResults.scriptCount = -1;
     }
     surveyResults.surveyTime = t0;
 
-    if ( surveyResults.scriptCount === -1 ) {
+    if (surveyResults.scriptCount === -1) {
         const reInlineScript = /^(data:|blob:|$)/;
         let inlineScriptCount = 0;
         let scriptCount = 0;
-        for ( const script of document.scripts ) {
-            if ( reInlineScript.test(script.src) ) {
+        for (const script of document.scripts) {
+            if (reInlineScript.test(script.src)) {
                 inlineScriptCount = 1;
                 continue;
             }
             scriptCount += 1;
-            if ( scriptCount === 99 ) { break; }
+            if (scriptCount === 99) { break; }
         }
         scriptCount += inlineScriptCount;
-        if ( scriptCount !== 0 ) {
+        if (scriptCount !== 0) {
             surveyResults.scriptCount = scriptCount;
         }
     }
@@ -66,15 +66,15 @@
     // https://github.com/uBlockOrigin/uBlock-issues/issues/756
     //   Keep trying to find inline script-like instances but only if we
     //   have the time-budget to do so.
-    if ( surveyResults.scriptCount === -1 ) {
-        if ( document.querySelector('a[href^="javascript:"]') !== null ) {
+    if (surveyResults.scriptCount === -1) {
+        if (document.querySelector('a[href^="javascript:"]') !== null) {
             surveyResults.scriptCount = 1;
         }
     }
 
     // https://github.com/uBlockOrigin/uBlock-issues/issues/1756
     //   Mind that there might be no body element.
-    if ( surveyResults.scriptCount === -1 && document.body !== null ) {
+    if (surveyResults.scriptCount === -1 && document.body !== null) {
         surveyResults.scriptCount = 0;
         const onHandlers = new Set([
             'onabort', 'onblur', 'oncancel', 'oncanplay',
@@ -102,12 +102,12 @@
             document.body,
             NodeFilter.SHOW_ELEMENT
         );
-        for (;;) {
+        for (; ;) {
             const node = nodeIter.nextNode();
-            if ( node === null ) { break; }
-            if ( node.hasAttributes() === false ) { continue; }
-            for ( const attr of node.getAttributeNames() ) {
-                if ( onHandlers.has(attr) === false ) { continue; }
+            if (node === null) { break; }
+            if (node.hasAttributes() === false) { continue; }
+            for (const attr of node.getAttributeNames()) {
+                if (onHandlers.has(attr) === false) { continue; }
                 surveyResults.scriptCount = 1;
                 break;
             }
@@ -118,7 +118,7 @@
 
     // IMPORTANT: This is returned to the injector, so this MUST be
     //            the last statement.
-    if ( surveyResults.scriptCount !== -1 ) {
+    if (surveyResults.scriptCount !== -1) {
         return surveyResults.scriptCount;
     }
 })();

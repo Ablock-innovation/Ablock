@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import cosmeticFilteringEngine from './cosmetic-filtering.js';
@@ -59,15 +59,15 @@ import scriptletFilteringEngine from './scriptlet-filtering.js';
 const staticExtFilteringEngine = {
     get acceptedCount() {
         return cosmeticFilteringEngine.acceptedCount +
-               scriptletFilteringEngine.acceptedCount +
-               httpheaderFilteringEngine.acceptedCount +
-               htmlFilteringEngine.acceptedCount;
+            scriptletFilteringEngine.acceptedCount +
+            httpheaderFilteringEngine.acceptedCount +
+            htmlFilteringEngine.acceptedCount;
     },
     get discardedCount() {
         return cosmeticFilteringEngine.discardedCount +
-               scriptletFilteringEngine.discardedCount +
-               httpheaderFilteringEngine.discardedCount +
-               htmlFilteringEngine.discardedCount;
+            scriptletFilteringEngine.discardedCount +
+            httpheaderFilteringEngine.discardedCount +
+            htmlFilteringEngine.discardedCount;
     },
 };
 
@@ -75,24 +75,24 @@ const staticExtFilteringEngine = {
 // Public methods
 //--------------------------------------------------------------------------
 
-staticExtFilteringEngine.reset = function() {
+staticExtFilteringEngine.reset = function () {
     cosmeticFilteringEngine.reset();
     scriptletFilteringEngine.reset();
     httpheaderFilteringEngine.reset();
     htmlFilteringEngine.reset();
 };
 
-staticExtFilteringEngine.freeze = function() {
+staticExtFilteringEngine.freeze = function () {
     cosmeticFilteringEngine.freeze();
     scriptletFilteringEngine.freeze();
     httpheaderFilteringEngine.freeze();
     htmlFilteringEngine.freeze();
 };
 
-staticExtFilteringEngine.compile = function(parser, writer) {
-    if ( parser.isExtendedFilter() === false ) { return false; }
+staticExtFilteringEngine.compile = function (parser, writer) {
+    if (parser.isExtendedFilter() === false) { return false; }
 
-    if ( parser.hasError() ) {
+    if (parser.hasError()) {
         logger.writeOne({
             realm: 'message',
             type: 'error',
@@ -102,13 +102,13 @@ staticExtFilteringEngine.compile = function(parser, writer) {
     }
 
     // Scriptlet injection
-    if ( parser.isScriptletFilter() ) {
+    if (parser.isScriptletFilter()) {
         scriptletFilteringEngine.compile(parser, writer);
         return true;
     }
 
     // Response header filtering
-    if ( parser.isResponseheaderFilter() ) {
+    if (parser.isResponseheaderFilter()) {
         httpheaderFilteringEngine.compile(parser, writer);
         return true;
     }
@@ -116,13 +116,13 @@ staticExtFilteringEngine.compile = function(parser, writer) {
     // HTML filtering
     // TODO: evaluate converting Adguard's `$$` syntax into uBO's HTML
     //       filtering syntax.
-    if ( parser.isHtmlFilter() ) {
+    if (parser.isHtmlFilter()) {
         htmlFilteringEngine.compile(parser, writer);
         return true;
     }
 
     // Cosmetic filtering
-    if ( parser.isCosmeticFilter() ) {
+    if (parser.isCosmeticFilter()) {
         cosmeticFilteringEngine.compile(parser, writer);
         return true;
     }
@@ -135,14 +135,14 @@ staticExtFilteringEngine.compile = function(parser, writer) {
     return true;
 };
 
-staticExtFilteringEngine.fromCompiledContent = function(reader, options) {
+staticExtFilteringEngine.fromCompiledContent = function (reader, options) {
     cosmeticFilteringEngine.fromCompiledContent(reader, options);
     scriptletFilteringEngine.fromCompiledContent(reader, options);
     httpheaderFilteringEngine.fromCompiledContent(reader, options);
     htmlFilteringEngine.fromCompiledContent(reader, options);
 };
 
-staticExtFilteringEngine.toSelfie = function() {
+staticExtFilteringEngine.toSelfie = function () {
     return {
         cosmetic: cosmeticFilteringEngine.toSelfie(),
         scriptlets: scriptletFilteringEngine.toSelfie(),
@@ -151,12 +151,12 @@ staticExtFilteringEngine.toSelfie = function() {
     };
 };
 
-staticExtFilteringEngine.fromSelfie = async function(selfie) {
-    if ( typeof selfie !== 'object' || selfie === null ) { return false; }
+staticExtFilteringEngine.fromSelfie = async function (selfie) {
+    if (typeof selfie !== 'object' || selfie === null) { return false; }
     cosmeticFilteringEngine.fromSelfie(selfie.cosmetic);
     httpheaderFilteringEngine.fromSelfie(selfie.httpHeaders);
     htmlFilteringEngine.fromSelfie(selfie.html);
-    if ( scriptletFilteringEngine.fromSelfie(selfie.scriptlets) === false ) {
+    if (scriptletFilteringEngine.fromSelfie(selfie.scriptlets) === false) {
         return false;
     }
     return true;

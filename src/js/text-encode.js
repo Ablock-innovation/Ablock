@@ -16,49 +16,49 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import µb from './background.js';
 
 /******************************************************************************/
 
-const textEncode = (( ) => {
+const textEncode = (() => {
 
-    if ( µb.canFilterResponseData !== true ) { return; }
+    if (µb.canFilterResponseData !== true) { return; }
 
     // charset aliases extracted from:
     // https://github.com/inexorabletash/text-encoding/blob/b4e5bc26e26e51f56e3daa9f13138c79f49d3c34/lib/encoding.js#L342
     const normalizedCharset = new Map([
-        [ 'utf8', 'utf-8' ],
-        [ 'unicode-1-1-utf-8', 'utf-8' ],
-        [ 'utf-8', 'utf-8' ],
+        ['utf8', 'utf-8'],
+        ['unicode-1-1-utf-8', 'utf-8'],
+        ['utf-8', 'utf-8'],
 
-        [ 'windows-1250', 'windows-1250' ],
-        [ 'cp1250', 'windows-1250' ],
-        [ 'x-cp1250', 'windows-1250' ],
+        ['windows-1250', 'windows-1250'],
+        ['cp1250', 'windows-1250'],
+        ['x-cp1250', 'windows-1250'],
 
-        [ 'windows-1251', 'windows-1251' ],
-        [ 'cp1251', 'windows-1251' ],
-        [ 'x-cp1251', 'windows-1251' ],
+        ['windows-1251', 'windows-1251'],
+        ['cp1251', 'windows-1251'],
+        ['x-cp1251', 'windows-1251'],
 
-        [ 'windows-1252', 'windows-1252' ],
-        [ 'ansi_x3.4-1968', 'windows-1252' ],
-        [ 'ascii', 'windows-1252' ],
-        [ 'cp1252', 'windows-1252' ],
-        [ 'cp819', 'windows-1252' ],
-        [ 'csisolatin1', 'windows-1252' ],
-        [ 'ibm819', 'windows-1252' ],
-        [ 'iso-8859-1', 'windows-1252' ],
-        [ 'iso-ir-100', 'windows-1252' ],
-        [ 'iso8859-1', 'windows-1252' ],
-        [ 'iso88591', 'windows-1252' ],
-        [ 'iso_8859-1', 'windows-1252' ],
-        [ 'iso_8859-1:1987', 'windows-1252' ],
-        [ 'l1', 'windows-1252' ],
-        [ 'latin1', 'windows-1252' ],
-        [ 'us-ascii', 'windows-1252' ],
-        [ 'x-cp1252', 'windows-1252' ],
+        ['windows-1252', 'windows-1252'],
+        ['ansi_x3.4-1968', 'windows-1252'],
+        ['ascii', 'windows-1252'],
+        ['cp1252', 'windows-1252'],
+        ['cp819', 'windows-1252'],
+        ['csisolatin1', 'windows-1252'],
+        ['ibm819', 'windows-1252'],
+        ['iso-8859-1', 'windows-1252'],
+        ['iso-ir-100', 'windows-1252'],
+        ['iso8859-1', 'windows-1252'],
+        ['iso88591', 'windows-1252'],
+        ['iso_8859-1', 'windows-1252'],
+        ['iso_8859-1:1987', 'windows-1252'],
+        ['l1', 'windows-1252'],
+        ['latin1', 'windows-1252'],
+        ['us-ascii', 'windows-1252'],
+        ['x-cp1252', 'windows-1252'],
     ]);
 
     // http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP1250.TXT
@@ -124,123 +124,123 @@ const textEncode = (( ) => {
     ]);
 
     const encoders = {
-        'windows-1250': function(buf) {
+        'windows-1250': function (buf) {
             let i = 0, n = buf.byteLength, o = 0, c;
-            while ( i < n ) {
+            while (i < n) {
                 c = buf[i++];
-                if ( c < 0x80 ) {
+                if (c < 0x80) {
                     buf[o++] = c;
                 } else {
-                    if ( (c & 0xE0) === 0xC0 ) {
-                        c  = (c        & 0x1F) << 6;
+                    if ((c & 0xE0) === 0xC0) {
+                        c = (c & 0x1F) << 6;
                         c |= (buf[i++] & 0x3F);
-                    } else if ( (c & 0xF0) === 0xE0 ) {
-                        c  = (c        & 0x0F) << 12;
+                    } else if ((c & 0xF0) === 0xE0) {
+                        c = (c & 0x0F) << 12;
                         c |= (buf[i++] & 0x3F) << 6;
                         c |= (buf[i++] & 0x3F);
-                    } else if ( (c & 0xF8) === 0xF0 ) {
-                        c  = (c        & 0x07) << 18;
+                    } else if ((c & 0xF8) === 0xF0) {
+                        c = (c & 0x07) << 18;
                         c |= (buf[i++] & 0x3F) << 12;
                         c |= (buf[i++] & 0x3F) << 6;
                         c |= (buf[i++] & 0x3F);
                     }
-                    if ( c < 0x100 ) {
+                    if (c < 0x100) {
                         buf[o++] = c;
-                    } else if ( c < 0x180 ) {
+                    } else if (c < 0x180) {
                         buf[o++] = cp1250_range0[c - 0x100];
-                    } else if ( c >= 0x2010 && c < 0x2040 ) {
+                    } else if (c >= 0x2010 && c < 0x2040) {
                         buf[o++] = cp125x_range0[c - 0x2010];
-                    } else if ( c === 0x02C7 ) {
+                    } else if (c === 0x02C7) {
                         buf[o++] = 0xA1;
-                    } else if ( c === 0x02D8 ) {
+                    } else if (c === 0x02D8) {
                         buf[o++] = 0xA2;
-                    } else if ( c === 0x02D9 ) {
+                    } else if (c === 0x02D9) {
                         buf[o++] = 0xFF;
-                    } else if ( c === 0x02DB ) {
+                    } else if (c === 0x02DB) {
                         buf[o++] = 0xB2;
-                    } else if ( c === 0x02DD ) {
+                    } else if (c === 0x02DD) {
                         buf[o++] = 0xBD;
-                    } else if ( c === 0x20AC ) {
+                    } else if (c === 0x20AC) {
                         buf[o++] = 0x88;
-                    } else if ( c === 0x2122 ) {
+                    } else if (c === 0x2122) {
                         buf[o++] = 0x99;
                     }
                 }
             }
             return buf.slice(0, o);
         },
-        'windows-1251': function(buf) {
+        'windows-1251': function (buf) {
             let i = 0, n = buf.byteLength, o = 0, c;
-            while ( i < n ) {
+            while (i < n) {
                 c = buf[i++];
-                if ( c < 0x80 ) {
+                if (c < 0x80) {
                     buf[o++] = c;
                 } else {
-                    if ( (c & 0xE0) === 0xC0 ) {
-                        c  = (c        & 0x1F) << 6;
+                    if ((c & 0xE0) === 0xC0) {
+                        c = (c & 0x1F) << 6;
                         c |= (buf[i++] & 0x3F);
-                    } else if ( (c & 0xF0) === 0xE0 ) {
-                        c  = (c        & 0x0F) << 12;
+                    } else if ((c & 0xF0) === 0xE0) {
+                        c = (c & 0x0F) << 12;
                         c |= (buf[i++] & 0x3F) << 6;
                         c |= (buf[i++] & 0x3F);
-                    } else if ( (c & 0xF8) === 0xF0 ) {
-                        c  = (c        & 0x07) << 18;
+                    } else if ((c & 0xF8) === 0xF0) {
+                        c = (c & 0x07) << 18;
                         c |= (buf[i++] & 0x3F) << 12;
                         c |= (buf[i++] & 0x3F) << 6;
                         c |= (buf[i++] & 0x3F);
                     }
-                    if ( c < 0x100 ) {
+                    if (c < 0x100) {
                         buf[o++] = c;
-                    } else if ( c >= 0x400 && c < 0x4A0 ) {
+                    } else if (c >= 0x400 && c < 0x4A0) {
                         buf[o++] = cp1251_range0[c - 0x400];
-                    } else if ( c >= 0x2010 && c < 0x2040 ) {
+                    } else if (c >= 0x2010 && c < 0x2040) {
                         buf[o++] = cp125x_range0[c - 0x2010];
-                    } else if ( c === 0x20AC ) {
+                    } else if (c === 0x20AC) {
                         buf[o++] = 0x88;
-                    } else if ( c === 0x2116 ) {
+                    } else if (c === 0x2116) {
                         buf[o++] = 0xB9;
-                    } else if ( c === 0x2122 ) {
+                    } else if (c === 0x2122) {
                         buf[o++] = 0x99;
                     }
                 }
             }
             return buf.slice(0, o);
         },
-        'windows-1252': function(buf) {
+        'windows-1252': function (buf) {
             let i = 0, n = buf.byteLength, o = 0, c;
-            while ( i < n ) {
+            while (i < n) {
                 c = buf[i++];
-                if ( c < 0x80 ) {
+                if (c < 0x80) {
                     buf[o++] = c;
                 } else {
-                    if ( (c & 0xE0) === 0xC0 ) {
-                        c  = (c        & 0x1F) << 6;
+                    if ((c & 0xE0) === 0xC0) {
+                        c = (c & 0x1F) << 6;
                         c |= (buf[i++] & 0x3F);
-                    } else if ( (c & 0xF0) === 0xE0 ) {
-                        c  = (c        & 0x0F) << 12;
+                    } else if ((c & 0xF0) === 0xE0) {
+                        c = (c & 0x0F) << 12;
                         c |= (buf[i++] & 0x3F) << 6;
                         c |= (buf[i++] & 0x3F);
-                    } else if ( (c & 0xF8) === 0xF0 ) {
-                        c  = (c        & 0x07) << 18;
+                    } else if ((c & 0xF8) === 0xF0) {
+                        c = (c & 0x07) << 18;
                         c |= (buf[i++] & 0x3F) << 12;
                         c |= (buf[i++] & 0x3F) << 6;
                         c |= (buf[i++] & 0x3F);
                     }
-                    if ( c < 0x100 ) {
+                    if (c < 0x100) {
                         buf[o++] = c;
-                    } else if ( c >= 0x150 && c < 0x180 ) {
+                    } else if (c >= 0x150 && c < 0x180) {
                         buf[o++] = cp1252_range0[c - 0x150];
-                    } else if ( c >= 0x2010 && c < 0x2040 ) {
+                    } else if (c >= 0x2010 && c < 0x2040) {
                         buf[o++] = cp125x_range0[c - 0x2010];
-                    } else if ( c === 0x192 ) {
+                    } else if (c === 0x192) {
                         buf[o++] = 0x83;
-                    } else if ( c === 0x2C6 ) {
+                    } else if (c === 0x2C6) {
                         buf[o++] = 0x88;
-                    } else if ( c === 0x2DC ) {
+                    } else if (c === 0x2DC) {
                         buf[o++] = 0x98;
-                    } else if ( c === 0x20AC ) {
+                    } else if (c === 0x20AC) {
                         buf[o++] = 0x80;
-                    } else if ( c === 0x2122 ) {
+                    } else if (c === 0x2122) {
                         buf[o++] = 0x99;
                     }
                 }
@@ -250,13 +250,13 @@ const textEncode = (( ) => {
     };
 
     return {
-        encode: function(charset, buf) {
+        encode: function (charset, buf) {
             return Object.hasOwn(encoders, charset) ?
                 encoders[charset](buf) :
                 buf;
         },
-        normalizeCharset: function(charset) {
-            if ( charset === undefined ) {
+        normalizeCharset: function (charset) {
+            if (charset === undefined) {
                 return 'utf-8';
             }
             return normalizedCharset.get(charset.toLowerCase());

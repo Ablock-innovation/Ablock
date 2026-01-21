@@ -16,10 +16,12 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "uBlock0@raymondhill.net",
+      "id": "d2cepx6xi@mozmail.com",
       "strict_min_version": "115.0",
       "data_collection_permissions": {
-        "required": [ "none" ]
+        "required": [
+          "none"
+        ]
       }
     },
     "gecko_android": {
@@ -27,8 +29,7 @@
     }
   },
   "commands": {
-    "_execute_browser_action": {
-    },
+    "_execute_browser_action": {},
     "launch-element-zapper": {
       "description": "__MSG_popupTipZapper__"
     },

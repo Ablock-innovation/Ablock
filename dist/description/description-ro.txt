@@ -1,7 +1,7 @@
 Un blocant (paravan) eficient: folosește foarte puțin procesorul și memoria și totuși poate încărca și aplica mii de filtre în plus față de alte paravane populare.
 
 O ilustrare a eficienței poate fi observată la:
-https://github.com/gorhill/uBlock/wiki/uBlock-vs.-ABP:-efficiency-compared
+https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Utilizare: Butonul mare de pornire/oprire în fereastra paravanului este pentru a activa/dezactiva uBlock pentru saitul curent. Funcția este valabilă doar pentru saitul curent, nu la nivel global.
 
@@ -39,7 +39,7 @@ Gratuit.
 Cu sursă liberă și licență publică (GPLv3)
 Pentru utilizatori de la utilizatori.
 
-Contribuitori pe Github: https://github.com/gorhill/uBlock/graphs/contributors
+Contribuitori pe Github: https://github.com/Ablock/Ablock/graphs/contributors
 Contribuitori pe Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -47,4 +47,4 @@ Contribuitori pe Crowdin: https://crowdin.net/project/ublock
 Este încă o aplicație recentă, gândiți-vă la acest lucru când scrieți o recenzie.
 
 Lista de schimbări a proiectului:
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases

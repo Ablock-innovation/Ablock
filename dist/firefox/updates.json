@@ -1,6 +1,6 @@
 {
   "addons": {
-    "uBlock0@raymondhill.net": {
+    "d2cepx6xi@mozmail.com": {
       "updates": [
         {
           "version": "1.68.1.102",
@@ -9,7 +9,7 @@
               "strict_min_version": "115.0"
             }
           },
-          "update_link": "https://github.com/gorhill/uBlock/releases/download/1.68.1rc2/uBlock0_1.68.1rc2.firefox.signed.xpi"
+          "update_link": ""
         }
       ]
     }

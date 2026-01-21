@@ -16,49 +16,49 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import µb from './background.js';
 
 /******************************************************************************/
 
-µb.formatCount = function(count) {
-    if ( typeof count !== 'number' ) { return ''; }
+µb.formatCount = function (count) {
+    if (typeof count !== 'number') { return ''; }
     const s = `${count}`;
-    if ( count < 1000 ) { return s; }
-    if ( count < 10000 ) {
-        return '>' + s.slice(0,1) + 'k';
+    if (count < 1000) { return s; }
+    if (count < 10000) {
+        return '>' + s.slice(0, 1) + 'k';
     }
-    if ( count < 100000 ) {
-        return s.slice(0,2) + 'k';
+    if (count < 100000) {
+        return s.slice(0, 2) + 'k';
     }
-    if ( count < 1000000 ) {
-        return s.slice(0,3) + 'k';
+    if (count < 1000000) {
+        return s.slice(0, 3) + 'k';
     }
-    return s.slice(0,-6) + 'M';
+    return s.slice(0, -6) + 'M';
 };
 
 /******************************************************************************/
 
-µb.dateNowToSensibleString = function() {
+µb.dateNowToSensibleString = function () {
     const now = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000);
     return now.toISOString().replace(/\.\d+Z$/, '')
-                            .replace(/:/g, '.')
-                            .replace('T', '_');
+        .replace(/:/g, '.')
+        .replace('T', '_');
 };
 
 /******************************************************************************/
 
-µb.openNewTab = function(details) {
-    if ( details.url.startsWith('logger-ui.html') ) {
-        if ( details.shiftKey ) {
+µb.openNewTab = function (details) {
+    if (details.url.startsWith('logger-ui.html')) {
+        if (details.shiftKey) {
             this.changeUserSettings(
                 'alwaysDetachLogger',
                 !this.userSettings.alwaysDetachLogger
             );
         }
-        if ( this.userSettings.alwaysDetachLogger ) {
+        if (this.userSettings.alwaysDetachLogger) {
             details.popup = this.hiddenSettings.loggerPopupType;
             const url = new URL(vAPI.getURL(details.url));
             url.searchParams.set('popup', '1');
@@ -70,7 +70,7 @@ import µb from './background.js';
                 );
             } catch {
             }
-            if ( popupLoggerBox !== undefined ) {
+            if (popupLoggerBox !== undefined) {
                 details.box = popupLoggerBox;
             }
         }
@@ -82,7 +82,7 @@ import µb from './background.js';
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
 
-µb.escapeRegex = function(s) {
+µb.escapeRegex = function (s) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
 
@@ -90,43 +90,43 @@ import µb from './background.js';
 
 // TODO: properly compare arrays
 
-µb.getModifiedSettings = function(edit, orig = {}) {
+µb.getModifiedSettings = function (edit, orig = {}) {
     const out = {};
-    for ( const prop in edit ) {
-        if ( Object.hasOwn(orig, prop) && edit[prop] !== orig[prop] ) {
+    for (const prop in edit) {
+        if (Object.hasOwn(orig, prop) && edit[prop] !== orig[prop]) {
             out[prop] = edit[prop];
         }
     }
     return out;
 };
 
-µb.settingValueFromString = function(orig, name, s) {
-    if ( typeof name !== 'string' || typeof s !== 'string' ) { return; }
-    if ( Object.hasOwn(orig, name) === false ) { return; }
+µb.settingValueFromString = function (orig, name, s) {
+    if (typeof name !== 'string' || typeof s !== 'string') { return; }
+    if (Object.hasOwn(orig, name) === false) { return; }
     let r;
-    switch ( typeof orig[name] ) {
-    case 'boolean':
-        if ( s === 'true' ) {
-            r = true;
-        } else if ( s === 'false' ) {
-            r = false;
-        }
-        break;
-    case 'string':
-        r = s.trim();
-        break;
-    case 'number':
-        if ( s.startsWith('0b') ) {
-            r = parseInt(s.slice(2), 2);
-        } else if ( s.startsWith('0x') ) {
-            r = parseInt(s.slice(2), 16);
-        } else {
-            r = parseInt(s, 10);
-        }
-        if ( isNaN(r) ) { r = undefined; }
-        break;
-    default:
-        break;
+    switch (typeof orig[name]) {
+        case 'boolean':
+            if (s === 'true') {
+                r = true;
+            } else if (s === 'false') {
+                r = false;
+            }
+            break;
+        case 'string':
+            r = s.trim();
+            break;
+        case 'number':
+            if (s.startsWith('0b')) {
+                r = parseInt(s.slice(2), 2);
+            } else if (s.startsWith('0x')) {
+                r = parseInt(s.slice(2), 16);
+            } else {
+                r = parseInt(s, 10);
+            }
+            if (isNaN(r)) { r = undefined; }
+            break;
+        default:
+            break;
     }
     return r;
 };

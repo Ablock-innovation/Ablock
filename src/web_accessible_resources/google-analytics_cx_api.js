@@ -16,15 +16,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
-    const noopfn = function() {
+    const noopfn = function () {
     };
     window.cxApi = {
-        chooseVariation: function() {
+        chooseVariation: function () {
             return 0;
         },
         getChosenVariation: noopfn,
@@ -32,5 +32,5 @@
         setChosenVariation: noopfn,
         setCookiePath: noopfn,
         setDomainName: noopfn
-        };
+    };
 })();

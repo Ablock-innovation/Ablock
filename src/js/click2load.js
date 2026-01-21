@@ -16,42 +16,42 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 /******************************************************************************/
 
-(( ) => {
+(() => {
 
-/******************************************************************************/
+    /******************************************************************************/
 
-if ( typeof vAPI !== 'object' ) { return; }
+    if (typeof vAPI !== 'object') { return; }
 
-const url = new URL(self.location.href);
-const actualURL = url.searchParams.get('url');
-const frameURL = url.searchParams.get('aliasURL') || actualURL;
-const frameURLElem = document.getElementById('frameURL');
+    const url = new URL(self.location.href);
+    const actualURL = url.searchParams.get('url');
+    const frameURL = url.searchParams.get('aliasURL') || actualURL;
+    const frameURLElem = document.getElementById('frameURL');
 
-frameURLElem.children[0].textContent = actualURL;
+    frameURLElem.children[0].textContent = actualURL;
 
-frameURLElem.children[1].href = frameURL;
-frameURLElem.children[1].title = frameURL;
+    frameURLElem.children[1].href = frameURL;
+    frameURLElem.children[1].title = frameURL;
 
-document.body.setAttribute('title', actualURL);
+    document.body.setAttribute('title', actualURL);
 
-document.body.addEventListener('click', ev => {
-    if ( ev.isTrusted === false ) { return; }
-    if ( ev.target.closest('#frameURL') !== null ) { return; }
-    vAPI.messaging.send('default', {
-        what: 'clickToLoad',
-        frameURL,
-    }).then(ok => {
-        if ( ok !== true ) { return; }
-        self.location.replace(frameURL);
+    document.body.addEventListener('click', ev => {
+        if (ev.isTrusted === false) { return; }
+        if (ev.target.closest('#frameURL') !== null) { return; }
+        vAPI.messaging.send('default', {
+            what: 'clickToLoad',
+            frameURL,
+        }).then(ok => {
+            if (ok !== true) { return; }
+            self.location.replace(frameURL);
+        });
     });
-});
 
-/******************************************************************************/
+    /******************************************************************************/
 
 })();

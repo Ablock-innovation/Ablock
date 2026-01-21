@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* global CodeMirror, uBlockDashboard */
@@ -58,9 +58,9 @@ const sensitiveKeys = [
 /******************************************************************************/
 
 function removeKey(data, prop) {
-    if ( data instanceof Object === false ) { return; }
+    if (data instanceof Object === false) { return; }
     const pos = prop.indexOf('.');
-    if ( pos !== -1 ) {
+    if (pos !== -1) {
         const key = prop.slice(0, pos);
         return removeKey(data[key], prop.slice(pos + 1));
     }
@@ -68,15 +68,15 @@ function removeKey(data, prop) {
 }
 
 function redactValue(data, prop) {
-    if ( data instanceof Object === false ) { return; }
+    if (data instanceof Object === false) { return; }
     const pos = prop.indexOf('.');
-    if ( pos !== -1 ) {
+    if (pos !== -1) {
         return redactValue(data[prop.slice(0, pos)], prop.slice(pos + 1));
     }
     let value = data[prop];
-    if ( value === undefined ) { return; }
-    if ( Array.isArray(value) ) {
-        if ( value.length !== 0 ) {
+    if (value === undefined) { return; }
+    if (Array.isArray(value)) {
+        if (value.length !== 0) {
             value = `[array of ${value.length} redacted]`;
         } else {
             value = '[empty]';
@@ -88,35 +88,35 @@ function redactValue(data, prop) {
 }
 
 function redactKeys(data, prop) {
-    if ( data instanceof Object === false ) { return; }
+    if (data instanceof Object === false) { return; }
     const pos = prop.indexOf('.');
-    if ( pos !== -1 ) {
+    if (pos !== -1) {
         return redactKeys(data[prop.slice(0, pos)], prop.slice(pos + 1));
     }
     const obj = data[prop];
-    if ( obj instanceof Object === false ) { return; }
+    if (obj instanceof Object === false) { return; }
     let count = 1;
-    for ( const key in obj ) {
-        if ( key.startsWith('file://') === false ) { continue; }
+    for (const key in obj) {
+        if (key.startsWith('file://') === false) { continue; }
         const newkey = `[list name ${count} redacted]`;
         obj[newkey] = obj[key];
-        obj[key] = undefined; 
+        obj[key] = undefined;
         count += 1;
     }
 }
 
 function patchEmptiness(data, prop) {
     const entry = data[prop];
-    if ( Array.isArray(entry) && entry.length === 0 ) {
+    if (Array.isArray(entry) && entry.length === 0) {
         data[prop] = '[empty]';
         return;
     }
-    if ( entry instanceof Object === false ) { return; }
-    if ( Object.keys(entry).length === 0 ) {
+    if (entry instanceof Object === false) { return; }
+    if (Object.keys(entry).length === 0) {
         data[prop] = '[none]';
         return;
     }
-    for ( const key in entry ) {
+    for (const key in entry) {
         patchEmptiness(entry, key);
     }
 }
@@ -137,19 +137,19 @@ function addDetailsToReportURL(id, collapse = false) {
 
 function renderData(data, depth = 0) {
     const indent = ' '.repeat(depth);
-    if ( Array.isArray(data) ) {
+    if (Array.isArray(data)) {
         const out = [];
-        for ( const value of data ) {
+        for (const value of data) {
             out.push(renderData(value, depth));
         }
         return out.join('\n');
     }
-    if ( typeof data !== 'object' || data === null ) {
+    if (typeof data !== 'object' || data === null) {
         return `${indent}${data}`;
     }
     const out = [];
-    for ( const [ name, value ] of Object.entries(data) ) {
-        if ( typeof value === 'object' && value !== null ) {
+    for (const [name, value] of Object.entries(data)) {
+        if (typeof value === 'object' && value !== null) {
             out.push(`${indent}${name}:`);
             out.push(renderData(value, depth + 1));
             continue;
@@ -166,14 +166,14 @@ async function showSupportData() {
     const shownData = JSON.parse(JSON.stringify(supportData));
     uselessKeys.forEach(prop => { removeKey(shownData, prop); });
     const redacted = true;
-    if ( redacted ) {
+    if (redacted) {
         sensitiveValues.forEach(prop => { redactValue(shownData, prop); });
         sensitiveKeys.forEach(prop => { redactKeys(shownData, prop); });
     }
-    for ( const prop in shownData ) {
+    for (const prop in shownData) {
         patchEmptiness(shownData, prop);
     }
-    if ( reportedPage !== null ) {
+    if (reportedPage !== null) {
         shownData.popupPanel = reportedPage.popupPanel;
     }
     const text = renderData(shownData);
@@ -186,31 +186,31 @@ async function showSupportData() {
 
 /******************************************************************************/
 
-const reportedPage = (( ) => {
+const reportedPage = (() => {
     const url = new URL(window.location.href);
     try {
         const pageURL = url.searchParams.get('pageURL');
-        if ( pageURL === null ) { return null; }
+        if (pageURL === null) { return null; }
         const parsedURL = new URL(pageURL);
         parsedURL.username = '';
         parsedURL.password = '';
         parsedURL.hash = '';
         const select = qs$('select[name="url"]');
         dom.text(select.options[0], parsedURL.href);
-        if ( parsedURL.search !== '' ) {
+        if (parsedURL.search !== '') {
             const option = dom.create('option');
             parsedURL.search = '';
             dom.text(option, parsedURL.href);
             select.append(option);
         }
-        if ( parsedURL.pathname !== '/' ) {
+        if (parsedURL.pathname !== '/') {
             const option = dom.create('option');
             parsedURL.pathname = '';
             dom.text(option, parsedURL.href);
             select.append(option);
         }
         const shouldUpdateLists = url.searchParams.get('shouldUpdateLists');
-        if ( shouldUpdateLists !== null ) {
+        if (shouldUpdateLists !== null) {
             dom.body.dataset.shouldUpdateLists = shouldUpdateLists;
         }
         dom.cl.add(dom.body, 'filterIssue');
@@ -233,7 +233,7 @@ function reportSpecificFilterIssue() {
     );
     const issueType = reportSpecificFilterType();
     let title = `${reportedPage.hostname}: ${issueType}`;
-    if ( qs$('#isNSFW').checked ) {
+    if (qs$('#isNSFW').checked) {
         title = `[nsfw] ${title}`;
     }
     githubURL.searchParams.set('title', title);
@@ -250,7 +250,7 @@ function reportSpecificFilterIssue() {
 }
 
 async function updateFilterLists() {
-    if ( dom.body.dataset.shouldUpdateLists === undefined ) { return false; }
+    if (dom.body.dataset.shouldUpdateLists === undefined) { return false; }
     dom.cl.add(dom.body, 'updating');
     const assetKeys = JSON.parse(dom.body.dataset.shouldUpdateLists);
     vAPI.messaging.send('dashboard', { what: 'supportUpdateNow', assetKeys });
@@ -269,13 +269,13 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
 
 /******************************************************************************/
 
-(async ( ) => {
+(async () => {
     await showSupportData();
 
     dom.on('[data-url]', 'click', ev => {
         const elem = ev.target.closest('[data-url]');
         const url = dom.attr(elem, 'data-url');
-        if ( typeof url !== 'string' || url === '' ) { return; }
+        if (typeof url !== 'string' || url === '') { return; }
         vAPI.messaging.send('default', {
             what: 'gotoURL',
             details: { url, select: true, index: -1, shiftKey: ev.shiftKey },
@@ -283,10 +283,10 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
         ev.preventDefault();
     });
 
-    if ( reportedPage !== null ) {
-        if ( dom.body.dataset.shouldUpdateLists ) {
+    if (reportedPage !== null) {
+        if (dom.body.dataset.shouldUpdateLists) {
             dom.on('.supportEntry.shouldUpdate button', 'click', ev => {
-                if ( updateFilterLists() === false ) { return; }
+                if (updateFilterLists() === false) { return; }
                 ev.preventDefault();
             });
         }
@@ -315,18 +315,18 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
     }
 
     onBroadcast(msg => {
-        if ( msg.what === 'assetsUpdated' ) {
+        if (msg.what === 'assetsUpdated') {
             dom.cl.remove(dom.body, 'updating');
             dom.cl.add(dom.body, 'updated');
             return;
         }
-        if ( msg.what === 'staticFilteringDataChanged' ) {
+        if (msg.what === 'staticFilteringDataChanged') {
             showSupportData();
             return;
         }
     });
 
-    dom.on('#selectAllButton', 'click', ( ) => {
+    dom.on('#selectAllButton', 'click', () => {
         cmEditor.focus();
         cmEditor.execCommand('selectAll');
     });

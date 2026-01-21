@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -35,19 +35,19 @@ let listsetDetails = {};
 /******************************************************************************/
 
 onBroadcast(msg => {
-    switch ( msg.what ) {
-    case 'assetUpdated':
-        updateAssetStatus(msg);
-        break;
-    case 'assetsUpdated':
-        dom.cl.remove(dom.body, 'updating');
-        renderWidgets();
-        break;
-    case 'staticFilteringDataChanged':
-        renderFilterLists();
-        break;
-    default:
-        break;
+    switch (msg.what) {
+        case 'assetUpdated':
+            updateAssetStatus(msg);
+            break;
+        case 'assetsUpdated':
+            dom.cl.remove(dom.body, 'updating');
+            renderWidgets();
+            break;
+        case 'staticFilteringDataChanged':
+            renderFilterLists();
+            break;
+        default:
+            break;
     }
 });
 
@@ -60,31 +60,31 @@ const renderNumber = value => {
 const listStatsTemplate = i18n$('3pListsOfBlockedHostsPerListStats');
 
 const renderLeafStats = (used, total) => {
-    if ( isNaN(used) || isNaN(total) ) { return ''; }
+    if (isNaN(used) || isNaN(total)) { return ''; }
     return listStatsTemplate
         .replace('{{used}}', renderNumber(used))
         .replace('{{total}}', renderNumber(total));
 };
 
 const renderNodeStats = (used, total) => {
-    if ( isNaN(used) || isNaN(total) ) { return ''; }
+    if (isNaN(used) || isNaN(total)) { return ''; }
     return `${used.toLocaleString()}/${total.toLocaleString()}`;
 };
 
 const i18nGroupName = name => {
     const groupname = i18n$('3pGroup' + name.charAt(0).toUpperCase() + name.slice(1));
-    if ( groupname !== '' ) { return groupname; }
+    if (groupname !== '') { return groupname; }
     return `${name.charAt(0).toLocaleUpperCase}${name.slice(1)}`;
 };
 
 /******************************************************************************/
 
-const renderFilterLists = ( ) => {
+const renderFilterLists = () => {
     // Assemble a pretty list name if possible
     const listNameFromListKey = listkey => {
         const list = listsetDetails.current[listkey] || listsetDetails.available[listkey];
         const title = list && list.title || '';
-        if ( title !== '' ) { return title; }
+        if (title !== '') { return title; }
         return listkey;
     };
 
@@ -93,17 +93,17 @@ const renderFilterLists = ( ) => {
         const groupkey = listDetails.group2 || listDetails.group;
         const listEntryPrevious =
             qs$(`[data-key="${groupkey}"] [data-key="${listkey}"]`);
-        if ( listEntryPrevious !== null ) {
-            if ( dom.cl.has(listEntryPrevious, 'checked') ) {
+        if (listEntryPrevious !== null) {
+            if (dom.cl.has(listEntryPrevious, 'checked')) {
                 dom.cl.add(listEntry, 'checked');
             }
-            if ( dom.cl.has(listEntryPrevious, 'stickied') ) {
+            if (dom.cl.has(listEntryPrevious, 'stickied')) {
                 dom.cl.add(listEntry, 'stickied');
             }
-            if ( dom.cl.has(listEntryPrevious, 'toRemove') ) {
+            if (dom.cl.has(listEntryPrevious, 'toRemove')) {
                 dom.cl.add(listEntry, 'toRemove');
             }
-            if ( dom.cl.has(listEntryPrevious, 'searchMatch') ) {
+            if (dom.cl.has(listEntryPrevious, 'searchMatch')) {
                 dom.cl.add(listEntry, 'searchMatch');
             }
         } else {
@@ -115,17 +115,17 @@ const renderFilterLists = ( ) => {
         dom.attr(elem, 'href', 'asset-viewer.html?url=' + encodeURIComponent(listkey));
         dom.attr(elem, 'type', 'text/html');
         dom.cl.remove(listEntry, 'toRemove');
-        if ( listDetails.supportName ) {
+        if (listDetails.supportName) {
             elem = qs$(listEntry, ':scope > .detailbar a.support');
             dom.attr(elem, 'href', listDetails.supportURL || '#');
             dom.attr(elem, 'title', listDetails.supportName);
         }
-        if ( listDetails.external ) {
+        if (listDetails.external) {
             dom.cl.add(listEntry, 'external');
         } else {
             dom.cl.remove(listEntry, 'external');
         }
-        if ( listDetails.instructionURL ) {
+        if (listDetails.instructionURL) {
             elem = qs$(listEntry, ':scope > .detailbar a.mustread');
             dom.attr(elem, 'href', listDetails.instructionURL || '#');
         }
@@ -147,14 +147,14 @@ const renderFilterLists = ( ) => {
         const lastUpdateString = lastUpdateTemplateString.replace('{{ago}}',
             i18n.renderElapsedTimeToString(asset.writeTime || 0)
         );
-        if ( asset.obsolete === true ) {
+        if (asset.obsolete === true) {
             let title = obsoleteTemplateString;
-            if ( asset.cached && asset.writeTime !== 0 ) {
+            if (asset.cached && asset.writeTime !== 0) {
                 title += '\n' + lastUpdateString;
             }
             dom.attr(qs$(listEntry, ':scope > .detailbar .status.obsolete'), 'title', title);
         }
-        if ( asset.cached === true ) {
+        if (asset.cached === true) {
             dom.cl.add(listEntry, 'cached');
             dom.attr(qs$(listEntry, ':scope > .detailbar .status.cache'), 'title', lastUpdateString);
             const timeSinceLastUpdate = Date.now() - asset.writeTime;
@@ -165,10 +165,10 @@ const renderFilterLists = ( ) => {
     };
 
     const createListEntry = (listDetails, depth) => {
-        if ( listDetails.lists === undefined ) {
+        if (listDetails.lists === undefined) {
             return dom.clone('#templates .listEntry[data-role="leaf"]');
         }
-        if ( depth !== 0 ) {
+        if (depth !== 0) {
             return dom.clone('#templates .listEntry[data-role="node"]');
         }
         return dom.clone('#templates .listEntry[data-role="node"][data-parent="root"]');
@@ -177,22 +177,22 @@ const renderFilterLists = ( ) => {
     const createListEntries = (parentkey, listTree, depth = 0) => {
         const listEntries = dom.clone('#templates .listEntries');
         const treeEntries = Object.entries(listTree);
-        if ( depth !== 0 ) {
+        if (depth !== 0) {
             const reEmojis = /\p{Emoji}+/gu;
-            treeEntries.sort((a ,b) => {
+            treeEntries.sort((a, b) => {
                 const ap = a[1].preferred === true;
                 const bp = b[1].preferred === true;
-                if ( ap !== bp ) { return ap ? -1 : 1; }
+                if (ap !== bp) { return ap ? -1 : 1; }
                 const as = (a[1].title || a[0]).replace(reEmojis, '');
                 const bs = (b[1].title || b[0]).replace(reEmojis, '');
                 return as.localeCompare(bs);
             });
         }
-        for ( const [ listkey, listDetails ] of treeEntries ) {
+        for (const [listkey, listDetails] of treeEntries) {
             const listEntry = createListEntry(listDetails, depth);
-            if ( dom.cl.has(dom.root, 'mobile') ) {
+            if (dom.cl.has(dom.root, 'mobile')) {
                 const leafStats = qs$(listEntry, '.leafstats');
-                if ( leafStats ) {
+                if (leafStats) {
                     listEntry.append(leafStats);
                 }
             }
@@ -201,8 +201,8 @@ const renderFilterLists = ( ) => {
             qs$(listEntry, ':scope > .detailbar .listname').append(
                 i18n.patchUnicodeFlags(listDetails.title)
             );
-            if ( listDetails.lists !== undefined ) {
-                listEntry.append(createListEntries(listEntry.dataset.key, listDetails.lists, depth+1));
+            if (listDetails.lists !== undefined) {
+                listEntry.append(createListEntries(listEntry.dataset.key, listDetails.lists, depth + 1));
                 dom.cl.toggle(listEntry, 'expanded', listIsExpanded(listkey));
                 updateListNode(listEntry);
             } else {
@@ -234,25 +234,25 @@ const renderFilterLists = ( ) => {
             'unknown',
             'custom'
         ];
-        for ( const key of groupKeys ) {
+        for (const key of groupKeys) {
             listTree[key] = {
                 title: i18nGroupName(key),
                 lists: {},
             };
         }
-        for ( const [ listkey, listDetails ] of Object.entries(response.available) ) {
+        for (const [listkey, listDetails] of Object.entries(response.available)) {
             let groupkey = listDetails.group2 || listDetails.group;
-            if ( Object.hasOwn(listTree, groupkey) === false ) {
+            if (Object.hasOwn(listTree, groupkey) === false) {
                 groupkey = 'unknown';
             }
             const groupDetails = listTree[groupkey];
-            if ( listDetails.parent !== undefined ) {
+            if (listDetails.parent !== undefined) {
                 let lists = groupDetails.lists;
-                for ( const parent of listDetails.parent.split('|') ) {
-                    if ( lists[parent] === undefined ) {
+                for (const parent of listDetails.parent.split('|')) {
+                    if (lists[parent] === undefined) {
                         lists[parent] = { title: parent, lists: {} };
                     }
-                    if ( listDetails.preferred === true ) {
+                    if (listDetails.preferred === true) {
                         lists[parent].preferred = true;
                     }
                     lists = lists[parent].lists;
@@ -265,10 +265,10 @@ const renderFilterLists = ( ) => {
         }
         // https://github.com/uBlockOrigin/uBlock-issues/issues/3154#issuecomment-1975413427
         //   Remove empty sections
-        for ( const groupkey of groupKeys ) {
+        for (const groupkey of groupKeys) {
             const groupDetails = listTree[groupkey];
-            if ( groupDetails === undefined ) { continue; }
-            if ( Object.keys(groupDetails.lists).length !== 0 ) { continue; }
+            if (groupDetails === undefined) { continue; }
+            if (Object.keys(groupDetails.lists).length !== 0) { continue; }
             delete listTree[groupkey];
         }
 
@@ -289,7 +289,7 @@ const renderFilterLists = ( ) => {
         qs$('#suspendUntilListsAreLoaded').checked =
             listsetDetails.suspendUntilListsAreLoaded === true;
 
-        // https://github.com/gorhill/uBlock/issues/2394
+        // https://github.com/Ablock/Ablock/issues/2394
         dom.cl.toggle(dom.body, 'updating', listsetDetails.isUpdating);
 
         renderWidgets();
@@ -304,7 +304,7 @@ const renderFilterLists = ( ) => {
 
 /******************************************************************************/
 
-const renderWidgets = ( ) => {
+const renderWidgets = () => {
     const updating = dom.cl.has(dom.body, 'updating');
     const hasObsolete = qs$('#lists .listEntry.checked.obsolete:not(.toRemove)') !== null;
     dom.cl.toggle('#buttonApply', 'disabled',
@@ -320,11 +320,11 @@ const renderWidgets = ( ) => {
 
 const updateAssetStatus = details => {
     const listEntry = qs$(`#lists .listEntry[data-key="${details.key}"]`);
-    if ( listEntry === null ) { return; }
+    if (listEntry === null) { return; }
     dom.cl.toggle(listEntry, 'failed', !!details.failed);
     dom.cl.toggle(listEntry, 'obsolete', !details.cached);
     dom.cl.toggle(listEntry, 'cached', !!details.cached);
-    if ( details.cached ) {
+    if (details.cached) {
         dom.attr(qs$(listEntry, '.status.cache'), 'title',
             lastUpdateTemplateString.replace('{{ago}}', i18n.renderElapsedTimeToString(Date.now()))
         );
@@ -345,30 +345,30 @@ const updateAssetStatus = details => {
 
 let filteringSettingsHash = '';
 
-const hashFromListsetDetails = ( ) => {
+const hashFromListsetDetails = () => {
     const hashParts = [
         listsetDetails.parseCosmeticFilters === true,
         listsetDetails.ignoreGenericCosmeticFilters === true,
     ];
     const listHashes = [];
-    for ( const [ listkey, listDetails ] of Object.entries(listsetDetails.available) ) {
-        if ( listDetails.off === true ) { continue; }
+    for (const [listkey, listDetails] of Object.entries(listsetDetails.available)) {
+        if (listDetails.off === true) { continue; }
         listHashes.push(listkey);
     }
-    hashParts.push( listHashes.sort().join(), '', false);
+    hashParts.push(listHashes.sort().join(), '', false);
     filteringSettingsHash = hashParts.join();
 };
 
-const hashFromCurrentFromSettings = ( ) => {
+const hashFromCurrentFromSettings = () => {
     const hashParts = [
         qs$('#parseCosmeticFilters').checked,
         qs$('#ignoreGenericCosmeticFilters').checked,
     ];
     const listHashes = [];
     const listEntries = qsa$('#lists .listEntry[data-key]:not(.toRemove)');
-    for ( const liEntry of listEntries ) {
-        if ( liEntry.dataset.role !== 'leaf' ) { continue; }
-        if ( dom.cl.has(liEntry, 'checked') === false ) { continue; }
+    for (const liEntry of listEntries) {
+        if (liEntry.dataset.role !== 'leaf') { continue; }
+        if (dom.cl.has(liEntry, 'checked') === false) { continue; }
         listHashes.push(liEntry.dataset.key);
     }
     const textarea = qs$('#lists .listEntry[data-role="import"].expanded textarea');
@@ -384,7 +384,7 @@ const hashFromCurrentFromSettings = ( ) => {
 
 const onListsetChanged = ev => {
     const input = ev.target.closest('input');
-    if ( input === null ) { return; }
+    if (input === null) { return; }
     toggleFilterList(input, input.checked, true);
 };
 
@@ -392,11 +392,11 @@ dom.on('#lists', 'change', '.listEntry > .detailbar input', onListsetChanged);
 
 const toggleFilterList = (elem, on, ui = false) => {
     const listEntry = elem.closest('.listEntry');
-    if ( listEntry === null ) { return; }
-    if ( listEntry.dataset.parent === 'root' ) { return; }
+    if (listEntry === null) { return; }
+    if (listEntry.dataset.parent === 'root') { return; }
     const searchMode = dom.cl.has('#lists', 'searchMode');
     const input = qs$(listEntry, ':scope > .detailbar input');
-    if ( on === undefined ) {
+    if (on === undefined) {
         on = input.checked === false;
     }
     input.checked = on;
@@ -407,7 +407,7 @@ const toggleFilterList = (elem, on, ui = false) => {
     const childListEntries = searchMode
         ? qsa$(listEntry, '.listEntry.searchMatch')
         : qsa$(listEntry, '.listEntry');
-    for ( const descendantList of childListEntries ) {
+    for (const descendantList of childListEntries) {
         dom.cl.toggle(descendantList, 'checked', on);
         qs$(descendantList, ':scope > .detailbar input').checked = on;
     }
@@ -418,8 +418,8 @@ const toggleFilterList = (elem, on, ui = false) => {
 };
 
 const updateListNode = listNode => {
-    if ( listNode === null ) { return; }
-    if ( listNode.dataset.role !== 'node' ) { return; }
+    if (listNode === null) { return; }
+    if (listNode.dataset.role !== 'node') { return; }
     const checkedListLeaves = qsa$(listNode, '.listEntry[data-role="leaf"].checked');
     const allListLeaves = qsa$(listNode, '.listEntry[data-role="leaf"]');
     dom.text(qs$(listNode, '.nodestats'),
@@ -428,14 +428,14 @@ const updateListNode = listNode => {
     dom.cl.toggle(listNode, 'searchMatch',
         qs$(listNode, ':scope > .listEntries > .listEntry.searchMatch') !== null
     );
-    if ( listNode.dataset.parent === 'root' ) { return; }
+    if (listNode.dataset.parent === 'root') { return; }
     let usedFilterCount = 0;
     let totalFilterCount = 0;
     let isCached = false;
     let isObsolete = false;
     let latestWriteTime = 0;
     let oldestWriteTime = Number.MAX_SAFE_INTEGER;
-    for ( const listLeaf of checkedListLeaves ) {
+    for (const listLeaf of checkedListLeaves) {
         const listkey = listLeaf.dataset.key;
         const listDetails = listsetDetails.available[listkey];
         usedFilterCount += listDetails.off ? 0 : listDetails.entryUsedCount || 0;
@@ -459,7 +459,7 @@ const updateListNode = listNode => {
         renderLeafStats(usedFilterCount, totalFilterCount)
     );
     const firstLeaf = qs$(listNode, '.listEntry[data-role="leaf"]');
-    if ( firstLeaf !== null ) {
+    if (firstLeaf !== null) {
         dom.attr(qs$(listNode, ':scope > .detailbar a.support'), 'href',
             dom.attr(qs$(firstLeaf, ':scope > .detailbar a.support'), 'href') || '#'
         );
@@ -469,22 +469,22 @@ const updateListNode = listNode => {
     }
     dom.cl.toggle(listNode, 'cached', isCached);
     dom.cl.toggle(listNode, 'obsolete', isObsolete);
-    if ( isCached ) {
+    if (isCached) {
         dom.attr(qs$(listNode, ':scope > .detailbar .cache'), 'title',
             lastUpdateTemplateString.replace('{{ago}}', i18n.renderElapsedTimeToString(latestWriteTime))
         );
         dom.cl.toggle(listNode, 'recent', (Date.now() - oldestWriteTime) < recentlyUpdated);
     }
-    if ( qs$(listNode, '.listEntry.isDefault') !== null ) {
+    if (qs$(listNode, '.listEntry.isDefault') !== null) {
         dom.cl.add(listNode, 'isDefault');
     }
-    if ( qs$(listNode, '.listEntry.stickied') !== null ) {
+    if (qs$(listNode, '.listEntry.stickied') !== null) {
         dom.cl.add(listNode, 'stickied');
     }
 };
 
 const updateAncestorListNodes = (listEntry, fn) => {
-    while ( listEntry !== null ) {
+    while (listEntry !== null) {
         fn(listEntry);
         listEntry = qs$(`.listEntry[data-key="${listEntry.dataset.parent}"]`);
     }
@@ -492,7 +492,7 @@ const updateAncestorListNodes = (listEntry, fn) => {
 
 /******************************************************************************/
 
-const onFilteringSettingsChanged = ( ) => {
+const onFilteringSettingsChanged = () => {
     renderWidgets();
 };
 
@@ -504,7 +504,7 @@ dom.on('#lists', 'input', '[data-role="import"] textarea', onFilteringSettingsCh
 
 const onRemoveExternalList = ev => {
     const listEntry = ev.target.closest('[data-key]');
-    if ( listEntry === null ) { return; }
+    if (listEntry === null) { return; }
     dom.cl.toggle(listEntry, 'toRemove');
     renderWidgets();
 };
@@ -516,10 +516,10 @@ dom.on('#lists', 'click', '.listEntry .remove', onRemoveExternalList);
 const onPurgeClicked = ev => {
     const liEntry = ev.target.closest('[data-key]');
     const listkey = liEntry.dataset.key || '';
-    if ( listkey === '' ) { return; }
+    if (listkey === '') { return; }
 
-    const assetKeys = [ listkey ];
-    for ( const listLeaf of qsa$(liEntry, '[data-role="leaf"]') ) {
+    const assetKeys = [listkey];
+    for (const listLeaf of qsa$(liEntry, '[data-role="leaf"]')) {
         assetKeys.push(listLeaf.dataset.key);
         dom.cl.add(listLeaf, 'obsolete');
         dom.cl.remove(listLeaf, 'cached');
@@ -533,13 +533,13 @@ const onPurgeClicked = ev => {
 
     // If the cached version is purged, the installed version must be assumed
     // to be obsolete.
-    // https://github.com/gorhill/uBlock/issues/1733
+    // https://github.com/Ablock/Ablock/issues/1733
     //   An external filter list must not be marked as obsolete, they will
     //   always be fetched anyways if there is no cached copy.
     dom.cl.add(dom.body, 'updating');
     dom.cl.add(liEntry, 'obsolete');
 
-    if ( qs$(liEntry, 'input[type="checkbox"]').checked ) {
+    if (qs$(liEntry, 'input[type="checkbox"]').checked) {
         renderWidgets();
     }
 };
@@ -548,25 +548,25 @@ dom.on('#lists', 'click', 'span.cache', onPurgeClicked);
 
 /******************************************************************************/
 
-const selectFilterLists = async ( ) => {
+const selectFilterLists = async () => {
     // External filter lists to import
     // Find stock list matching entries in lists to import
-    const toImport = (( ) => {
+    const toImport = (() => {
         const textarea = qs$('#lists .listEntry[data-role="import"].expanded textarea');
-        if ( textarea === null ) { return ''; }
+        if (textarea === null) { return ''; }
         const lists = listsetDetails.available;
         const lines = textarea.value.split(/\s+/);
         const after = [];
-        for ( const line of lines ) {
+        for (const line of lines) {
             after.push(line);
-            if ( /^https?:\/\//.test(line) === false ) { continue; }
-            for ( const [ listkey, list ] of Object.entries(lists) ) {
-                if ( list.content !== 'filters' ) { continue; }
-                if ( list.contentURL === undefined ) { continue; }
-                if ( list.contentURL.includes(line) === false ) { continue; }
+            if (/^https?:\/\//.test(line) === false) { continue; }
+            for (const [listkey, list] of Object.entries(lists)) {
+                if (list.content !== 'filters') { continue; }
+                if (list.contentURL === undefined) { continue; }
+                if (list.contentURL.includes(line) === false) { continue; }
                 const groupkey = list.group2 || list.group;
                 const listEntry = qs$(`[data-key="${groupkey}"] [data-key="${listkey}"]`);
-                if ( listEntry === null ) { break; }
+                if (listEntry === null) { break; }
                 toggleFilterList(listEntry, true);
                 after.pop();
                 break;
@@ -597,18 +597,18 @@ const selectFilterLists = async ( ) => {
     // Filter lists to remove/select
     const toSelect = [];
     const toRemove = [];
-    for ( const liEntry of qsa$('#lists .listEntry[data-role="leaf"]') ) {
+    for (const liEntry of qsa$('#lists .listEntry[data-role="leaf"]')) {
         const listkey = liEntry.dataset.key;
-        if ( Object.hasOwn(listsetDetails.available, listkey) === false ) {
+        if (Object.hasOwn(listsetDetails.available, listkey) === false) {
             continue;
         }
         const listDetails = listsetDetails.available[listkey];
-        if ( dom.cl.has(liEntry, 'toRemove') ) {
+        if (dom.cl.has(liEntry, 'toRemove')) {
             toRemove.push(listkey);
             listDetails.off = true;
             continue;
         }
-        if ( dom.cl.has(liEntry, 'checked') ) {
+        if (dom.cl.has(liEntry, 'checked')) {
             toSelect.push(listkey);
             listDetails.off = false;
         } else {
@@ -628,7 +628,7 @@ const selectFilterLists = async ( ) => {
 
 /******************************************************************************/
 
-const buttonApplyHandler = async ( ) => {
+const buttonApplyHandler = async () => {
     await selectFilterLists();
     dom.cl.add(dom.body, 'working');
     dom.cl.remove('#lists .listEntry.stickied', 'stickied');
@@ -637,11 +637,11 @@ const buttonApplyHandler = async ( ) => {
     dom.cl.remove(dom.body, 'working');
 };
 
-dom.on('#buttonApply', 'click', ( ) => { buttonApplyHandler(); });
+dom.on('#buttonApply', 'click', () => { buttonApplyHandler(); });
 
 /******************************************************************************/
 
-const buttonUpdateHandler = async ( ) => {
+const buttonUpdateHandler = async () => {
     dom.cl.remove('#lists .listEntry.stickied', 'stickied');
     await selectFilterLists();
     dom.cl.add(dom.body, 'updating');
@@ -649,11 +649,11 @@ const buttonUpdateHandler = async ( ) => {
     vAPI.messaging.send('dashboard', { what: 'updateNow' });
 };
 
-dom.on('#buttonUpdate', 'click', ( ) => { buttonUpdateHandler(); });
+dom.on('#buttonUpdate', 'click', () => { buttonUpdateHandler(); });
 
 /******************************************************************************/
 
-const userSettingCheckboxChanged = ( ) => {
+const userSettingCheckboxChanged = () => {
     const target = event.target;
     vAPI.messaging.send('dashboard', {
         what: 'userSettings',
@@ -668,34 +668,34 @@ dom.on('#suspendUntilListsAreLoaded', 'change', userSettingCheckboxChanged);
 
 /******************************************************************************/
 
-const searchFilterLists = ( ) => {
+const searchFilterLists = () => {
     const pattern = dom.prop('.searchfield input', 'value') || '';
     dom.cl.toggle('#lists', 'searchMode', pattern !== '');
-    if ( pattern === '' ) { return; }
+    if (pattern === '') { return; }
     const reflectSearchMatches = listEntry => {
-        if ( listEntry.dataset.role !== 'node' ) { return; }
+        if (listEntry.dataset.role !== 'node') { return; }
         dom.cl.toggle(listEntry, 'searchMatch',
             qs$(listEntry, ':scope > .listEntries > .listEntry.searchMatch') !== null
         );
     };
     const toI18n = tags => {
-        if ( tags === '' ) { return ''; }
+        if (tags === '') { return ''; }
         return tags.toLowerCase().split(/\s+/).reduce((a, v) => {
             let s = i18n$(v);
-            if ( s === '' ) {
+            if (s === '') {
                 s = i18nGroupName(v);
-                if ( s === '' ) { return a; }
+                if (s === '') { return a; }
             }
             return `${a} ${s}`.trim();
         }, '');
     };
     const re = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    for ( const listEntry of qsa$('#lists [data-role="leaf"]') ) {
+    for (const listEntry of qsa$('#lists [data-role="leaf"]')) {
         const listkey = listEntry.dataset.key;
         const listDetails = listsetDetails.available[listkey];
-        if ( listDetails === undefined ) { continue; }
+        if (listDetails === undefined) { continue; }
         let haystack = perListHaystack.get(listDetails);
-        if ( haystack === undefined ) {
+        if (haystack === undefined) {
             const groupkey = listDetails.group2 || listDetails.group || '';
             haystack = [
                 listDetails.title,
@@ -727,7 +727,7 @@ const listIsExpanded = which => {
 };
 
 const applyListExpansion = listkeys => {
-    if ( listkeys === undefined ) {
+    if (listkeys === undefined) {
         listkeys = Array.from(expandedListSet);
     }
     expandedListSet.clear();
@@ -740,8 +740,8 @@ const applyListExpansion = listkeys => {
 
 const toggleListExpansion = which => {
     const isExpanded = expandedListSet.has(which);
-    if ( which === '*' ) {
-        if ( isExpanded ) {
+    if (which === '*') {
+        if (isExpanded) {
             expandedListSet.clear();
             dom.cl.remove('#lists .expandable', 'expanded');
             dom.cl.remove('#lists .stickied', 'stickied');
@@ -749,19 +749,19 @@ const toggleListExpansion = which => {
             expandedListSet.clear();
             expandedListSet.add('*');
             dom.cl.add('#lists .rootstats', 'expanded');
-            for ( const expandable of qsa$('#lists > .listEntries .expandable') ) {
+            for (const expandable of qsa$('#lists > .listEntries .expandable')) {
                 const listkey = expandable.dataset.key || '';
-                if ( listkey === '' ) { continue; }
+                if (listkey === '') { continue; }
                 expandedListSet.add(listkey);
                 dom.cl.add(expandable, 'expanded');
             }
         }
     } else {
-        if ( isExpanded ) {
+        if (isExpanded) {
             expandedListSet.delete(which);
             const listNode = qs$(`#lists > .listEntries [data-key="${which}"]`);
             dom.cl.remove(listNode, 'expanded');
-            if ( listNode.dataset.parent === 'root' ) {
+            if (listNode.dataset.parent === 'root') {
                 dom.cl.remove(qsa$(listNode, '.stickied'), 'stickied');
             }
         } else {
@@ -773,19 +773,19 @@ const toggleListExpansion = which => {
     vAPI.localStorage.removeItem('hideUnusedFilterLists');
 };
 
-dom.on('#listsOfBlockedHostsPrompt', 'click', ( ) => {
+dom.on('#listsOfBlockedHostsPrompt', 'click', () => {
     toggleListExpansion('*');
 });
 
 dom.on('#lists', 'click', '.listExpander', ev => {
     const expandable = ev.target.closest('.expandable');
-    if ( expandable === null ) { return; }
+    if (expandable === null) { return; }
     const which = expandable.dataset.key;
-    if ( which !== undefined ) {
+    if (which !== undefined) {
         toggleListExpansion(which);
     } else {
         dom.cl.toggle(expandable, 'expanded');
-        if ( expandable.dataset.role === 'import' ) {
+        if (expandable.dataset.role === 'import') {
             onFilteringSettingsChanged();
         }
     }
@@ -794,32 +794,32 @@ dom.on('#lists', 'click', '.listExpander', ev => {
 
 dom.on('#lists', 'click', '[data-parent="root"] > .detailbar .listname', ev => {
     const listEntry = ev.target.closest('.listEntry');
-    if ( listEntry === null ) { return; }
+    if (listEntry === null) { return; }
     const listkey = listEntry.dataset.key;
-    if ( listkey === undefined ) { return; }
+    if (listkey === undefined) { return; }
     toggleListExpansion(listkey);
     ev.preventDefault();
 });
 
 dom.on('#lists', 'click', '[data-role="import"] > .detailbar .listname', ev => {
     const expandable = ev.target.closest('.listEntry');
-    if ( expandable === null ) { return; }
+    if (expandable === null) { return; }
     dom.cl.toggle(expandable, 'expanded');
     ev.preventDefault();
 });
 
 dom.on('#lists', 'click', '.listEntry > .detailbar .nodestats', ev => {
     const listEntry = ev.target.closest('.listEntry');
-    if ( listEntry === null ) { return; }
+    if (listEntry === null) { return; }
     const listkey = listEntry.dataset.key;
-    if ( listkey === undefined ) { return; }
+    if (listkey === undefined) { return; }
     toggleListExpansion(listkey);
     ev.preventDefault();
 });
 
 // Initialize from saved state.
 vAPI.localStorage.getItemAsync('expandedListSet').then(listkeys => {
-    if ( Array.isArray(listkeys) === false ) { return; }
+    if (Array.isArray(listkeys) === false) { return; }
     applyListExpansion(listkeys);
 });
 
@@ -835,7 +835,7 @@ self.cloud.onPush = function toCloudData() {
     };
 
     const liEntries = qsa$('#lists .listEntry.checked[data-role="leaf"]');
-    for ( const liEntry of liEntries ) {
+    for (const liEntry of liEntries) {
         bin.selectedLists.push(liEntry.dataset.key);
     }
 
@@ -843,7 +843,7 @@ self.cloud.onPush = function toCloudData() {
 };
 
 self.cloud.onPull = function fromCloudData(data, append) {
-    if ( typeof data !== 'object' || data === null ) { return; }
+    if (typeof data !== 'object' || data === null) { return; }
 
     let elem = qs$('#parseCosmeticFilters');
     let checked = data.parseCosmeticFilters === true || append && elem.checked;
@@ -854,26 +854,26 @@ self.cloud.onPull = function fromCloudData(data, append) {
     elem.checked = listsetDetails.ignoreGenericCosmeticFilters = checked;
 
     const selectedSet = new Set(data.selectedLists);
-    for ( const listEntry of qsa$('#lists .listEntry[data-role="leaf"]') ) {
+    for (const listEntry of qsa$('#lists .listEntry[data-role="leaf"]')) {
         const listkey = listEntry.dataset.key;
         const mustEnable = selectedSet.has(listkey);
         selectedSet.delete(listkey);
-        if ( mustEnable === false && append ) { continue; }
+        if (mustEnable === false && append) { continue; }
         toggleFilterList(listEntry, mustEnable);
     }
 
     // If there are URL-like list keys left in the selected set, import them.
-    for ( const listkey of selectedSet ) {
-        if ( reValidExternalList.test(listkey) ) { continue; }
+    for (const listkey of selectedSet) {
+        if (reValidExternalList.test(listkey)) { continue; }
         selectedSet.delete(listkey);
     }
-    if ( selectedSet.size !== 0 ) {
+    if (selectedSet.size !== 0) {
         const textarea = qs$('#lists .listEntry[data-role="import"] textarea');
         const lines = append
             ? textarea.value.split(/[\n\r]+/)
             : [];
         lines.push(...selectedSet);
-        if ( lines.length !== 0 ) { lines.push(''); }
+        if (lines.length !== 0) { lines.push(''); }
         textarea.value = lines.join('\n');
         dom.cl.toggle('#lists .listEntry[data-role="import"]', 'expanded', textarea.value !== '');
     }
@@ -883,19 +883,19 @@ self.cloud.onPull = function fromCloudData(data, append) {
 
 /******************************************************************************/
 
-self.wikilink = 'https://github.com/gorhill/uBlock/wiki/Dashboard:-Filter-lists';
+self.wikilink = 'https://github.com/Ablock/Ablock/wiki/Dashboard:-Filter-lists';
 
-self.hasUnsavedData = function() {
+self.hasUnsavedData = function () {
     return hashFromCurrentFromSettings() !== filteringSettingsHash;
 };
 
 /******************************************************************************/
 
-renderFilterLists().then(( ) => {
+renderFilterLists().then(() => {
     const buttonUpdate = qs$('#buttonUpdate');
-    if ( dom.cl.has(buttonUpdate, 'active') ) { return; }
-    if ( dom.cl.has(buttonUpdate, 'disabled') ) { return; }
-    if ( listsetDetails.autoUpdate !== true ) { return; }
+    if (dom.cl.has(buttonUpdate, 'active')) { return; }
+    if (dom.cl.has(buttonUpdate, 'disabled')) { return; }
+    if (listsetDetails.autoUpdate !== true) { return; }
     buttonUpdateHandler();
 });
 

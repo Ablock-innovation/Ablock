@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -52,20 +52,20 @@ function trustedCreateHTML(
     htmlStr = '',
     durationStr = ''
 ) {
-    if ( parentSelector === '' ) { return; }
-    if ( htmlStr === '' ) { return; }
+    if (parentSelector === '') { return; }
+    if (htmlStr === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('trusted-create-html', parentSelector, htmlStr, durationStr);
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 3);
     // We do not want to recursively create elements
     self.trustedCreateHTML = true;
     let ancestor = self.frameElement;
-    while ( ancestor !== null ) {
+    while (ancestor !== null) {
         const doc = ancestor.ownerDocument;
-        if ( doc === null ) { break; }
+        if (doc === null) { break; }
         const win = doc.defaultView;
-        if ( win === null ) { break; }
-        if ( win.trustedCreateHTML ) { return; }
+        if (win === null) { break; }
+        if (win.trustedCreateHTML) { return; }
         ancestor = ancestor.frameElement;
     }
     const duration = parseInt(durationStr, 10);
@@ -73,47 +73,47 @@ function trustedCreateHTML(
     const externalDoc = domParser.parseFromString(htmlStr, 'text/html');
     const docFragment = new DocumentFragment();
     const toRemove = [];
-    while ( externalDoc.body.firstChild !== null ) {
+    while (externalDoc.body.firstChild !== null) {
         const imported = document.adoptNode(externalDoc.body.firstChild);
         docFragment.appendChild(imported);
-        if ( isNaN(duration) ) { continue; }
+        if (isNaN(duration)) { continue; }
         toRemove.push(imported);
     }
-    if ( docFragment.firstChild === null ) { return; }
-    const remove = ( ) => {
-        for ( const node of toRemove ) {
-            if ( node.parentNode === null ) { continue; }
+    if (docFragment.firstChild === null) { return; }
+    const remove = () => {
+        for (const node of toRemove) {
+            if (node.parentNode === null) { continue; }
             node.parentNode.removeChild(node);
         }
         safe.uboLog(logPrefix, 'Node(s) removed');
     };
-    const append = ( ) => {
+    const append = () => {
         const parent = document.querySelector(parentSelector);
-        if ( parent === null ) { return false; }
+        if (parent === null) { return false; }
         parent.append(docFragment);
         safe.uboLog(logPrefix, 'Node(s) appended');
-        if ( toRemove.length === 0 ) { return true; }
+        if (toRemove.length === 0) { return true; }
         setTimeout(remove, duration);
         return true;
     };
-    const start = ( ) => {
-        if ( append() ) { return; }
-        const observer = new MutationObserver(( ) => {
-            if ( append() === false ) { return; }
+    const start = () => {
+        if (append()) { return; }
+        const observer = new MutationObserver(() => {
+            if (append() === false) { return; }
             observer.disconnect();
         });
         const observerOptions = {
             childList: true,
             subtree: true,
         };
-        if ( /[#.[]/.test(parentSelector) ) {
+        if (/[#.[]/.test(parentSelector)) {
             observerOptions.attributes = true;
-            if ( parentSelector.includes('[') === false ) {
+            if (parentSelector.includes('[') === false) {
                 observerOptions.attributeFilter = [];
-                if ( parentSelector.includes('#') ) {
+                if (parentSelector.includes('#')) {
                     observerOptions.attributeFilter.push('id');
                 }
-                if ( parentSelector.includes('.') ) {
+                if (parentSelector.includes('.')) {
                     observerOptions.attributeFilter.push('class');
                 }
             }

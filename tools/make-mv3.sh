@@ -60,12 +60,12 @@ mkdir -p "$UBOL_DIR"/js
 mkdir -p "$UBOL_DIR"/img
 
 if [ -n "$UBO_VERSION" ]; then
-    UBO_REPO="https://github.com/gorhill/uBlock.git"
+    UBO_REPO="https://github.com/Ablock/Ablock.git"
     UBO_DIR=$(mktemp -d)
     echo "*** uBOLite.mv3: Fetching uBO $UBO_VERSION from $UBO_REPO into $UBO_DIR"
     cd "$UBO_DIR"
     git init -q
-    git remote add origin "https://github.com/gorhill/uBlock.git"
+    git remote add origin "https://github.com/Ablock/Ablock.git"
     git fetch --depth 1 origin "$UBO_VERSION"
     git checkout -q FETCH_HEAD
     cd - > /dev/null

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom } from './dom.js';
@@ -41,17 +41,17 @@ function onSvgClicked(ev) {
 
 /******************************************************************************/
 
-const onSvgTouch = (( ) => {
+const onSvgTouch = (() => {
     let startX = 0, startY = 0;
     let t0 = 0;
     return ev => {
-        if ( ev.type === 'touchstart' ) {
+        if (ev.type === 'touchstart') {
             startX = ev.touches[0].screenX;
             startY = ev.touches[0].screenY;
             t0 = ev.timeStamp;
             return;
         }
-        if ( startX === undefined ) { return; }
+        if (startX === undefined) { return; }
         const stopX = ev.changedTouches[0].screenX;
         const stopY = ev.changedTouches[0].screenY;
         const distance = Math.sqrt(
@@ -62,7 +62,7 @@ const onSvgTouch = (( ) => {
         // - Swipe is not valid; and
         // - The time between start and stop was less than 200ms.
         const duration = ev.timeStamp - t0;
-        if ( distance >= 32 || duration >= 200 ) { return; }
+        if (distance >= 32 || duration >= 200) { return; }
         onSvgClicked({
             type: 'touch',
             target: ev.target,
@@ -77,7 +77,7 @@ const onSvgTouch = (( ) => {
 
 function onKeyPressed(ev) {
     // Delete
-    if ( ev.key === 'Delete' || ev.key === 'Backspace' ) {
+    if (ev.key === 'Delete' || ev.key === 'Backspace') {
         toolOverlay.postMessage({
             what: 'zapElementAtPoint',
             options: { stay: true },
@@ -85,7 +85,7 @@ function onKeyPressed(ev) {
         return;
     }
     // Esc
-    if ( ev.key === 'Escape' || ev.which === 27 ) {
+    if (ev.key === 'Escape' || ev.which === 27) {
         quitZapper();
         return;
     }
@@ -99,8 +99,8 @@ function startZapper() {
     dom.on('svg#overlay', 'click', onSvgClicked);
     dom.on('svg#overlay', 'touchstart', onSvgTouch, { passive: true });
     dom.on('svg#overlay', 'touchend', onSvgTouch);
-    dom.on('#quit', 'click', quitZapper );
-    dom.on('#pick', 'click', resetZapper );
+    dom.on('#quit', 'click', quitZapper);
+    dom.on('#pick', 'click', resetZapper);
     toolOverlay.highlightElementUnderMouse(true);
 }
 
@@ -116,12 +116,12 @@ function resetZapper() {
 /******************************************************************************/
 
 function onMessage(msg) {
-    switch ( msg.what ) {
-    case 'startTool':
-        startZapper();
-        break;
-    default:
-        break;
+    switch (msg.what) {
+        case 'startTool':
+            startZapper();
+            break;
+        default:
+            break;
     }
 }
 

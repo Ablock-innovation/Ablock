@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 export class MRUCache {
@@ -29,20 +29,20 @@ export class MRUCache {
     add(key, value) {
         const found = this.map.has(key);
         this.map.set(key, value);
-        if ( found ) { return; }
-        if ( this.array.length === this.maxSize ) {
+        if (found) { return; }
+        if (this.array.length === this.maxSize) {
             this.map.delete(this.array.pop());
         }
         this.array.unshift(key);
     }
     remove(key) {
-        if ( this.map.delete(key) === false ) { return; }
+        if (this.map.delete(key) === false) { return; }
         this.array.splice(this.array.indexOf(key), 1);
     }
     lookup(key) {
         const value = this.map.get(key);
-        if ( value === undefined ) { return; }
-        if ( this.array[0] === key ) { return value; }
+        if (value === undefined) { return; }
+        if (this.array[0] === key) { return value; }
         const i = this.array.indexOf(key);
         this.array.copyWithin(1, 0, i);
         this.array[0] = key;

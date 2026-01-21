@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "Bllokoj raportet e CSP-së",
-    "description": "background information: https://github.com/gorhill/uBlock/issues/3150"
+    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Demaskoj emrat kanonikë",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Rregullat e sintaksës: <code>burimi destinacioni lloji veprimi</code> (<a href='https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-rule-syntax'>dokumentimi i plotë</a>).",
+    "message": "Rregullat e sintaksës: <code>burimi destinacioni lloji veprimi</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>dokumentimi i plotë</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

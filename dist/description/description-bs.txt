@@ -1,6 +1,6 @@
 Efikasan bloker: lagan na memoriju i procesor, a može učitati i primijeniti još hiljadu više drugih filtera nego drugi poznati blokeri.
 
-Ilustrovani pregled njegove efikasnosti: https://github.com/gorhill/uBlock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Ilustrovani pregled njegove efikasnosti: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Upotreba: Veliko dugme u skočnom prozoru je da trajno omogućite/onemogućite uBlock na trenutačnoj web-stranici. To se odnosi samo na trenutačnu web-stranicu, pa nije da ga kompletno isključite.
 
@@ -38,10 +38,10 @@ Besplatno.
 Otvorenog koda sa javnom licencom (GPLv3)
 Za korisnike od korisnika.
 
-Saradnici @ Github: https://github.com/gorhill/uBlock/graphs/contributors
+Saradnici @ Github: https://github.com/Ablock/Ablock/graphs/contributors
 Saradnici @ Crowdin: https://crowdin.net/project/ublock
 
 ***
 
 Spiska promjena:
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases

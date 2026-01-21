@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -30,16 +30,16 @@ export function proxyApplyFn(
 ) {
     let context = globalThis;
     let prop = target;
-    for (;;) {
+    for (; ;) {
         const pos = prop.indexOf('.');
-        if ( pos === -1 ) { break; }
+        if (pos === -1) { break; }
         context = context[prop.slice(0, pos)];
-        if ( context instanceof Object === false ) { return; }
-        prop = prop.slice(pos+1);
+        if (context instanceof Object === false) { return; }
+        prop = prop.slice(pos + 1);
     }
     const fn = context[prop];
-    if ( typeof fn !== 'function' ) { return; }
-    if ( proxyApplyFn.CtorContext === undefined ) {
+    if (typeof fn !== 'function') { return; }
+    if (proxyApplyFn.CtorContext === undefined) {
         proxyApplyFn.ctorContexts = [];
         proxyApplyFn.CtorContext = class {
             constructor(...args) {
@@ -87,7 +87,7 @@ export function proxyApplyFn(
         };
         proxyApplyFn.isCtor = new Map();
     }
-    if ( proxyApplyFn.isCtor.has(target) === false ) {
+    if (proxyApplyFn.isCtor.has(target) === false) {
         proxyApplyFn.isCtor.set(target, fn.prototype?.constructor === fn);
     }
     const fnStr = fn.toString();
@@ -97,12 +97,12 @@ export function proxyApplyFn(
             return handler(proxyApplyFn.ApplyContext.factory(target, thisArg, args));
         },
         get(target, prop) {
-            if ( prop === 'toString' ) { return toString; }
+            if (prop === 'toString') { return toString; }
             return Reflect.get(target, prop);
         },
     };
-    if ( proxyApplyFn.isCtor.get(target) ) {
-        proxyDetails.construct = function(target, args) {
+    if (proxyApplyFn.isCtor.get(target)) {
+        proxyDetails.construct = function (target, args) {
             return handler(proxyApplyFn.CtorContext.factory(target, args));
         };
     }

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { LineIterator, orphanizeString } from './text-utils.js';
@@ -25,33 +25,33 @@ import redirectableResources from './redirect-resources.js';
 /******************************************************************************/
 
 const extToMimeMap = new Map([
-    [  'css', 'text/css' ],
-    [   'fn', 'fn/javascript' ], // invented mime type for internal use
-    [  'gif', 'image/gif' ],
-    [ 'html', 'text/html' ],
-    [   'js', 'text/javascript' ],
-    [ 'json', 'application/json' ],
-    [  'mp3', 'audio/mp3' ],
-    [  'mp4', 'video/mp4' ],
-    [  'png', 'image/png' ],
-    [  'txt', 'text/plain' ],
-    [  'xml', 'text/xml' ],
+    ['css', 'text/css'],
+    ['fn', 'fn/javascript'], // invented mime type for internal use
+    ['gif', 'image/gif'],
+    ['html', 'text/html'],
+    ['js', 'text/javascript'],
+    ['json', 'application/json'],
+    ['mp3', 'audio/mp3'],
+    ['mp4', 'video/mp4'],
+    ['png', 'image/png'],
+    ['txt', 'text/plain'],
+    ['xml', 'text/xml'],
 ]);
 
 const typeToMimeMap = new Map([
-    [     'main_frame', 'text/html' ],
-    [          'other', 'text/plain' ],
-    [         'script', 'text/javascript' ],
-    [     'stylesheet', 'text/css' ],
-    [      'sub_frame', 'text/html' ],
-    [ 'xmlhttprequest', 'text/plain' ],
+    ['main_frame', 'text/html'],
+    ['other', 'text/plain'],
+    ['script', 'text/javascript'],
+    ['stylesheet', 'text/css'],
+    ['sub_frame', 'text/html'],
+    ['xmlhttprequest', 'text/plain'],
 ]);
 
 const validMimes = new Set(extToMimeMap.values());
 
 const mimeFromName = name => {
     const match = /\.([^.]+)$/.exec(name);
-    if ( match === null ) { return ''; }
+    if (match === null) { return ''; }
     return extToMimeMap.get(match[1]);
 };
 
@@ -65,7 +65,7 @@ const removeTopCommentBlock = text => {
 // module, but for now I just want to remove an obstacle to modularization.
 const warSecret = typeof vAPI === 'object' && vAPI !== null
     ? vAPI.warSecret.short
-    : ( ) => '';
+    : () => '';
 
 const RESOURCES_SELFIE_VERSION = 7;
 const RESOURCES_SELFIE_NAME = 'selfie/redirectEngine/resources';
@@ -101,29 +101,29 @@ class RedirectEntry {
         ) {
             const params = [];
             const secret = warSecret();
-            if ( secret !== '' ) { params.push(`secret=${secret}`); }
-            if ( this.params !== undefined ) {
-                for ( const name of this.params ) {
+            if (secret !== '') { params.push(`secret=${secret}`); }
+            if (this.params !== undefined) {
+                for (const name of this.params) {
                     const value = fctxt[name];
-                    if ( value === undefined ) { continue; }
+                    if (value === undefined) { continue; }
                     params.push(`${name}=${encodeURIComponent(value)}`);
                 }
             }
             let url = `${this.warURL}`;
-            if ( params.length !== 0 ) {
+            if (params.length !== 0) {
                 url += `?${params.join('&')}`;
             }
             return url;
         }
-        if ( this.data === undefined ) { return; }
+        if (this.data === undefined) { return; }
         // https://github.com/uBlockOrigin/uBlock-issues/issues/701
-        if ( this.data === '' ) {
+        if (this.data === '') {
             const mime = typeToMimeMap.get(fctxt.type);
-            if ( mime === '' ) { return; }
+            if (mime === '') { return; }
             return `data:${mime},`;
         }
-        if ( this.data.startsWith('data:') === false ) {
-            if ( this.mime.indexOf(';') === -1 ) {
+        if (this.data.startsWith('data:') === false) {
+            if (this.mime.indexOf(';') === -1) {
                 this.data = `data:${this.mime};base64,${btoa(this.data)}`;
             } else {
                 this.data = `data:${this.mime},${this.data}`;
@@ -133,11 +133,11 @@ class RedirectEntry {
     }
 
     toContent() {
-        if ( this.data.startsWith('data:') ) {
+        if (this.data.startsWith('data:')) {
             const pos = this.data.indexOf(',');
             const base64 = this.data.endsWith(';base64', pos);
             this.data = this.data.slice(pos + 1);
-            if ( base64 ) {
+            if (base64) {
                 this.data = atob(this.data);
             }
         }
@@ -174,21 +174,21 @@ class RedirectEngine {
         asDataURI = false
     ) {
         const entry = this.resources.get(this.aliases.get(token) || token);
-        if ( entry === undefined ) { return; }
+        if (entry === undefined) { return; }
         return entry.toURL(fctxt, asDataURI);
     }
 
     tokenToDNR(token) {
         const entry = this.resources.get(this.aliases.get(token) || token);
-        if ( entry === undefined ) { return; }
-        if ( entry.warURL === undefined ) { return; }
+        if (entry === undefined) { return; }
+        if (entry.warURL === undefined) { return; }
         return entry.warURL;
     }
 
     hasToken(token) {
-        if ( token === 'none' ) { return true; }
+        if (token === 'none') { return true; }
         const asDataURI = token.charCodeAt(0) === 0x25 /* '%' */;
-        if ( asDataURI ) {
+        if (asDataURI) {
             token = token.slice(1);
         }
         return this.resources.get(this.aliases.get(token) || token) !== undefined;
@@ -208,9 +208,9 @@ class RedirectEngine {
 
     contentFromName(name, mime = '') {
         const entry = this.resources.get(this.aliases.get(name) || name);
-        if ( entry === undefined ) { return; }
-        if ( entry.mime.startsWith(mime) === false ) { return; }
-        if ( entry.data === undefined ) { return; }
+        if (entry === undefined) { return; }
+        if (entry.mime.startsWith(mime) === false) { return; }
+        if (entry.data === undefined) { return; }
         return {
             js: entry.toContent(),
             world: entry.world,
@@ -230,26 +230,26 @@ class RedirectEngine {
         const reNonEmptyLine = /\S/;
         let fields, encoded, details;
 
-        while ( lineIter.eot() === false ) {
+        while (lineIter.eot() === false) {
             const line = lineIter.next();
-            if ( line.startsWith('#') ) { continue; }
-            if ( line.startsWith('// ') ) { continue; }
+            if (line.startsWith('#')) { continue; }
+            if (line.startsWith('// ')) { continue; }
 
-            if ( fields === undefined ) {
-                if ( line === '' ) { continue; }
+            if (fields === undefined) {
+                if (line === '') { continue; }
                 // Modern parser
-                if ( line.startsWith('/// ') ) {
+                if (line.startsWith('/// ')) {
                     const name = line.slice(4).trim();
-                    fields = [ name, mimeFromName(name) ];
+                    fields = [name, mimeFromName(name)];
                     continue;
                 }
                 // Legacy parser
                 const head = line.trim().split(/\s+/);
-                if ( head.length !== 2 ) { continue; }
-                if ( head[0] === 'none' ) { continue; }
+                if (head.length !== 2) { continue; }
+                if (head[0] === 'none') { continue; }
                 let pos = head[1].indexOf(';');
-                if ( pos === -1 ) { pos = head[1].length; }
-                if ( validMimes.has(head[1].slice(0, pos)) === false ) {
+                if (pos === -1) { pos = head[1].length; }
+                if (validMimes.has(head[1].slice(0, pos)) === false) {
                     continue;
                 }
                 encoded = head[1].indexOf(';') !== -1;
@@ -257,18 +257,18 @@ class RedirectEngine {
                 continue;
             }
 
-            if ( line.startsWith('/// ') ) {
-                if ( details === undefined ) {
+            if (line.startsWith('/// ')) {
+                if (details === undefined) {
                     details = [];
                 }
-                const [ prop, value ] = line.slice(4).trim().split(/\s+/);
-                if ( value !== undefined ) {
+                const [prop, value] = line.slice(4).trim().split(/\s+/);
+                if (value !== undefined) {
                     details.push({ prop, value });
                 }
                 continue;
             }
 
-            if ( reNonEmptyLine.test(line) ) {
+            if (reNonEmptyLine.test(line)) {
                 fields.push(encoded ? line.trim() : line);
                 continue;
             }
@@ -280,23 +280,23 @@ class RedirectEngine {
                 fields.slice(2).join(encoded ? '' : '\n')
             );
             this.resources.set(name, RedirectEntry.fromDetails({ mime, data }));
-            if ( Array.isArray(details) ) {
+            if (Array.isArray(details)) {
                 const resource = this.resources.get(name);
-                for ( const { prop, value } of details ) {
-                    switch ( prop ) {
-                    case 'alias':
-                        this.aliases.set(value, name);
-                        break;
-                    case 'world':
-                        if ( /^isolated$/i.test(value) === false ) { break; }
-                        resource.world = 'ISOLATED';
-                        break;
-                    case 'dependency':
-                        if ( this.resources.has(value) === false ) { break; }
-                        resource.dependencies.push(value);
-                        break;
-                    default:
-                        break;
+                for (const { prop, value } of details) {
+                    switch (prop) {
+                        case 'alias':
+                            this.aliases.set(value, name);
+                            break;
+                        case 'world':
+                            if (/^isolated$/i.test(value) === false) { break; }
+                            resource.world = 'ISOLATED';
+                            break;
+                        case 'dependency':
+                            if (this.resources.has(value) === false) { break; }
+                            resource.dependencies.push(value);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -314,18 +314,18 @@ class RedirectEngine {
 
         const fetches = [
             import('/js/resources/scriptlets.js').then(module => {
-                for ( const scriptlet of module.builtinScriptlets ) {
+                for (const scriptlet of module.builtinScriptlets) {
                     const details = {};
                     details.mime = mimeFromName(scriptlet.name);
                     details.data = scriptlet.fn.toString();
-                    for ( const [ k, v ] of Object.entries(scriptlet) ) {
-                        if ( k === 'fn' ) { continue; }
+                    for (const [k, v] of Object.entries(scriptlet)) {
+                        if (k === 'fn') { continue; }
                         details[k] = v;
                     }
                     const entry = RedirectEntry.fromDetails(details);
                     this.resources.set(details.name, entry);
-                    if ( Array.isArray(details.aliases) === false ) { continue; }
-                    for ( const alias of details.aliases ) {
+                    if (Array.isArray(details.aliases) === false) { continue; }
+                    for (const alias of details.aliases) {
                         this.aliases.set(alias, details.name);
                     }
                 }
@@ -344,9 +344,9 @@ class RedirectEngine {
                 params: details.params,
             });
             this.resources.set(name, entry);
-            if ( details.alias === undefined ) { return; }
-            if ( Array.isArray(details.alias) ) {
-                for ( const alias of details.alias ) {
+            if (details.alias === undefined) { return; }
+            if (Array.isArray(details.alias)) {
+                for (const alias of details.alias) {
                     this.aliases.set(alias, name);
                 }
             } else {
@@ -357,11 +357,11 @@ class RedirectEngine {
         const processBlob = (name, blob) => {
             return new Promise(resolve => {
                 const reader = new FileReader();
-                reader.onload = ( ) => {
+                reader.onload = () => {
                     store(name, reader.result);
                     resolve();
                 };
-                reader.onabort = reader.onerror = ( ) => {
+                reader.onabort = reader.onerror = () => {
                     resolve();
                 };
                 reader.readAsDataURL(blob);
@@ -374,15 +374,15 @@ class RedirectEngine {
 
         const process = result => {
             const match = /^\/web_accessible_resources\/([^?]+)/.exec(result.url);
-            if ( match === null ) { return; }
+            if (match === null) { return; }
             const name = match[1];
             return result.content instanceof Blob
                 ? processBlob(name, result.content)
                 : processText(name, result.content);
         };
 
-        for ( const [ name, details ] of redirectableResources ) {
-            if ( typeof details.data !== 'string' ) {
+        for (const [name, details] of redirectableResources) {
+            if (typeof details.data !== 'string') {
                 store(name);
                 continue;
             }
@@ -400,9 +400,9 @@ class RedirectEngine {
 
     getResourceDetails() {
         const out = new Map([
-            [ 'none', { canInject: false, canRedirect: true, aliasOf: '' } ],
+            ['none', { canInject: false, canRedirect: true, aliasOf: '' }],
         ]);
-        for ( const [ name, entry ] of this.resources ) {
+        for (const [name, entry] of this.resources) {
             out.set(name, {
                 canInject: typeof entry.data === 'string',
                 canRedirect: entry.warURL !== undefined,
@@ -410,9 +410,9 @@ class RedirectEngine {
                 extensionPath: entry.warURL,
             });
         }
-        for ( const [ alias, name ] of this.aliases ) {
+        for (const [alias, name] of this.aliases) {
             const original = out.get(name);
-            if ( original === undefined ) { continue; }
+            if (original === undefined) { continue; }
             const aliased = Object.assign({}, original);
             aliased.aliasOf = name;
             out.set(alias, aliased);
@@ -425,18 +425,18 @@ class RedirectEngine {
     getTrustedScriptletTokens() {
         const out = [];
         const isTrustedScriptlet = entry => {
-            if ( entry.requiresTrust !== true ) { return false; }
-            if ( entry.warURL !== undefined ) { return false; }
-            if ( typeof entry.data !== 'string' ) { return false; }
-            if ( entry.name.endsWith('.js') === false ) { return false; }
+            if (entry.requiresTrust !== true) { return false; }
+            if (entry.warURL !== undefined) { return false; }
+            if (typeof entry.data !== 'string') { return false; }
+            if (entry.name.endsWith('.js') === false) { return false; }
             return true;
         };
-        for ( const [ name, entry ] of this.resources ) {
-            if ( isTrustedScriptlet(entry) === false ) { continue; }
+        for (const [name, entry] of this.resources) {
+            if (isTrustedScriptlet(entry) === false) { continue; }
             out.push(name.slice(0, -3));
         }
-        for ( const [ alias, name ] of this.aliases ) {
-            if ( out.includes(name.slice(0, -3)) === false ) { continue; }
+        for (const [alias, name] of this.aliases) {
+            if (out.includes(name.slice(0, -3)) === false) { continue; }
             out.push(alias.slice(0, -3));
         }
         return out;
@@ -452,13 +452,13 @@ class RedirectEngine {
 
     async resourcesFromSelfie(storage) {
         const selfie = await storage.fromCache(RESOURCES_SELFIE_NAME);
-        if ( selfie instanceof Object === false ) { return false; }
-        if ( selfie.version !== RESOURCES_SELFIE_VERSION ) { return false; }
-        if ( selfie.aliases instanceof Map === false ) { return false; }
-        if ( selfie.resources instanceof Map === false ) { return false; }
+        if (selfie instanceof Object === false) { return false; }
+        if (selfie.version !== RESOURCES_SELFIE_VERSION) { return false; }
+        if (selfie.aliases instanceof Map === false) { return false; }
+        if (selfie.resources instanceof Map === false) { return false; }
         this.aliases = selfie.aliases;
         this.resources = selfie.resources;
-        for ( const [ token, entry ] of this.resources ) {
+        for (const [token, entry] of this.resources) {
             this.resources.set(token, RedirectEntry.fromDetails(entry));
         }
         this.modifyTime = Date.now();

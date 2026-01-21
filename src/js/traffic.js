@@ -16,12 +16,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 
-import * as fc from  './filtering-context.js';
+import * as fc from './filtering-context.js';
 import * as sfp from './static-filtering-parser.js';
 import {
     sessionFirewall,
@@ -59,21 +59,21 @@ function onBeforeRequest(details) {
     // https://github.com/chrisaljoudi/uBlock/issues/1001
     // This must be executed regardless of whether the request is
     // behind-the-scene
-    if ( fctxt.itype === fctxt.MAIN_FRAME ) {
+    if (fctxt.itype === fctxt.MAIN_FRAME) {
         return onBeforeRootFrameRequest(fctxt);
     }
 
     // Special treatment: behind-the-scene requests
     const tabId = details.tabId;
-    if ( tabId < 0 ) {
+    if (tabId < 0) {
         return onBeforeBehindTheSceneRequest(fctxt);
     }
 
     // Lookup the page store associated with this tab id.
     let pageStore = µb.pageStoreFromTabId(tabId);
-    if ( pageStore === null ) {
+    if (pageStore === null) {
         const tabContext = µb.tabContextManager.mustLookup(tabId);
-        if ( tabContext.tabId < 0 ) {
+        if (tabContext.tabId < 0) {
             return onBeforeBehindTheSceneRequest(fctxt);
         }
         vAPI.tabs.onNavigation({ tabId, frameId: 0, url: tabContext.rawURL });
@@ -84,20 +84,20 @@ function onBeforeRequest(details) {
 
     pageStore.journalAddRequest(fctxt, result);
 
-    if ( logger.enabled ) {
+    if (logger.enabled) {
         fctxt.setRealm('network').toLogger();
     }
 
     // Redirected
 
-    if ( fctxt.redirectURL !== undefined ) {
+    if (fctxt.redirectURL !== undefined) {
         return { redirectUrl: patchLocalRedirectURL(fctxt.redirectURL) };
     }
 
     // Not redirected
 
     // Blocked
-    if ( result === 1 ) {
+    if (result === 1) {
         return { cancel: true };
     }
 
@@ -110,7 +110,7 @@ function onBeforeRequest(details) {
         pageStore.setFrameURL(details);
     }
 
-    if ( result === 2 ) {
+    if (result === 2) {
         return { cancel: false };
     }
 };
@@ -130,9 +130,9 @@ function onBeforeRootFrameRequest(fctxt) {
 
     // If the site is whitelisted, disregard strict blocking
     const trusted = µb.getNetFilteringSwitch(requestURL) === false;
-    if ( trusted ) {
+    if (trusted) {
         result = 2;
-        if ( logger.enabled ) {
+        if (logger.enabled) {
             logData = { engine: 'u', result: 2, raw: 'whitelisted' };
         }
     }
@@ -143,7 +143,7 @@ function onBeforeRootFrameRequest(fctxt) {
         sessionSwitches.evaluateZ('no-strict-blocking', requestHostname)
     ) {
         result = 2;
-        if ( logger.enabled ) {
+        if (logger.enabled) {
             logData = {
                 engine: 'u',
                 result: 2,
@@ -153,9 +153,9 @@ function onBeforeRootFrameRequest(fctxt) {
     }
 
     // Temporarily whitelisted?
-    if ( result === 0 && strictBlockBypasser.isBypassed(requestHostname) ) {
+    if (result === 0 && strictBlockBypasser.isBypassed(requestHostname)) {
         result = 2;
-        if ( logger.enabled ) {
+        if (logger.enabled) {
             logData = {
                 engine: 'u',
                 result: 2,
@@ -165,47 +165,47 @@ function onBeforeRootFrameRequest(fctxt) {
     }
 
     // Static filtering
-    if ( result === 0 ) {
+    if (result === 0) {
         ({ result, logData } = shouldStrictBlock(fctxt, logger.enabled));
     }
 
     const pageStore = µb.bindTabToPageStore(fctxt.tabId, 'beforeRequest');
-    if ( pageStore !== null ) {
+    if (pageStore !== null) {
         pageStore.journalAddRootFrame('uncommitted', requestURL);
         pageStore.journalAddRequest(fctxt, result);
     }
 
-    if ( logger.enabled ) {
+    if (logger.enabled) {
         fctxt.setRealm('network').setFilter(logData);
     }
 
     // https://github.com/uBlockOrigin/uBlock-issues/issues/760
     //   Redirect non-blocked request?
-    if ( trusted === false && pageStore !== null ) {
-        if ( result !== 1 ) {
+    if (trusted === false && pageStore !== null) {
+        if (result !== 1) {
             pageStore.redirectNonBlockedRequest(fctxt);
         } else {
             pageStore.skipMainDocument(fctxt, true);
         }
     }
 
-    if ( logger.enabled ) {
+    if (logger.enabled) {
         fctxt.toLogger();
     }
 
     // Redirected
 
-    if ( fctxt.redirectURL !== undefined ) {
+    if (fctxt.redirectURL !== undefined) {
         return { redirectUrl: patchLocalRedirectURL(fctxt.redirectURL) };
     }
 
     // Not blocked
 
-    if ( result !== 1 ) { return; }
+    if (result !== 1) { return; }
 
     // No log data means no strict blocking (because we need to report why
     // the blocking occurs
-    if ( logData === undefined  ) { return; }
+    if (logData === undefined) { return; }
 
     // Blocked
 
@@ -214,7 +214,7 @@ function onBeforeRootFrameRequest(fctxt) {
     // Find out the URL navigated to should the document not be strict-blocked
     pageStore.skipMainDocument(fctxt, false);
 
-    if ( reason === undefined && Array.isArray(fctxt.filter) ) {
+    if (reason === undefined && Array.isArray(fctxt.filter)) {
         const filter = fctxt.filter.find(a => a.reason !== undefined);
         reason = filter?.reason;
     }
@@ -226,7 +226,7 @@ function onBeforeRootFrameRequest(fctxt) {
         hn: requestHostname,
         to: fctxt.redirectURL || '',
     };
-    if ( reason ) {
+    if (reason) {
         query.reason = reason;
     }
 
@@ -245,7 +245,7 @@ function onBeforeRootFrameRequest(fctxt) {
 // https://github.com/chrisaljoudi/uBlock/issues/1128
 //   Do not block if the match begins after the hostname,
 //   except when the filter is specifically of type `other`.
-// https://github.com/gorhill/uBlock/issues/490
+// https://github.com/Ablock/Ablock/issues/490
 //   Removing this for the time being, will need a new, dedicated type.
 // https://github.com/uBlockOrigin/uBlock-issues/issues/1501
 //   Support explicit exception filters.
@@ -273,7 +273,7 @@ function shouldStrictBlock(fctxt, loggerEnabled) {
     const rs = snfe.matchRequest(fctxt, 0b0011);
     const is = rs === 1 && snfe.isBlockImportant();
     let lds;
-    if ( rs !== 0 || loggerEnabled ) {
+    if (rs !== 0 || loggerEnabled) {
         lds = snfe.toLogData();
     }
 
@@ -286,7 +286,7 @@ function shouldStrictBlock(fctxt, loggerEnabled) {
     //         |   1i   |   rg   |   rg   |   x    |   rg   |
     //         |   2    |   rg   |   rg   |   x    |   rs   |
     // --------+--------+--------+--------+--------+--------+
-    if ( rs === 1 && is ) {
+    if (rs === 1 && is) {
         return { result: rs, logData: lds };
     }
 
@@ -296,9 +296,9 @@ function shouldStrictBlock(fctxt, loggerEnabled) {
     fctxt.type = 'main_frame';
     const ig = rg === 1 && snfe.isBlockImportant();
     let ldg;
-    if ( rg !== 0 || loggerEnabled ) {
+    if (rg !== 0 || loggerEnabled) {
         ldg = snfe.toLogData();
-        if ( rg === 1 && validateStrictBlock(fctxt, ldg) === false ) {
+        if (rg === 1 && validateStrictBlock(fctxt, ldg) === false) {
             rg = 0; ldg = undefined;
         }
     }
@@ -312,7 +312,7 @@ function shouldStrictBlock(fctxt, loggerEnabled) {
     //         |   1i   |   x    |   x    |   -    |   x    |
     //         |   2    |   x    |   x    |   -    |   rs   |
     // --------+--------+--------+--------+--------+--------+
-    if ( rs === 0 || rg === 1 && ig || rg === 2 && rs !== 2 ) {
+    if (rs === 0 || rg === 1 && ig || rg === 2 && rs !== 2) {
         return { result: rg, logData: ldg };
     }
 
@@ -330,21 +330,21 @@ function shouldStrictBlock(fctxt, loggerEnabled) {
 
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/3208
+// https://github.com/Ablock/Ablock/issues/3208
 //   Mind case insensitivity.
 // https://github.com/uBlockOrigin/uBlock-issues/issues/1147
 //   Do not strict-block if the filter pattern does not contain at least one
 //   token character.
 
 function validateStrictBlock(fctxt, logData) {
-    if ( typeof logData.regex !== 'string' ) { return false; }
-    if ( typeof logData.raw === 'string' && /\w/.test(logData.raw) === false ) {
+    if (typeof logData.regex !== 'string') { return false; }
+    if (typeof logData.raw === 'string' && /\w/.test(logData.raw) === false) {
         return false;
     }
     const url = fctxt.url;
     const re = new RegExp(logData.regex, 'i');
     const match = re.exec(url.toLowerCase());
-    if ( match === null ) { return false; }
+    if (match === null) { return false; }
 
     // https://github.com/chrisaljoudi/uBlock/issues/1128
     // https://github.com/chrisaljoudi/uBlock/issues/1212
@@ -357,7 +357,7 @@ function validateStrictBlock(fctxt, logData) {
     const hnlen = hostname.length;
     const end = match.index + match[0].length - hnpos - hnlen;
     return end === 0 || end === 1 ||
-           end === 2 && url.charCodeAt(hnpos + hnlen) === 0x2E /* '.' */;
+        end === 2 && url.charCodeAt(hnpos + hnlen) === 0x2E /* '.' */;
 }
 
 /******************************************************************************/
@@ -366,9 +366,9 @@ function validateStrictBlock(fctxt, logData) {
 
 function onBeforeBehindTheSceneRequest(fctxt) {
     const pageStore = µb.pageStoreFromTabId(fctxt.tabId);
-    if ( pageStore === null ) { return; }
+    if (pageStore === null) { return; }
 
-    // https://github.com/gorhill/uBlock/issues/3150
+    // https://github.com/Ablock/Ablock/issues/3150
     //   Ability to globally block CSP reports MUST also apply to
     //   behind-the-scene network requests.
 
@@ -409,19 +409,19 @@ function onBeforeBehindTheSceneRequest(fctxt) {
     // https://github.com/uBlockOrigin/uBlock-issues/issues/1204
     onBeforeBehindTheSceneRequest.journalAddRequest(fctxt, result);
 
-    if ( logger.enabled ) {
+    if (logger.enabled) {
         fctxt.setRealm('network').toLogger();
     }
 
     // Redirected
 
-    if ( fctxt.redirectURL !== undefined ) {
+    if (fctxt.redirectURL !== undefined) {
         return { redirectUrl: patchLocalRedirectURL(fctxt.redirectURL) };
     }
 
     // Blocked?
 
-    if ( result === 1 ) {
+    if (result === 1) {
         return { cancel: true };
     }
 }
@@ -437,14 +437,14 @@ function onBeforeBehindTheSceneRequest(fctxt) {
     let hostname = '';
     let pageStoresToken = 0;
 
-    const reset = function() {
+    const reset = function () {
         hostname = '';
         pageStores.clear();
         pageStoresToken = 0;
     };
 
-    const gc = ( ) => {
-        if ( pageStoresToken !== µb.pageStoresToken ) { return reset(); }
+    const gc = () => {
+        if (pageStoresToken !== µb.pageStoresToken) { return reset(); }
         gcTimer.on(30011);
     };
 
@@ -458,14 +458,14 @@ function onBeforeBehindTheSceneRequest(fctxt) {
         ) {
             hostname = docHostname;
             pageStores.clear();
-            for ( const pageStore of µb.pageStores.values() ) {
-                if ( pageStore.tabHostname !== docHostname ) { continue; }
+            for (const pageStore of µb.pageStores.values()) {
+                if (pageStore.tabHostname !== docHostname) { continue; }
                 pageStores.add(pageStore);
             }
             pageStoresToken = µb.pageStoresToken;
             gcTimer.offon(30011);
         }
-        for ( const pageStore of pageStores ) {
+        for (const pageStore of pageStores) {
             pageStore.journalAddRequest(fctxt, result);
         }
     };
@@ -485,36 +485,36 @@ function onHeadersReceived(details) {
     const isRootDoc = fctxt.itype === fctxt.MAIN_FRAME;
 
     let pageStore = µb.pageStoreFromTabId(fctxt.tabId);
-    if ( pageStore === null ) {
-        if ( isRootDoc === false ) { return; }
+    if (pageStore === null) {
+        if (isRootDoc === false) { return; }
         pageStore = µb.bindTabToPageStore(fctxt.tabId, 'beforeRequest');
     }
-    if ( pageStore.getNetFilteringSwitch(fctxt) === false ) { return; }
+    if (pageStore.getNetFilteringSwitch(fctxt) === false) { return; }
 
     // To enforce strict-blocking with ipaddress option
-    if ( isRootDoc && fctxt.ipaddress ) {
+    if (isRootDoc && fctxt.ipaddress) {
         const r = onBeforeRootFrameRequest(fctxt);
-        if ( r ) { return ( r ); }
+        if (r) { return (r); }
     }
 
-    if ( (fctxt.itype & foilLargeMediaElement.TYPE_BITS) !== 0 ) {
+    if ((fctxt.itype & foilLargeMediaElement.TYPE_BITS) !== 0) {
         const result = foilLargeMediaElement(details, fctxt, pageStore);
-        if ( result !== undefined ) { return result; }
+        if (result !== undefined) { return result; }
     }
 
     // Keep in mind response headers will be modified in-place if needed, so
     // `details.responseHeaders` will always point to the modified response
     // headers.
     const { responseHeaders } = details;
-    if ( Array.isArray(responseHeaders) === false ) { return; }
+    if (Array.isArray(responseHeaders) === false) { return; }
 
-    if ( isRootDoc === false ) {
+    if (isRootDoc === false) {
         const result = pageStore.filterOnHeaders(fctxt, responseHeaders);
-        if ( result !== 0 ) {
-            if ( logger.enabled ) {
+        if (result !== 0) {
+            if (logger.enabled) {
                 fctxt.setRealm('network').toLogger();
             }
-            if ( result === 1 ) {
+            if (result === 1) {
                 pageStore.journalAddRequest(fctxt, 1);
                 return { cancel: true };
             }
@@ -523,56 +523,56 @@ function onHeadersReceived(details) {
 
     const mime = mimeFromHeaders(responseHeaders);
 
-    // https://github.com/gorhill/uBlock/issues/2813
+    // https://github.com/Ablock/Ablock/issues/2813
     //   Disable the blocking of large media elements if the document is itself
     //   a media element: the resource was not prevented from loading so no
     //   point to further block large media elements for the current document.
-    if ( isRootDoc ) {
-        if ( reMediaContentTypes.test(mime) ) {
+    if (isRootDoc) {
+        if (reMediaContentTypes.test(mime)) {
             pageStore.allowLargeMediaElementsUntil = 0;
             // Fall-through: this could be an SVG document, which supports
             // script tags.
         }
     }
 
-    if ( bodyFilterer.canFilter(fctxt, details) ) {
+    if (bodyFilterer.canFilter(fctxt, details)) {
         const jobs = [];
         // `replace=` filter option
         const replaceDirectives =
             staticNetFilteringEngine.matchAndFetchModifiers(fctxt, 'replace');
-        if ( replaceDirectives ) {
+        if (replaceDirectives) {
             jobs.push({
                 fn: textResponseFilterer,
-                args: [ replaceDirectives ],
+                args: [replaceDirectives],
             });
         }
         // html filtering
-        if ( mime === 'text/html' || mime === 'application/xhtml+xml' ) {
+        if (mime === 'text/html' || mime === 'application/xhtml+xml') {
             const selectors = htmlFilteringEngine.retrieve(fctxt);
-            if ( selectors ) {
+            if (selectors) {
                 jobs.push({
                     fn: htmlResponseFilterer,
-                    args: [ selectors ],
+                    args: [selectors],
                 });
             }
         }
-        if ( jobs.length !== 0 ) {
+        if (jobs.length !== 0) {
             bodyFilterer.doFilter(details.requestId, fctxt, jobs);
         }
     }
 
     let modifiedHeaders = false;
-    if ( httpheaderFilteringEngine.apply(fctxt, responseHeaders) === true ) {
+    if (httpheaderFilteringEngine.apply(fctxt, responseHeaders) === true) {
         modifiedHeaders = true;
     }
 
     // https://github.com/uBlockOrigin/uBlock-issues/issues/229#issuecomment-2220354261
     // Inject CSP/PP in document resource only
-    if ( fctxt.isDocument() ) {
-        if ( injectCSP(fctxt, pageStore, responseHeaders) === true ) {
+    if (fctxt.isDocument()) {
+        if (injectCSP(fctxt, pageStore, responseHeaders) === true) {
             modifiedHeaders = true;
         }
-        if ( injectPP(fctxt, pageStore, responseHeaders) === true ) {
+        if (injectPP(fctxt, pageStore, responseHeaders) === true) {
             modifiedHeaders = true;
         }
     }
@@ -583,11 +583,11 @@ function onHeadersReceived(details) {
     // https://github.com/uBlockOrigin/uBlock-issues/issues/229
     //   Use `no-cache` instead of `no-cache, no-store, must-revalidate`, this
     //   allows Firefox's offline mode to work as expected.
-    if ( modifiedHeaders && isGecko ) {
+    if (modifiedHeaders && isGecko) {
         const cacheControl = µb.hiddenSettings.cacheControlForFirefox1376932;
-        if ( cacheControl !== 'unset' ) {
+        if (cacheControl !== 'unset') {
             let i = headerIndexFromName('cache-control', responseHeaders);
-            if ( i !== -1 ) {
+            if (i !== -1) {
                 responseHeaders[i].value = cacheControl;
             } else {
                 responseHeaders.push({ name: 'Cache-Control', value: cacheControl });
@@ -596,7 +596,7 @@ function onHeadersReceived(details) {
         }
     }
 
-    if ( modifiedHeaders ) {
+    if (modifiedHeaders) {
         return { responseHeaders };
     }
 }
@@ -606,13 +606,13 @@ const reMediaContentTypes = /^(?:audio|image|video)\/|(?:\/ogg)$/;
 /******************************************************************************/
 
 const mimeFromHeaders = headers => {
-    if ( Array.isArray(headers) === false ) { return ''; }
+    if (Array.isArray(headers) === false) { return ''; }
     return mimeFromContentType(headerValueFromName('content-type', headers));
 };
 
 const mimeFromContentType = contentType => {
     const match = reContentTypeMime.exec(contentType);
-    if ( match === null ) { return ''; }
+    if (match === null) { return ''; }
     return match[0].toLowerCase();
 };
 
@@ -622,81 +622,81 @@ const reContentTypeMime = /^[^;]+/i;
 
 function textResponseFilterer(session, directives) {
     const applied = [];
-    for ( const directive of directives ) {
-        if ( directive.refs instanceof Object === false ) { continue; }
-        if ( directive.result !== 1 ) {
+    for (const directive of directives) {
+        if (directive.refs instanceof Object === false) { continue; }
+        if (directive.result !== 1) {
             applied.push(directive);
             continue;
         }
         const { refs } = directive;
-        if ( refs.$cache !== null ) {
+        if (refs.$cache !== null) {
             const { jsonp } = refs.$cache;
-            if ( jsonp && jsonp.apply === undefined ) {
+            if (jsonp && jsonp.apply === undefined) {
                 refs.$cache = null;
             }
         }
-        if ( refs.$cache === null ) {
+        if (refs.$cache === null) {
             refs.$cache = sfp.parseReplaceValue(refs.value);
         }
         const cache = refs.$cache;
-        if ( cache === undefined ) { continue; }
-        switch ( cache.type ) {
-        case 'json': {
-            const json = session.getString();
-            let obj;
-            try { obj = JSON.parse(json); } catch { break; }
-            const objAfter = cache.jsonp.apply(obj);
-            if ( objAfter === undefined ) { break; }
-            session.setString(cache.jsonp.toJSON(objAfter));
-            applied.push(directive);
-            break;
-        }
-        case 'jsonl': {
-            const linesBefore = session.getString().split(/\n+/);
-            const linesAfter = [];
-            for ( const lineBefore of linesBefore ) {
+        if (cache === undefined) { continue; }
+        switch (cache.type) {
+            case 'json': {
+                const json = session.getString();
                 let obj;
-                try { obj = JSON.parse(lineBefore); } catch { }
-                if ( typeof obj !== 'object' || obj === null ) {
-                    linesAfter.push(lineBefore);
-                    continue;
-                }
+                try { obj = JSON.parse(json); } catch { break; }
                 const objAfter = cache.jsonp.apply(obj);
-                if ( objAfter === undefined ) {
-                    linesAfter.push(lineBefore);
-                    continue;
-                }
-                linesAfter.push(cache.jsonp.toJSON(objAfter));
+                if (objAfter === undefined) { break; }
+                session.setString(cache.jsonp.toJSON(objAfter));
+                applied.push(directive);
+                break;
             }
-            session.setString(linesAfter.join('\n'));
-            break;
-        }
-        case 'text': {
-            cache.re.lastIndex = 0;
-            if ( cache.re.test(session.getString()) !== true ) { break; }
-            cache.re.lastIndex = 0;
-            session.setString(session.getString().replace(
-                cache.re,
-                cache.replacement
-            ));
-            applied.push(directive);
-            break;
-        }
-        default:
-            break;
+            case 'jsonl': {
+                const linesBefore = session.getString().split(/\n+/);
+                const linesAfter = [];
+                for (const lineBefore of linesBefore) {
+                    let obj;
+                    try { obj = JSON.parse(lineBefore); } catch { }
+                    if (typeof obj !== 'object' || obj === null) {
+                        linesAfter.push(lineBefore);
+                        continue;
+                    }
+                    const objAfter = cache.jsonp.apply(obj);
+                    if (objAfter === undefined) {
+                        linesAfter.push(lineBefore);
+                        continue;
+                    }
+                    linesAfter.push(cache.jsonp.toJSON(objAfter));
+                }
+                session.setString(linesAfter.join('\n'));
+                break;
+            }
+            case 'text': {
+                cache.re.lastIndex = 0;
+                if (cache.re.test(session.getString()) !== true) { break; }
+                cache.re.lastIndex = 0;
+                session.setString(session.getString().replace(
+                    cache.re,
+                    cache.replacement
+                ));
+                applied.push(directive);
+                break;
+            }
+            default:
+                break;
         }
     }
-    if ( applied.length === 0 ) { return; }
-    if ( logger.enabled !== true ) { return; }
+    if (applied.length === 0) { return; }
+    if (logger.enabled !== true) { return; }
     session.setRealm('network')
-         .pushFilters(applied.map(a => a.logData()))
-         .toLogger();
+        .pushFilters(applied.map(a => a.logData()))
+        .toLogger();
 }
 
 /******************************************************************************/
 
 function htmlResponseFilterer(session, selectors) {
-    if ( htmlResponseFilterer.domParser === null ) {
+    if (htmlResponseFilterer.domParser === null) {
         htmlResponseFilterer.domParser = new DOMParser();
         htmlResponseFilterer.xmlSerializer = new XMLSerializer();
     }
@@ -706,8 +706,8 @@ function htmlResponseFilterer(session, selectors) {
         session.mime
     );
 
-    if ( selectors === undefined ) { return; }
-    if ( htmlFilteringEngine.apply(doc, session, selectors) !== true ) { return; }
+    if (selectors === undefined) { return; }
+    if (htmlFilteringEngine.apply(doc, session, selectors) !== true) { return; }
 
     // https://stackoverflow.com/questions/6088972/get-doctype-of-an-html-as-string-with-javascript/10162353#10162353
     const doctypeStr = [
@@ -731,7 +731,7 @@ htmlResponseFilterer.xmlSerializer = null;
 
 **/
 
-const bodyFilterer = (( ) => {
+const bodyFilterer = (() => {
     const sessions = new Map();
     const reContentTypeCharset = /charset=['"]?([^'" ]+)/i;
     const otherValidMimes = new Set([
@@ -757,106 +757,106 @@ const bodyFilterer = (( ) => {
     let charset = '';
 
     const contentTypeFromDetails = details => {
-        switch ( details.type ) {
-        case 'script':
-            return 'text/javascript; charset=utf-8';
-        case 'stylesheet':
-            return 'text/css';
-        default:
-            break;
+        switch (details.type) {
+            case 'script':
+                return 'text/javascript; charset=utf-8';
+            case 'stylesheet':
+                return 'text/css';
+            default:
+                break;
         }
         return '';
     };
 
     const charsetFromContentType = contentType => {
         const match = reContentTypeCharset.exec(contentType);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         return match[1].toLowerCase();
     };
 
     const charsetFromMime = mime => {
-        switch ( mime ) {
-        case 'application/xml':
-        case 'application/xhtml+xml':
-        case 'text/html':
-        case 'text/css':
-            return;
-        default:
-            break;
+        switch (mime) {
+            case 'application/xml':
+            case 'application/xhtml+xml':
+            case 'text/html':
+            case 'text/css':
+                return;
+            default:
+                break;
         }
         return 'utf-8';
     };
 
     const charsetFromStream = bytes => {
-        if ( bytes.length < 3 ) { return; }
-        if ( bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF ) {
+        if (bytes.length < 3) { return; }
+        if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) {
             return 'utf-8';
         }
         let i = -1;
-        while ( i < 65536 ) {
+        while (i < 65536) {
             i += 1;
-            /* c */ if ( bytes[i+0] !== 0x63 ) { continue; }
-            /* h */ if ( bytes[i+1] !== 0x68 ) { continue; }
-            /* a */ if ( bytes[i+2] !== 0x61 ) { continue; }
-            /* r */ if ( bytes[i+3] !== 0x72 ) { continue; }
-            /* s */ if ( bytes[i+4] !== 0x73 ) { continue; }
-            /* e */ if ( bytes[i+5] !== 0x65 ) { continue; }
-            /* t */ if ( bytes[i+6] !== 0x74 ) { continue; }
+            /* c */ if (bytes[i + 0] !== 0x63) { continue; }
+            /* h */ if (bytes[i + 1] !== 0x68) { continue; }
+            /* a */ if (bytes[i + 2] !== 0x61) { continue; }
+            /* r */ if (bytes[i + 3] !== 0x72) { continue; }
+            /* s */ if (bytes[i + 4] !== 0x73) { continue; }
+            /* e */ if (bytes[i + 5] !== 0x65) { continue; }
+            /* t */ if (bytes[i + 6] !== 0x74) { continue; }
             break;
         }
-        if ( (i + 40) >= 65536 ) { return; }
+        if ((i + 40) >= 65536) { return; }
         i += 8;
         // find first alpha character
         let j = -1;
-        while ( j < 8 ) {
+        while (j < 8) {
             j += 1;
-            const c = bytes[i+j];
-            if ( c >= 0x41 && c <= 0x5A ) { break; }
-            if ( c >= 0x61 && c <= 0x7A ) { break; }
+            const c = bytes[i + j];
+            if (c >= 0x41 && c <= 0x5A) { break; }
+            if (c >= 0x61 && c <= 0x7A) { break; }
         }
-        if ( j === 8 ) { return; }
+        if (j === 8) { return; }
         i += j;
         // Collect characters until first non charset-name-character
         const chars = [];
         j = 0;
-        while ( j < 24 ) {
-            const c = bytes[i+j];
-            if ( c < 0x2D ) { break; }
-            if ( c > 0x2D && c < 0x30 ) { break; }
-            if ( c > 0x39 && c < 0x41 ) { break; }
-            if ( c > 0x5A && c < 0x61 ) { break; }
-            if ( c > 0x7A ) { break; }
+        while (j < 24) {
+            const c = bytes[i + j];
+            if (c < 0x2D) { break; }
+            if (c > 0x2D && c < 0x30) { break; }
+            if (c > 0x39 && c < 0x41) { break; }
+            if (c > 0x5A && c < 0x61) { break; }
+            if (c > 0x7A) { break; }
             chars.push(c);
             j += 1;
         }
-        if ( j === 20 ) { return; }
+        if (j === 20) { return; }
         return String.fromCharCode(...chars).toLowerCase();
     };
 
     const streamClose = (session, buffer) => {
-        if ( buffer !== undefined ) {
+        if (buffer !== undefined) {
             session.stream.write(buffer);
-        } else if ( session.buffer !== undefined ) {
+        } else if (session.buffer !== undefined) {
             session.stream.write(session.buffer);
         }
         session.stream.close();
     };
 
-    const onStreamData = function(ev) {
+    const onStreamData = function (ev) {
         const session = sessions.get(this);
-        if ( session === undefined ) {
+        if (session === undefined) {
             this.write(ev.data);
             this.disconnect();
             return;
         }
-        if ( this.status !== 'transferringdata' ) {
-            if ( this.status !== 'finishedtransferringdata' ) {
+        if (this.status !== 'transferringdata') {
+            if (this.status !== 'finishedtransferringdata') {
                 sessions.delete(this);
                 this.disconnect();
                 return;
             }
         }
-        if ( session.buffer === null ) {
+        if (session.buffer === null) {
             session.buffer = new Uint8Array(ev.data);
             return;
         }
@@ -866,54 +866,54 @@ const bodyFilterer = (( ) => {
         buffer.set(session.buffer);
         buffer.set(new Uint8Array(ev.data), session.buffer.byteLength);
         session.buffer = buffer;
-        if ( session.buffer.length >= MAX_RESPONSE_BUFFER_LENGTH ) {
+        if (session.buffer.length >= MAX_RESPONSE_BUFFER_LENGTH) {
             sessions.delete(this);
             this.write(session.buffer);
             this.disconnect();
         }
     };
 
-    const onStreamStop = function() {
+    const onStreamStop = function () {
         const session = sessions.get(this);
         sessions.delete(this);
-        if ( session === undefined || session.buffer === null ) {
+        if (session === undefined || session.buffer === null) {
             this.close();
             return;
         }
-        if ( this.status !== 'finishedtransferringdata' ) { return; }
+        if (this.status !== 'finishedtransferringdata') { return; }
 
         // If encoding is still unknown, try to extract from stream data.
         // Just assume utf-8 if ultimately no encoding can be looked up.
-        if ( session.charset === undefined ) {
+        if (session.charset === undefined) {
             const charsetFound = charsetFromStream(session.buffer);
-            if ( charsetFound !== undefined ) {
+            if (charsetFound !== undefined) {
                 const charsetUsed = textEncode.normalizeCharset(charsetFound);
-                if ( charsetUsed === undefined ) { return streamClose(session); }
+                if (charsetUsed === undefined) { return streamClose(session); }
                 session.charset = charsetUsed;
             } else {
                 session.charset = 'utf-8';
             }
         }
 
-        while ( session.jobs.length !== 0 ) {
+        while (session.jobs.length !== 0) {
             const job = session.jobs.shift();
             job.fn(session, ...job.args);
         }
-        if ( session.modified !== true ) { return streamClose(session); }
+        if (session.modified !== true) { return streamClose(session); }
 
-        if ( textEncoder === undefined ) {
+        if (textEncoder === undefined) {
             textEncoder = new TextEncoder();
         }
         let encodedStream = textEncoder.encode(session.str);
 
-        if ( session.charset !== 'utf-8' ) {
+        if (session.charset !== 'utf-8') {
             encodedStream = textEncode.encode(session.charset, encodedStream);
         }
 
         streamClose(session, encodedStream);
     };
 
-    const onStreamError = function() {
+    const onStreamError = function () {
         sessions.delete(this);
     };
 
@@ -929,13 +929,13 @@ const bodyFilterer = (( ) => {
             this.jobs = jobs;
         }
         getString() {
-            if ( this.str !== null ) { return this.str; }
-            if ( textDecoder !== undefined ) {
-                if ( textDecoder.encoding !== this.charset ) {
+            if (this.str !== null) { return this.str; }
+            if (textDecoder !== undefined) {
+                if (textDecoder.encoding !== this.charset) {
                     textDecoder = undefined;
                 }
             }
-            if ( textDecoder === undefined ) {
+            if (textDecoder === undefined) {
                 textDecoder = new TextDecoder(this.charset);
             }
             this.str = textDecoder.decode(this.buffer);
@@ -946,7 +946,7 @@ const bodyFilterer = (( ) => {
             this.modified = true;
         }
         static doFilter(requestId, fctxt, jobs) {
-            if ( jobs.length === 0 ) { return; }
+            if (jobs.length === 0) { return; }
             const session = new Session(fctxt, mime, charset, jobs);
             session.stream = browser.webRequest.filterResponseData(requestId);
             session.stream.ondata = onStreamData;
@@ -955,44 +955,44 @@ const bodyFilterer = (( ) => {
             sessions.set(session.stream, session);
         }
         static canFilter(fctxt, details) {
-            if ( µb.canFilterResponseData !== true ) { return; }
+            if (µb.canFilterResponseData !== true) { return; }
 
-            if ( (fctxt.itype & BINARY_TYPES) !== 0 ) { return; }
+            if ((fctxt.itype & BINARY_TYPES) !== 0) { return; }
 
-            if ( fctxt.method !== fc.METHOD_GET ) {
-                if ( fctxt.method !== fc.METHOD_POST ) {
+            if (fctxt.method !== fc.METHOD_GET) {
+                if (fctxt.method !== fc.METHOD_POST) {
                     return;
                 }
             }
 
-            // https://github.com/gorhill/uBlock/issues/3478
+            // https://github.com/Ablock/Ablock/issues/3478
             const statusCode = details.statusCode || 0;
-            if ( statusCode === 0 ) { return; }
+            if (statusCode === 0) { return; }
 
             const hostname = fctxt.getHostname();
-            if ( hostname === '' ) { return; }
+            if (hostname === '') { return; }
 
             // https://bugzilla.mozilla.org/show_bug.cgi?id=1426789
             const headers = details.responseHeaders;
             const disposition = headerValueFromName('content-disposition', headers);
-            if ( disposition !== '' ) {
-                if ( disposition.startsWith('inline') === false ) { return; }
+            if (disposition !== '') {
+                if (disposition.startsWith('inline') === false) { return; }
             }
 
             mime = 'text/plain';
             charset = 'utf-8';
             const contentType = headerValueFromName('content-type', headers) ||
                 contentTypeFromDetails(details);
-            if ( contentType !== '' ) {
+            if (contentType !== '') {
                 mime = mimeFromContentType(contentType);
-                if ( mime === undefined ) { return; }
-                if ( mime.startsWith('text/') === false ) {
-                    if ( otherValidMimes.has(mime) === false ) { return; }
+                if (mime === undefined) { return; }
+                if (mime.startsWith('text/') === false) {
+                    if (otherValidMimes.has(mime) === false) { return; }
                 }
                 charset = charsetFromContentType(contentType);
-                if ( charset !== undefined ) {
+                if (charset !== undefined) {
                     charset = textEncode.normalizeCharset(charset);
-                    if ( charset === undefined ) { return; }
+                    if (charset === undefined) { return; }
                 } else {
                     charset = charsetFromMime(mime);
                 }
@@ -1015,9 +1015,9 @@ function injectCSP(fctxt, pageStore, responseHeaders) {
 
     const builtinDirectives = [];
 
-    if ( pageStore.filterScripting(fctxt, true) === 1 ) {
+    if (pageStore.filterScripting(fctxt, true) === 1) {
         builtinDirectives.push(µb.hiddenSettings.noScriptingCSP);
-        if ( logger.enabled ) {
+        if (logger.enabled) {
             fctxt.setRealm('network').setType('scripting').toLogger();
         }
     }
@@ -1030,25 +1030,25 @@ function injectCSP(fctxt, pageStore, responseHeaders) {
         fctxt2.type = 'inline-script';
         fctxt2.setDocOriginFromURL(fctxt.url);
         const result = pageStore.filterRequest(fctxt2);
-        if ( result === 1 ) {
+        if (result === 1) {
             builtinDirectives.push(µb.cspNoInlineScript);
         }
-        if ( result === 2 && logger.enabled ) {
+        if (result === 2 && logger.enabled) {
             fctxt2.setRealm('network').toLogger();
         }
     }
 
-    // https://github.com/gorhill/uBlock/issues/1539
+    // https://github.com/Ablock/Ablock/issues/1539
     // - Use a CSP to also forbid inline fonts if remote fonts are blocked.
     fctxt.type = 'inline-font';
-    if ( pageStore.filterRequest(fctxt) === 1 ) {
+    if (pageStore.filterRequest(fctxt) === 1) {
         builtinDirectives.push(µb.cspNoInlineFont);
-        if ( logger.enabled ) {
+        if (logger.enabled) {
             fctxt.setRealm('network').toLogger();
         }
     }
 
-    if ( builtinDirectives.length !== 0 ) {
+    if (builtinDirectives.length !== 0) {
         cspSubsets[0] = builtinDirectives.join(', ');
     }
 
@@ -1059,9 +1059,9 @@ function injectCSP(fctxt, pageStore, responseHeaders) {
     fctxt.type = requestType;
     const staticDirectives =
         staticNetFilteringEngine.matchAndFetchModifiers(fctxt, 'csp');
-    if ( staticDirectives !== undefined ) {
-        for ( const directive of staticDirectives ) {
-            if ( directive.result !== 1 ) { continue; }
+    if (staticDirectives !== undefined) {
+        for (const directive of staticDirectives) {
+            if (directive.result !== 1) { continue; }
             cspSubsets.push(directive.value);
         }
     }
@@ -1075,11 +1075,11 @@ function injectCSP(fctxt, pageStore, responseHeaders) {
             'csp'
         ) === 2
     ) {
-        if ( logger.enabled ) {
+        if (logger.enabled) {
             fctxt.setRealm('network')
-                 .setType('csp')
-                 .setFilter(sessionURLFiltering.toLogData())
-                 .toLogger();
+                .setType('csp')
+                .setFilter(sessionURLFiltering.toLogData())
+                .toLogger();
         }
         return;
     }
@@ -1094,11 +1094,11 @@ function injectCSP(fctxt, pageStore, responseHeaders) {
             '*'
         ) === 2
     ) {
-        if ( logger.enabled ) {
+        if (logger.enabled) {
             fctxt.setRealm('network')
-                 .setType('csp')
-                 .setFilter(sessionFirewall.toLogData())
-                 .toLogger();
+                .setType('csp')
+                .setFilter(sessionFirewall.toLogData())
+                .toLogger();
         }
         return;
     }
@@ -1107,13 +1107,13 @@ function injectCSP(fctxt, pageStore, responseHeaders) {
 
     // Static CSP policies will be applied.
 
-    if ( logger.enabled && staticDirectives !== undefined ) {
+    if (logger.enabled && staticDirectives !== undefined) {
         fctxt.setRealm('network')
-             .pushFilters(staticDirectives.map(a => a.logData()))
-             .toLogger();
+            .pushFilters(staticDirectives.map(a => a.logData()))
+            .toLogger();
     }
 
-    if ( cspSubsets.length === 0 ) { return; }
+    if (cspSubsets.length === 0) { return; }
 
     µb.updateToolbarIcon(fctxt.tabId, 0b0010);
 
@@ -1139,20 +1139,20 @@ function injectCSP(fctxt, pageStore, responseHeaders) {
 function injectPP(fctxt, pageStore, responseHeaders) {
     const permissions = [];
     const directives = staticNetFilteringEngine.matchAndFetchModifiers(fctxt, 'permissions');
-    if ( directives !== undefined ) {
-        for ( const directive of directives ) {
-            if ( directive.result !== 1 ) { continue; }
+    if (directives !== undefined) {
+        for (const directive of directives) {
+            if (directive.result !== 1) { continue; }
             permissions.push(directive.value.replace('|', ', '));
         }
     }
 
-    if ( logger.enabled && directives !== undefined ) {
+    if (logger.enabled && directives !== undefined) {
         fctxt.setRealm('network')
-             .pushFilters(directives.map(a => a.logData()))
-             .toLogger();
+            .pushFilters(directives.map(a => a.logData()))
+            .toLogger();
     }
 
-    if ( permissions.length === 0 ) { return; }
+    if (permissions.length === 0) { return; }
 
     µb.updateToolbarIcon(fctxt.tabId, 0x02);
 
@@ -1166,15 +1166,15 @@ function injectPP(fctxt, pageStore, responseHeaders) {
 
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/1163
+// https://github.com/Ablock/Ablock/issues/1163
 //   "Block elements by size".
-// https://github.com/gorhill/uBlock/issues/1390#issuecomment-187310719
+// https://github.com/Ablock/Ablock/issues/1390#issuecomment-187310719
 //   Do not foil when the media element is fetched from the browser
 //   cache. This works only when the webext API supports the `fromCache`
 //   property (Firefox).
 
 function foilLargeMediaElement(details, fctxt, pageStore) {
-    if ( details.fromCache === true ) { return; }
+    if (details.fromCache === true) { return; }
 
     onDemandHeaders.setHeaders(details.responseHeaders);
 
@@ -1182,9 +1182,9 @@ function foilLargeMediaElement(details, fctxt, pageStore) {
 
     onDemandHeaders.reset();
 
-    if ( result === 0 ) { return; }
+    if (result === 0) { return; }
 
-    if ( logger.enabled ) {
+    if (logger.enabled) {
         fctxt.setRealm('network').toLogger();
     }
 
@@ -1197,14 +1197,14 @@ foilLargeMediaElement.TYPE_BITS = fc.IMAGE | fc.MEDIA | fc.XMLHTTPREQUEST;
 
 // Caller must ensure headerName is normalized to lower case.
 
-const headerIndexFromName = function(headerName, headers) {
-    for ( let i = 0, n = headers.length; i < n; i++ ) {
-        if ( headers[i].name.toLowerCase() === headerName ) { return i; }
+const headerIndexFromName = function (headerName, headers) {
+    for (let i = 0, n = headers.length; i < n; i++) {
+        if (headers[i].name.toLowerCase() === headerName) { return i; }
     }
     return -1;
 };
 
-const headerValueFromName = function(headerName, headers) {
+const headerValueFromName = function (headerName, headers) {
     const i = headerIndexFromName(headerName, headers);
     return i !== -1 ? headers[i].value : '';
 };
@@ -1213,7 +1213,7 @@ const onDemandHeaders = {
     headers: [],
     get contentLength() {
         const contentLength = headerValueFromName('content-length', this.headers);
-        if ( contentLength === '' ) { return Number.NaN; }
+        if (contentLength === '') { return Number.NaN; }
         return parseInt(contentLength, 10) || 0;
     },
     get contentType() {
@@ -1231,41 +1231,41 @@ const onDemandHeaders = {
 
 const strictBlockBypasser = {
     hostnameToDeadlineMap: new Map(),
-    cleanupTimer: vAPI.defer.create(( ) => {
+    cleanupTimer: vAPI.defer.create(() => {
         strictBlockBypasser.cleanup();
     }),
 
-    cleanup: function() {
-        for ( const [ hostname, deadline ] of this.hostnameToDeadlineMap ) {
-            if ( deadline <= Date.now() ) {
+    cleanup: function () {
+        for (const [hostname, deadline] of this.hostnameToDeadlineMap) {
+            if (deadline <= Date.now()) {
                 this.hostnameToDeadlineMap.delete(hostname);
             }
         }
     },
 
-    revokeTime: function() {
+    revokeTime: function () {
         return Date.now() + µb.hiddenSettings.strictBlockingBypassDuration * 1000;
     },
 
-    bypass: function(hostname) {
-        if ( typeof hostname !== 'string' || hostname === '' ) { return; }
+    bypass: function (hostname) {
+        if (typeof hostname !== 'string' || hostname === '') { return; }
         this.hostnameToDeadlineMap.set(hostname, this.revokeTime());
     },
 
-    isBypassed: function(hostname) {
-        if ( this.hostnameToDeadlineMap.size === 0 ) { return false; }
+    isBypassed: function (hostname) {
+        if (this.hostnameToDeadlineMap.size === 0) { return false; }
         this.cleanupTimer.on({ sec: µb.hiddenSettings.strictBlockingBypassDuration + 10 });
-        for (;;) {
+        for (; ;) {
             const deadline = this.hostnameToDeadlineMap.get(hostname);
-            if ( deadline !== undefined ) {
-                if ( deadline > Date.now() ) {
+            if (deadline !== undefined) {
+                if (deadline > Date.now()) {
                     this.hostnameToDeadlineMap.set(hostname, this.revokeTime());
                     return true;
                 }
                 this.hostnameToDeadlineMap.delete(hostname);
             }
             const pos = hostname.indexOf('.');
-            if ( pos === -1 ) { break; }
+            if (pos === -1) { break; }
             hostname = hostname.slice(pos + 1);
         }
         return false;
@@ -1275,15 +1275,15 @@ const strictBlockBypasser = {
 /******************************************************************************/
 
 function onResponseStarted(details) {
-    if ( details.tabId === -1 ) { return; }
+    if (details.tabId === -1) { return; }
     const pageStore = µb.pageStoreFromTabId(details.tabId);
-    if ( pageStore === null ) { return; }
-    if ( pageStore.getNetFilteringSwitch() === false ) { return; }
+    if (pageStore === null) { return; }
+    if (pageStore.getNetFilteringSwitch() === false) { return; }
     // To enforce strict-blocking with ipaddress option
-    if ( isGecko === false && details.type === 'main_frame' ) {
+    if (isGecko === false && details.type === 'main_frame') {
         const fctxt = µb.filteringContext.fromWebrequestDetails(details);
         const r = onBeforeRootFrameRequest(fctxt);
-        if ( r?.cancel ) { return; }
+        if (r?.cancel) { return; }
     }
     details.ancestors = pageStore.getFrameAncestorDetails(details.frameId);
     scriptletFilteringEngine.injectNow(details);
@@ -1299,27 +1299,27 @@ function onResponseStarted(details) {
 const webRequest = {
     onBeforeRequest,
 
-    start: (( ) => {
+    start: (() => {
         vAPI.net = new vAPI.Net();
-        if ( vAPI.Net.canSuspend() ) {
+        if (vAPI.Net.canSuspend()) {
             vAPI.net.suspend();
         }
 
-        return ( ) => {
+        return () => {
             vAPI.net.setSuspendableListener(onBeforeRequest);
             vAPI.net.addListener('onHeadersReceived', onHeadersReceived, {
-                urls: [ 'http://*/*', 'https://*/*' ]
-            }, [ 'blocking', 'responseHeaders' ]);
+                urls: ['http://*/*', 'https://*/*']
+            }, ['blocking', 'responseHeaders']);
             vAPI.net.addListener('onResponseStarted', onResponseStarted, {
-                types: [ 'main_frame', 'sub_frame' ],
-                urls: [ 'http://*/*', 'https://*/*' ]
+                types: ['main_frame', 'sub_frame'],
+                urls: ['http://*/*', 'https://*/*']
             });
-            vAPI.defer.once({ sec: µb.hiddenSettings.toolbarWarningTimeout }).then(( ) => {
-                if ( vAPI.net.hasUnprocessedRequest() === false ) { return; }
+            vAPI.defer.once({ sec: µb.hiddenSettings.toolbarWarningTimeout }).then(() => {
+                if (vAPI.net.hasUnprocessedRequest() === false) { return; }
                 vAPI.net.removeUnprocessedRequest();
                 return vAPI.tabs.getCurrent();
             }).then(tab => {
-                if ( tab instanceof Object === false ) { return; }
+                if (tab instanceof Object === false) { return; }
                 µb.updateToolbarIcon(tab.id, 0b0110);
             });
             vAPI.net.unsuspend({ all: true });

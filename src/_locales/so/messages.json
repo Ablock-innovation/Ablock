@@ -368,7 +368,7 @@
     "description": "English: "
   },
   "settingPerSiteSwitchGroup": {
-    "message": "Waxaan ahay isticmaale horumarsan (<a href='https://github.com/gorhill/uBlock/wiki/Advanced-user-features'>akhris loo baahan yahay</a>)",
+    "message": "Waxaan ahay isticmaale horumarsan (<a href='https://github.com/Ablock/Ablock/wiki/Advanced-user-features'>akhris loo baahan yahay</a>)",
     "description": ""
   },
   "settingPerSiteSwitchGroupSynopsis": {
@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "Dabeecadahan aan caadiga ahayn waa laga gudbi karaa si ku saleysan goob kasta",
-    "description": "background information: https://github.com/gorhill/uBlock/issues/3150"
+    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Dami shaandhaynta qurxinta",
@@ -640,7 +640,7 @@
     "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
-    "message": "Xeerka syntax: <code> nooca goobta loo socdo</code> (<a href='https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-rule-syntax'>full documents</a> ).",
+    "message": "Xeerka syntax: <code> nooca goobta loo socdo</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>full documents</a> ).",
     "description": "The default filename to use for import/export purpose"
   },
   "whitelistApply": {

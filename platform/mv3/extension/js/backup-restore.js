@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import {
@@ -32,44 +32,44 @@ export async function backupToObject(currentConfig) {
     const manifest = runtime.getManifest();
     out.version = manifest.versionName ?? manifest.version;
     const defaultConfig = await sendMessage({ what: 'getDefaultConfig' });
-    if ( currentConfig.autoReload !== defaultConfig.autoReload ) {
+    if (currentConfig.autoReload !== defaultConfig.autoReload) {
         out.autoReload = currentConfig.autoReload;
     }
-    if ( currentConfig.developerMode !== defaultConfig.developerMode ) {
+    if (currentConfig.developerMode !== defaultConfig.developerMode) {
         out.developerMode = currentConfig.developerMode;
     }
-    if ( currentConfig.showBlockedCount !== defaultConfig.showBlockedCount ) {
+    if (currentConfig.showBlockedCount !== defaultConfig.showBlockedCount) {
         out.showBlockedCount = currentConfig.showBlockedCount;
     }
-    if ( currentConfig.strictBlockMode !== defaultConfig.strictBlockMode ) {
+    if (currentConfig.strictBlockMode !== defaultConfig.strictBlockMode) {
         out.strictBlockMode = currentConfig.strictBlockMode;
     }
     const { enabledRulesets } = currentConfig;
     const customRulesets = [];
-    for ( const id of enabledRulesets ) {
-        if ( defaultConfig.rulesets.includes(id) ) { continue; }
+    for (const id of enabledRulesets) {
+        if (defaultConfig.rulesets.includes(id)) { continue; }
         customRulesets.push(`+${id}`);
     }
-    for ( const id of defaultConfig.rulesets ) {
-        if ( enabledRulesets.includes(id) ) { continue; }
+    for (const id of defaultConfig.rulesets) {
+        if (enabledRulesets.includes(id)) { continue; }
         customRulesets.push(`-${id}`);
     }
-    if ( customRulesets.length !== 0 ) {
+    if (customRulesets.length !== 0) {
         out.rulesets = customRulesets;
     }
     out.filteringModes = await sendMessage({ what: 'getFilteringModeDetails' });
     const customFilters = await sendMessage({ what: 'getAllCustomFilters' });
     const filters = [];
-    for ( const [ hostname, selectors ] of customFilters ) {
-        for ( const selector of selectors ) {
+    for (const [hostname, selectors] of customFilters) {
+        for (const selector of selectors) {
             filters.push(`${hostname}##${selector}`);
         }
     }
-    if ( filters.length !== 0 ) {
+    if (filters.length !== 0) {
         out.cosmeticFilters = filters;
     }
     const dnrRules = await localRead('userDnrRules');
-    if ( typeof dnrRules === 'string' && dnrRules.length !== 0 ) {
+    if (typeof dnrRules === 'string' && dnrRules.length !== 0) {
         out.dnrRules = dnrRules.split(/\n+/);
     }
     return out;
@@ -101,11 +101,11 @@ export async function restoreFromObject(targetConfig) {
     });
 
     const enabledRulesets = new Set(defaultConfig.rulesets);
-    for ( const entry of targetConfig.rulesets || [] ) {
+    for (const entry of targetConfig.rulesets || []) {
         const id = entry.slice(1);
-        if ( entry.startsWith('+') ) {
+        if (entry.startsWith('+')) {
             enabledRulesets.add(id);
-        } else if ( entry.startsWith('-') ) {
+        } else if (entry.startsWith('-')) {
             enabledRulesets.delete(id);
         }
     }
@@ -121,21 +121,21 @@ export async function restoreFromObject(targetConfig) {
 
     await sendMessage({ what: 'removeAllCustomFilters', hostname: '*' });
     const hostnameMap = new Map();
-    for ( const line of targetConfig.cosmeticFilters ?? [] ) {
+    for (const line of targetConfig.cosmeticFilters ?? []) {
         const i = line.indexOf('##');
-        if ( i === -1 ) { continue; }
+        if (i === -1) { continue; }
         const hostname = line.slice(0, i);
-        if ( hostname === '' ) { continue; }
-        const selector = line.slice(i+2);
-        if ( selector === '' ) { continue; }
+        if (hostname === '') { continue; }
+        const selector = line.slice(i + 2);
+        if (selector === '') { continue; }
         const selectors = hostnameMap.get(hostname) || [];
-        if ( selectors.length === 0 ) {
+        if (selectors.length === 0) {
             hostnameMap.set(hostname, selectors)
         }
         selectors.push(selector);
     }
     const promises = [];
-    for ( const [ hostname, selectors ] of hostnameMap ) {
+    for (const [hostname, selectors] of hostnameMap) {
         promises.push(
             sendMessage({ what: 'addCustomFilters', hostname, selectors })
         );
@@ -143,7 +143,7 @@ export async function restoreFromObject(targetConfig) {
     await Promise.all(promises);
 
     const dnrRules = targetConfig.dnrRules ?? [];
-    if ( dnrRules.length !== 0 ) {
+    if (dnrRules.length !== 0) {
         await localWrite('userDnrRules', dnrRules.join('\n'));
     } else {
         await localRemove('userDnrRules');

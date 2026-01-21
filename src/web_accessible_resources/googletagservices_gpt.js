@@ -16,24 +16,24 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
     // https://developers.google.com/doubleclick-gpt/reference
-    const noopfn = function() {
+    const noopfn = function () {
     }.bind();
-    const noopthisfn = function() {
+    const noopthisfn = function () {
         return this;
     };
-    const noopnullfn = function() {
+    const noopnullfn = function () {
         return null;
     };
-    const nooparrayfn = function() {
+    const nooparrayfn = function () {
         return [];
     };
-    const noopstrfn = function() {
+    const noopstrfn = function () {
         return '';
     };
     //
@@ -46,7 +46,7 @@
         addEventListener: noopthisfn,
         setContent: noopfn
     };
-    const PassbackSlot = function() {
+    const PassbackSlot = function () {
     };
     let p = PassbackSlot.prototype;
     p.display = noopfn;
@@ -63,8 +63,8 @@
         clearTagForChildDirectedTreatment: noopthisfn,
         clearTargeting: noopthisfn,
         collapseEmptyDivs: noopfn,
-        defineOutOfPagePassback: function() { return new PassbackSlot(); },
-        definePassback: function() { return new PassbackSlot(); },
+        defineOutOfPagePassback: function () { return new PassbackSlot(); },
+        definePassback: function () { return new PassbackSlot(); },
         disableInitialLoad: noopfn,
         display: noopfn,
         enableAsyncRendering: noopfn,
@@ -94,12 +94,12 @@
         setVideoContent: noopthisfn,
         updateCorrelator: noopfn
     };
-    const SizeMappingBuilder = function() {
+    const SizeMappingBuilder = function () {
     };
     p = SizeMappingBuilder.prototype;
     p.addSize = noopthisfn;
     p.build = noopnullfn;
-    const Slot = function() {
+    const Slot = function () {
     };
     p = Slot.prototype;
     p.addService = noopthisfn;
@@ -127,28 +127,28 @@
     const cmd = gpt.cmd || [];
     gpt.apiReady = true;
     gpt.cmd = [];
-    gpt.cmd.push = function(a) {
+    gpt.cmd.push = function (a) {
         try {
             a();
         } catch (ex) {
         }
         return 1;
     };
-    gpt.companionAds = function() { return companionAdsService; };
-    gpt.content = function() { return contentService; };
-    gpt.defineOutOfPageSlot = function() { return new Slot(); };
-    gpt.defineSlot = function() { return new Slot(); };
+    gpt.companionAds = function () { return companionAdsService; };
+    gpt.content = function () { return contentService; };
+    gpt.defineOutOfPageSlot = function () { return new Slot(); };
+    gpt.defineSlot = function () { return new Slot(); };
     gpt.destroySlots = noopfn;
     gpt.disablePublisherConsole = noopfn;
     gpt.display = noopfn;
     gpt.enableServices = noopfn;
     gpt.getVersion = noopstrfn;
-    gpt.pubads = function() { return pubAdsService; };
+    gpt.pubads = function () { return pubAdsService; };
     gpt.pubadsReady = true;
     gpt.setAdIframeTitle = noopfn;
-    gpt.sizeMapping = function() { return new SizeMappingBuilder(); };
+    gpt.sizeMapping = function () { return new SizeMappingBuilder(); };
     window.googletag = gpt;
-    while ( cmd.length !== 0 ) {
+    while (cmd.length !== 0) {
         gpt.cmd.push(cmd.shift());
     }
 })();

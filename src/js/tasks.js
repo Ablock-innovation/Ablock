@@ -16,11 +16,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 export function queueTask(func, timeout = 5000) {
-    if ( typeof requestIdleCallback === 'undefined' ) {
+    if (typeof requestIdleCallback === 'undefined') {
         return setTimeout(func, 1);
     }
 
@@ -28,7 +28,7 @@ export function queueTask(func, timeout = 5000) {
 }
 
 export function dropTask(id) {
-    if ( typeof cancelIdleCallback === 'undefined' ) {
+    if (typeof cancelIdleCallback === 'undefined') {
         return clearTimeout(id);
     }
 

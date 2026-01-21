@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 export function safeReplace(text, pattern, replacement, count = 1) {
@@ -24,14 +24,14 @@ export function safeReplace(text, pattern, replacement, count = 1) {
         ? new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
         : pattern;
     let out = text;
-    for (;;) {
+    for (; ;) {
         const match = rePattern.exec(out);
-        if ( match === null ) { break; }
+        if (match === null) { break; }
         out = out.slice(0, match.index) +
-        replacement +
-        out.slice(match.index + match[0].length);
+            replacement +
+            out.slice(match.index + match[0].length);
         count -= 1;
-        if ( count === 0 ) { break; }
+        if (count === 0) { break; }
     }
     return out;
 }

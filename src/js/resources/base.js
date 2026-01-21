@@ -16,21 +16,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
 export const registeredScriptlets = [];
 
 export const registerScriptlet = (fn, details) => {
-    if ( typeof details !== 'object' ) {
+    if (typeof details !== 'object') {
         throw new ReferenceError('Missing scriptlet details');
     }
     details.fn = fn;
     fn.details = details;
-    if ( Array.isArray(details.dependencies) ) {
+    if (Array.isArray(details.dependencies)) {
         details.dependencies.forEach((fn, i, array) => {
-            if ( typeof fn !== 'function' ) { return; }
+            if (typeof fn !== 'function') { return; }
             array[i] = fn.details.name;
         });
     }

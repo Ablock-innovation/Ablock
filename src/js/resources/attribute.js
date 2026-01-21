@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -34,8 +34,8 @@ export function setAttrFn(
     value = '',
     options = {}
 ) {
-    if ( selector === '' ) { return; }
-    if ( attr === '' ) { return; }
+    if (selector === '') { return; }
+    if (attr === '') { return; }
 
     const safe = safeSelf();
     const copyFrom = trusted === false && /^\[.+\]$/.test(value)
@@ -46,19 +46,19 @@ export function setAttrFn(
         ? elem.getAttribute(copyFrom) || ''
         : value;
 
-    const applySetAttr = ( ) => {
+    const applySetAttr = () => {
         let elems;
         try {
             elems = document.querySelectorAll(selector);
         } catch {
             return false;
         }
-        for ( const elem of elems ) {
+        for (const elem of elems) {
             const before = elem.getAttribute(attr);
             const after = extractValue(elem);
-            if ( after === before ) { continue; }
-            if ( after !== '' && /^on/i.test(attr) ) {
-                if ( attr.toLowerCase() in elem ) { continue; }
+            if (after === before) { continue; }
+            if (after !== '' && /^on/i.test(attr)) {
+                if (attr.toLowerCase() in elem) { continue; }
             }
             elem.setAttribute(attr, after);
             safe.uboLog(logPrefix, `${attr}="${after}"`);
@@ -68,33 +68,33 @@ export function setAttrFn(
 
     let observer, timer;
     const onDomChanged = mutations => {
-        if ( timer !== undefined ) { return; }
+        if (timer !== undefined) { return; }
         let shouldWork = false;
-        for ( const mutation of mutations ) {
-            if ( mutation.addedNodes.length === 0 ) { continue; }
-            for ( const node of mutation.addedNodes ) {
-                if ( node.nodeType !== 1 ) { continue; }
+        for (const mutation of mutations) {
+            if (mutation.addedNodes.length === 0) { continue; }
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType !== 1) { continue; }
                 shouldWork = true;
                 break;
             }
-            if ( shouldWork ) { break; }
+            if (shouldWork) { break; }
         }
-        if ( shouldWork === false ) { return; }
-        timer = self.requestAnimationFrame(( ) => {
+        if (shouldWork === false) { return; }
+        timer = self.requestAnimationFrame(() => {
             timer = undefined;
             applySetAttr();
         });
     };
 
-    const start = ( ) => {
-        if ( applySetAttr() === false ) { return; }
+    const start = () => {
+        if (applySetAttr() === false) { return; }
         observer = new MutationObserver(onDomChanged);
         observer.observe(document.body, {
             subtree: true,
             childList: true,
         });
     };
-    runAt(( ) => { start(); }, options.runAt || 'idle');
+    runAt(() => { start(); }, options.runAt || 'idle');
 }
 registerScriptlet(setAttrFn, {
     name: 'set-attr.fn',
@@ -136,13 +136,13 @@ export function setAttr(
 ) {
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('set-attr', selector, attr, value);
-    const validValues = [ '', 'false', 'true' ];
-    if ( validValues.includes(value.toLowerCase()) === false ) {
-        if ( /^\d+$/.test(value) ) {
+    const validValues = ['', 'false', 'true'];
+    if (validValues.includes(value.toLowerCase()) === false) {
+        if (/^\d+$/.test(value)) {
             const n = parseInt(value, 10);
-            if ( n >= 32768 ) { return; }
+            if (n >= 32768) { return; }
             value = `${n}`;
-        } else if ( /^\[.+\]$/.test(value) === false ) {
+        } else if (/^\[.+\]$/.test(value) === false) {
             return;
         }
     }
@@ -226,36 +226,36 @@ export function removeAttr(
     rawSelector = '',
     behavior = ''
 ) {
-    if ( typeof rawToken !== 'string' ) { return; }
-    if ( rawToken === '' ) { return; }
+    if (typeof rawToken !== 'string') { return; }
+    if (rawToken === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix('remove-attr', rawToken, rawSelector, behavior);
     const tokens = safe.String_split.call(rawToken, /\s*\|\s*/);
     const selector = tokens
         .map(a => `${rawSelector}[${CSS.escape(a)}]`)
         .join(',');
-    if ( safe.logLevel > 1 ) {
+    if (safe.logLevel > 1) {
         safe.uboLog(logPrefix, `Target selector:\n\t${selector}`);
     }
     const asap = /\basap\b/.test(behavior);
     let timerId;
-    const rmattrAsync = ( ) => {
-        if ( timerId !== undefined ) { return; }
-        timerId = safe.onIdle(( ) => {
+    const rmattrAsync = () => {
+        if (timerId !== undefined) { return; }
+        timerId = safe.onIdle(() => {
             timerId = undefined;
             rmattr();
         }, { timeout: 17 });
     };
-    const rmattr = ( ) => {
-        if ( timerId !== undefined ) {
+    const rmattr = () => {
+        if (timerId !== undefined) {
             safe.offIdle(timerId);
             timerId = undefined;
         }
         try {
             const nodes = document.querySelectorAll(selector);
-            for ( const node of nodes ) {
-                for ( const attr of tokens ) {
-                    if ( node.hasAttribute(attr) === false ) { continue; }
+            for (const node of nodes) {
+                for (const attr of tokens) {
+                    if (node.hasAttribute(attr) === false) { continue; }
                     node.removeAttribute(attr);
                     safe.uboLog(logPrefix, `Removed attribute '${attr}'`);
                 }
@@ -264,24 +264,24 @@ export function removeAttr(
         }
     };
     const mutationHandler = mutations => {
-        if ( timerId !== undefined ) { return; }
+        if (timerId !== undefined) { return; }
         let skip = true;
-        for ( let i = 0; i < mutations.length && skip; i++ ) {
+        for (let i = 0; i < mutations.length && skip; i++) {
             const { type, addedNodes, removedNodes } = mutations[i];
-            if ( type === 'attributes' ) { skip = false; }
-            for ( let j = 0; j < addedNodes.length && skip; j++ ) {
-                if ( addedNodes[j].nodeType === 1 ) { skip = false; break; }
+            if (type === 'attributes') { skip = false; }
+            for (let j = 0; j < addedNodes.length && skip; j++) {
+                if (addedNodes[j].nodeType === 1) { skip = false; break; }
             }
-            for ( let j = 0; j < removedNodes.length && skip; j++ ) {
-                if ( removedNodes[j].nodeType === 1 ) { skip = false; break; }
+            for (let j = 0; j < removedNodes.length && skip; j++) {
+                if (removedNodes[j].nodeType === 1) { skip = false; break; }
             }
         }
-        if ( skip ) { return; }
+        if (skip) { return; }
         asap ? rmattr() : rmattrAsync();
     };
-    const start = ( ) => {
+    const start = () => {
         rmattr();
-        if ( /\bstay\b/.test(behavior) === false ) { return; }
+        if (/\bstay\b/.test(behavior) === false) { return; }
         const observer = new MutationObserver(mutationHandler);
         observer.observe(document, {
             attributes: true,
@@ -290,7 +290,7 @@ export function removeAttr(
             subtree: true,
         });
     };
-    runAt(( ) => { start(); }, safe.String_split.call(behavior, /\s+/));
+    runAt(() => { start(); }, safe.String_split.call(behavior, /\s+/));
 }
 registerScriptlet(removeAttr, {
     name: 'remove-attr.js',

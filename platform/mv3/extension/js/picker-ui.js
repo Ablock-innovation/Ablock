@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -36,9 +36,9 @@ let sliderPartsPos = -1;
 
 function validateSelector(selector) {
     validateSelector.error = undefined;
-    if ( selector === '' ) { return; }
+    if (selector === '') { return; }
     const result = {};
-    if ( selectorCompiler.compile(selector, result) ) {
+    if (selectorCompiler.compile(selector, result)) {
         return result.compiled;
     }
     validateSelector.error = 'Error';
@@ -47,13 +47,13 @@ function validateSelector(selector) {
 /******************************************************************************/
 
 function onSvgTouch(ev) {
-    if ( ev.type === 'touchstart' ) {
+    if (ev.type === 'touchstart') {
         onSvgTouch.x0 = ev.touches[0].screenX;
         onSvgTouch.y0 = ev.touches[0].screenY;
         onSvgTouch.t0 = ev.timeStamp;
         return;
     }
-    if ( onSvgTouch.x0 === undefined ) { return; }
+    if (onSvgTouch.x0 === undefined) { return; }
     const stopX = ev.changedTouches[0].screenX;
     const stopY = ev.changedTouches[0].screenY;
     const distance = Math.sqrt(
@@ -64,7 +64,7 @@ function onSvgTouch(ev) {
     // - Swipe is not valid; and
     // - The time between start and stop was less than 200ms.
     const duration = ev.timeStamp - onSvgTouch.t0;
-    if ( distance >= 32 || duration >= 200 ) { return; }
+    if (distance >= 32 || duration >= 200) { return; }
     onSvgClicked({
         type: 'touch',
         target: ev.target,
@@ -82,15 +82,15 @@ function onSvgClicked(ev) {
     // Unpause picker if:
     // - click outside dialog AND
     // - not in preview mode
-    if ( dom.cl.has(dom.root, 'paused') ) {
-        if ( dom.cl.has(dom.root, 'preview') ) {
+    if (dom.cl.has(dom.root, 'paused')) {
+        if (dom.cl.has(dom.root, 'preview')) {
             updatePreview(false);
         }
         unpausePicker();
         return;
     }
     // Force dialog to always be visible when using a touch-driven device.
-    if ( ev.type === 'touch' ) {
+    if (ev.type === 'touch') {
         dom.cl.add(dom.root, 'show');
     }
     toolOverlay.postMessage({
@@ -106,7 +106,7 @@ function onSvgClicked(ev) {
 /******************************************************************************/
 
 function onKeyPressed(ev) {
-    if ( ev.key === 'Escape' || ev.which === 27 ) {
+    if (ev.key === 'Escape' || ev.which === 27) {
         quitPicker();
         return;
     }
@@ -115,7 +115,7 @@ function onKeyPressed(ev) {
 /******************************************************************************/
 
 function onMinimizeClicked() {
-    if ( dom.cl.has(dom.root, 'paused') === false ) {
+    if (dom.cl.has(dom.root, 'paused') === false) {
         pausePicker();
         highlightCandidate();
         return;
@@ -133,15 +133,15 @@ function onFilterTextChanged() {
 
 function toggleView(view, persist = false) {
     dom.root.dataset.view = `${view}`;
-    if ( persist !== true ) { return; }
+    if (persist !== true) { return; }
     localWrite('picker.view', dom.root.dataset.view);
 }
 
 function onViewToggled(dir) {
     let view = parseInt(dom.root.dataset.view, 10);
     view += dir;
-    if ( view < 0 ) { view = 0; }
-    if ( view > 2 ) { view = 2; }
+    if (view < 0) { view = 0; }
+    if (view > 2) { view = 2; }
     toggleView(view, true);
 }
 
@@ -150,16 +150,16 @@ function onViewToggled(dir) {
 function selectorFromCandidates() {
     const selectorParts = [];
     let liPrevious = null;
-    for ( const li of qsa$('#candidateFilters li') ) {
+    for (const li of qsa$('#candidateFilters li')) {
         const selector = [];
-        for ( const span of qsa$(li, '.on[data-part]') ) {
+        for (const span of qsa$(li, '.on[data-part]')) {
             selector.push(span.textContent);
         }
-        if ( selector.length !== 0 ) {
-            if ( liPrevious !== null ) {
-                if ( li.previousElementSibling === liPrevious ) {
+        if (selector.length !== 0) {
+            if (liPrevious !== null) {
+                if (li.previousElementSibling === liPrevious) {
                     selectorParts.unshift(' > ');
-                } else if ( liPrevious !== li ) {
+                } else if (liPrevious !== li) {
                     selectorParts.unshift(' ');
                 }
             }
@@ -177,11 +177,11 @@ function onSliderChanged(ev) {
 }
 
 function updateSlider(i) {
-    if ( i === sliderPartsPos ) { return; }
+    if (i === sliderPartsPos) { return; }
     sliderPartsPos = i;
     dom.cl.remove('#candidateFilters [data-part]', 'on');
     const parts = sliderParts[i];
-    for ( const address of parts ) {
+    for (const address of parts) {
         dom.cl.add(`#candidateFilters [data-part="${address}"]`, 'on');
     }
     const selector = selectorFromCandidates();
@@ -194,7 +194,7 @@ function updateSlider(i) {
 function updateElementCount(details) {
     const { count, error } = details;
     const span = qs$('#resultsetCount');
-    if ( error ) {
+    if (error) {
         span.textContent = 'Error';
         span.setAttribute('title', error);
     } else {
@@ -214,7 +214,7 @@ function onPreviewClicked() {
 }
 
 function updatePreview(state) {
-    if ( state === undefined ) {
+    if (state === undefined) {
         state = dom.cl.has(dom.root, 'preview');
     } else {
         dom.cl.toggle(dom.root, 'preview', state)
@@ -227,12 +227,12 @@ function updatePreview(state) {
 
 async function onCreateClicked() {
     const selector = validateSelector(qs$('textarea').value);
-    if ( selector === undefined ) { return; }
+    if (selector === undefined) { return; }
     await toolOverlay.postMessage({ what: 'terminateCustomFilters' });
     await toolOverlay.sendMessage({
         what: 'addCustomFilters',
         hostname: toolOverlay.url.hostname,
-        selectors: [ selector ],
+        selectors: [selector],
     });
     await toolOverlay.postMessage({ what: 'startCustomFilters' });
     qs$('textarea').value = '';
@@ -251,14 +251,14 @@ function attributeNameFromSelector(part) {
 
 function onCandidateClicked(ev) {
     const target = ev.target;
-    if ( target.matches('[data-part]') ) {
+    if (target.matches('[data-part]')) {
         const address = target.dataset.part;
         const part = selectorPartsDB.get(parseInt(address, 10));
-        if ( part.startsWith('[') ) {
-            if ( target.textContent === part ) {
+        if (part.startsWith('[')) {
+            if (target.textContent === part) {
                 target.textContent = `[${attributeNameFromSelector(part)}]`;
                 dom.cl.remove(target, 'on');
-            } else if ( dom.cl.has(target, 'on') ) {
+            } else if (dom.cl.has(target, 'on')) {
                 target.textContent = part;
             } else {
                 dom.cl.add(target, 'on');
@@ -266,8 +266,8 @@ function onCandidateClicked(ev) {
         } else {
             dom.cl.toggle(target, 'on');
         }
-    } else if ( target.matches('li') ) {
-        if ( qs$(target, ':scope > span:not(.on)') !== null ) {
+    } else if (target.matches('li')) {
+        if (qs$(target, ':scope > span:not(.on)') !== null) {
             dom.cl.add(qsa$(target, ':scope > [data-part]:not(.on)'), 'on');
         } else {
             dom.cl.remove(qsa$(target, ':scope > [data-part]'), 'on');
@@ -287,16 +287,16 @@ function showDialog(msg) {
     const { listParts } = msg;
     const root = qs$('#candidateFilters');
     const ul = qs$(root, 'ul');
-    while ( ul.firstChild !== null ) {
+    while (ul.firstChild !== null) {
         ul.firstChild.remove();
     }
-    for ( const parts of listParts ) {
+    for (const parts of listParts) {
         const li = document.createElement('li');
-        for ( const address of parts ) {
+        for (const address of parts) {
             const span = document.createElement('span');
             const part = selectorPartsDB.get(address);
             span.dataset.part = address;
-            if ( part.startsWith('[') ) {
+            if (part.startsWith('[')) {
                 span.textContent = `[${attributeNameFromSelector(part)}]`;
             } else {
                 span.textContent = part;
@@ -321,7 +321,7 @@ function showDialog(msg) {
 
 function highlightCandidate() {
     const selector = validateSelector(qs$('textarea').value);
-    if ( selector === undefined ) {
+    if (selector === undefined) {
         toolOverlay.postMessage({ what: 'unhighlight' });
         updateElementCount({ count: 0, error: validateSelector.error });
         return;
@@ -367,7 +367,7 @@ function startPicker() {
     toolOverlay.postMessage({ what: 'startTool' });
 
     localRead('picker.view').then(value => {
-        if ( Boolean(value) === false ) { return; }
+        if (Boolean(value) === false) { return; }
         toggleView(value);
     });
 
@@ -381,9 +381,9 @@ function startPicker() {
     dom.on('#slider', 'input', onSliderChanged);
     dom.on('#pick', 'click', resetPicker);
     dom.on('#preview', 'click', onPreviewClicked);
-    dom.on('#moreOrLess > span:first-of-type', 'click', ( ) => { onViewToggled(1); });
-    dom.on('#moreOrLess > span:last-of-type', 'click', ( ) => { onViewToggled(-1); });
-    dom.on('#create', 'click', ( ) => { onCreateClicked(); });
+    dom.on('#moreOrLess > span:first-of-type', 'click', () => { onViewToggled(1); });
+    dom.on('#moreOrLess > span:last-of-type', 'click', () => { onViewToggled(-1); });
+    dom.on('#create', 'click', () => { onCreateClicked(); });
     dom.on('#candidateFilters ul', 'click', onCandidateClicked);
     toolOverlay.highlightElementUnderMouse(true);
 }
@@ -405,12 +405,12 @@ function resetPicker() {
 /******************************************************************************/
 
 function onMessage(msg) {
-    switch ( msg.what ) {
-    case 'startTool':
-        startPicker();
-        break;
-    default:
-        break;
+    switch (msg.what) {
+        case 'startTool':
+            startPicker();
+            break;
+        default:
+            break;
     }
 }
 

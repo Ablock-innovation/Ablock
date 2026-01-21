@@ -1,6 +1,6 @@
 ஒரு திறமையான தடுப்பான்: நினைவகம் மற்றும் CPU தடம் எளிதானது, ஆனால் அங்குள்ள பிற பிரபலமான தடுப்பான்களைக் காட்டிலும் ஆயிரக்கணக்கான வடிப்பான்களை ஏற்றலாம் மற்றும் செயல்படுத்தலாம்.
 
-அதன் செயல்திறனைப் பற்றிய விளக்கமான கண்ணோட்டம்: https://github.com/gorhill/uBlock/wiki/uBlock-vs.-ABP:-efficiency-compared
+அதன் செயல்திறனைப் பற்றிய விளக்கமான கண்ணோட்டம்: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 பயன்பாடு: தற்போதைய வலைத்தளத்திற்கான uBlock ஐ நிரந்தரமாக முடக்க / இயக்குவதே பாப்அப்பில் உள்ள பெரிய ஆற்றல் பொத்தான். இது தற்போதைய வலைத்தளத்திற்கு மட்டுமே பொருந்தும், இது உலகளாவிய சக்தி பொத்தான் அல்ல.
 
@@ -41,7 +41,7 @@
 பொது உரிமத்துடன் திறந்த மூல (GPLv3)
 பயனர்களால் பயனர்களுக்கு.
 
-பங்களிப்பாளர்கள் @ கிதுப்: https://github.com/gorhill/uBlock/graphs/contributors
+பங்களிப்பாளர்கள் @ கிதுப்: https://github.com/Ablock/Ablock/graphs/contributors
 பங்களிப்பாளர்கள் @ க்ரவுடின்: https://crowdin.net/project/ublock
 
 ***
@@ -49,4 +49,4 @@
 It's quite an early version, keep this in mind when you review.
 
 திட்ட மாற்ற பதிவு:
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases

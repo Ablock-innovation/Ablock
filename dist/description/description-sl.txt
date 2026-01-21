@@ -1,6 +1,6 @@
 Efektiven zatiralec oglasov: lahek na pomnilniku in procesorju, in vendar lahko nalaga in uveljavlja tisoče filtrov več kot kakšen drug popularen dodatek za blokiranje oglasov.
 
-Ilustrirana efektivnost: https://github.com/gorhill/uBlock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Ilustrirana efektivnost: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Uporaba: Velik gumb za vklop/izklop v pojavnem oknu je namenjen trajnemu izklopu/vklopu uBlock₀ za trenutno spletno stran. Ta uporaba velja samo za trenutno spletno stran, tako da gumb ne predstavlja globalnega vklopa/izklopa.
 
@@ -38,7 +38,7 @@ Zastonj.
 Odprtokodno pod GPLv3 licenco
 Za uporabnike od uporabnikov.
 
-Razvijalci @ Github: https://github.com/gorhill/uBlock/graphs/contributors
+Razvijalci @ Github: https://github.com/Ablock/Ablock/graphs/contributors
 Prevajalci @ Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@ Prevajalci @ Crowdin: https://crowdin.net/project/ublock
 Gre še za dokaj sveže različice, prosimo da to upoštevate pri vaši kritiki.
 
 Dnevnik sprememb projekta:
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases

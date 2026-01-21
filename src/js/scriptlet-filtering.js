@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -41,11 +41,11 @@ const contentScriptRegisterer = {
     id: 1,
     hostnameToDetails: new Map(),
     register(hostname, code) {
-        if ( browser.contentScripts === undefined ) { return false; }
-        if ( hostname === '' ) { return false; }
+        if (browser.contentScripts === undefined) { return false; }
+        if (hostname === '') { return false; }
         const details = this.hostnameToDetails.get(hostname);
-        if ( details !== undefined ) {
-            if ( code === details.code ) {
+        if (details !== undefined) {
+            if (code === details.code) {
                 return details.handle instanceof Promise === false;
             }
             this.unregisterHandle(details.handle);
@@ -53,51 +53,51 @@ const contentScriptRegisterer = {
         }
         const id = this.id++;
         const promise = browser.contentScripts.register({
-            js: [ { code } ],
+            js: [{ code }],
             allFrames: true,
-            matches: [ `*://*.${hostname}/*` ],
+            matches: [`*://*.${hostname}/*`],
             matchAboutBlank: true,
             runAt: 'document_start',
         }).then(handle => {
             const details = this.hostnameToDetails.get(hostname);
-            if ( details === undefined ) { return; }
-            if ( details.id !== id ) { return; }
+            if (details === undefined) { return; }
+            if (details.id !== id) { return; }
             details.handle = handle;
-        }).catch(( ) => {
+        }).catch(() => {
             this.hostnameToDetails.delete(hostname);
         });
         this.hostnameToDetails.set(hostname, { id, handle: promise, code });
         return false;
     },
     unregister(hostname) {
-        if ( hostname === '' ) { return; }
-        if ( this.hostnameToDetails.size === 0 ) { return; }
+        if (hostname === '') { return; }
+        if (this.hostnameToDetails.size === 0) { return; }
         const details = this.hostnameToDetails.get(hostname);
-        if ( details === undefined ) { return; }
+        if (details === undefined) { return; }
         this.hostnameToDetails.delete(hostname);
         this.unregisterHandle(details.handle);
     },
     flush(hostname) {
-        if ( hostname === '' ) { return; }
-        if ( hostname === '*' ) { return this.reset(); }
-        for ( const hn of this.hostnameToDetails.keys() ) {
-            if ( hn.endsWith(hostname) === false ) { continue; }
+        if (hostname === '') { return; }
+        if (hostname === '*') { return this.reset(); }
+        for (const hn of this.hostnameToDetails.keys()) {
+            if (hn.endsWith(hostname) === false) { continue; }
             const pos = hn.length - hostname.length;
-            if ( pos !== 0 && hn.charCodeAt(pos-1) !== 0x2E /* . */ ) { continue; }
+            if (pos !== 0 && hn.charCodeAt(pos - 1) !== 0x2E /* . */) { continue; }
             this.unregister(hn);
         }
     },
     reset() {
-        if ( this.hostnameToDetails.size === 0 ) { return; }
-        for ( const details of this.hostnameToDetails.values() ) {
+        if (this.hostnameToDetails.size === 0) { return; }
+        for (const details of this.hostnameToDetails.values()) {
             this.unregisterHandle(details.handle);
         }
         this.hostnameToDetails.clear();
     },
     unregisterHandle(handle) {
-        if ( handle instanceof Promise ) {
+        if (handle instanceof Promise) {
             handle.then(handle => {
-                if ( handle ) { handle.unregister(); }
+                if (handle) { handle.unregister(); }
             });
         } else {
             handle.unregister();
@@ -107,22 +107,22 @@ const contentScriptRegisterer = {
 
 /******************************************************************************/
 
-const isolatedWorldInjector = (( ) => {
+const isolatedWorldInjector = (() => {
     const parts = [
         '(',
-        function(details) {
-            if ( self.uBO_isolatedScriptlets === 'done' ) { return; }
+        function (details) {
+            if (self.uBO_isolatedScriptlets === 'done') { return; }
             const doc = document;
-            if ( doc.location === null ) { return; }
+            if (doc.location === null) { return; }
             const hostname = doc.location.hostname;
-            if ( hostname !== '' && details.hostname !== hostname ) { return; }
-            const isolatedScriptlets = function(){};
+            if (hostname !== '' && details.hostname !== hostname) { return; }
+            const isolatedScriptlets = function () { };
             isolatedScriptlets();
             self.uBO_isolatedScriptlets = 'done';
             return 0;
         }.toString(),
         ')(',
-            'json-slot',
+        'json-slot',
         ');',
     ];
     const jsonSlot = parts.indexOf('json-slot');
@@ -142,27 +142,27 @@ const isolatedWorldInjector = (( ) => {
     };
 })();
 
-const onScriptletMessageInjector = (( ) => {
+const onScriptletMessageInjector = (() => {
     const parts = [
         '(',
-        function(name) {
-            if ( self.uBO_bcSecret ) { return; }
+        function (name) {
+            if (self.uBO_bcSecret) { return; }
             try {
                 const bcSecret = new self.BroadcastChannel(name);
                 bcSecret.onmessage = ev => {
                     const msg = ev.data;
-                    switch ( typeof msg ) {
-                    case 'string':
-                        if ( msg !== 'areyouready?' ) { break; }
-                        bcSecret.postMessage('iamready!');
-                        break;
-                    case 'object':
-                        if ( self.vAPI && self.vAPI.messaging ) {
-                            self.vAPI.messaging.send('contentscript', msg);
-                        } else {
-                            console.log(`[uBO][${msg.type}]${msg.text}`);
-                        }
-                        break;
+                    switch (typeof msg) {
+                        case 'string':
+                            if (msg !== 'areyouready?') { break; }
+                            bcSecret.postMessage('iamready!');
+                            break;
+                        case 'object':
+                            if (self.vAPI && self.vAPI.messaging) {
+                                self.vAPI.messaging.send('contentscript', msg);
+                            } else {
+                                console.log(`[uBO][${msg.type}]${msg.text}`);
+                            }
+                            break;
                     }
                 };
                 bcSecret.postMessage('iamready!');
@@ -171,7 +171,7 @@ const onScriptletMessageInjector = (( ) => {
             }
         }.toString(),
         ')(',
-            'bcSecret-slot',
+        'bcSecret-slot',
         ');',
     ];
     const bcSecretSlot = parts.indexOf('bcSecret-slot');
@@ -194,41 +194,41 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
         this.isDevBuild = undefined;
         this.logLevel = 1;
         this.bc = onBroadcast(msg => {
-            switch ( msg.what ) {
-            case 'filteringBehaviorChanged': {
-                const direction = msg.direction || 0;
-                if ( direction > 0 ) { return; }
-                if ( direction >= 0 && msg.hostname ) {
-                    return contentScriptRegisterer.flush(msg.hostname);
-                }
-                contentScriptRegisterer.reset();
-                break;
-            }
-            case 'hiddenSettingsChanged':
-                this.isDevBuild = undefined;
-                /* fall through */
-            case 'loggerEnabled':
-            case 'loggerDisabled':
-                this.clearCache();
-                break;
-            case 'loggerLevelChanged':
-                this.logLevel = msg.level;
-                vAPI.tabs.query({
-                    discarded: false,
-                    url: [ 'http://*/*', 'https://*/*' ],
-                }).then(tabs => {
-                    for ( const tab of tabs ) {
-                        const { status } = tab;
-                        if ( status !== 'loading' && status !== 'complete' ) { continue; }
-                        vAPI.tabs.executeScript(tab.id, {
-                            allFrames: true,
-                            file: `/js/scriptlets/scriptlet-loglevel-${this.logLevel}.js`,
-                            matchAboutBlank: true,
-                        });
+            switch (msg.what) {
+                case 'filteringBehaviorChanged': {
+                    const direction = msg.direction || 0;
+                    if (direction > 0) { return; }
+                    if (direction >= 0 && msg.hostname) {
+                        return contentScriptRegisterer.flush(msg.hostname);
                     }
-                });
-                this.clearCache();
-                break;
+                    contentScriptRegisterer.reset();
+                    break;
+                }
+                case 'hiddenSettingsChanged':
+                    this.isDevBuild = undefined;
+                /* fall through */
+                case 'loggerEnabled':
+                case 'loggerDisabled':
+                    this.clearCache();
+                    break;
+                case 'loggerLevelChanged':
+                    this.logLevel = msg.level;
+                    vAPI.tabs.query({
+                        discarded: false,
+                        url: ['http://*/*', 'https://*/*'],
+                    }).then(tabs => {
+                        for (const tab of tabs) {
+                            const { status } = tab;
+                            if (status !== 'loading' && status !== 'complete') { continue; }
+                            vAPI.tabs.executeScript(tab.id, {
+                                allFrames: true,
+                                file: `/js/scriptlets/scriptlet-loglevel-${this.logLevel}.js`,
+                                matchAboutBlank: true,
+                            });
+                        }
+                    });
+                    this.clearCache();
+                    break;
             }
         });
     }
@@ -253,29 +253,29 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
     retrieve(request) {
         const { hostname } = request;
 
-        // https://github.com/gorhill/uBlock/issues/2835
+        // https://github.com/Ablock/Ablock/issues/2835
         // Do not inject scriptlets if the site is under an `allow` rule.
-        if ( µb.userSettings.advancedUserEnabled ) {
-            if ( sessionFirewall.evaluateCellZY(hostname, hostname, '*') === 2 ) {
+        if (µb.userSettings.advancedUserEnabled) {
+            if (sessionFirewall.evaluateCellZY(hostname, hostname, '*') === 2) {
                 return;
             }
         }
 
-        if ( this.scriptletCache.resetTime < reng.modifyTime ) {
+        if (this.scriptletCache.resetTime < reng.modifyTime) {
             this.clearCache();
         }
 
         let scriptletDetails = this.scriptletCache.lookup(hostname);
-        if ( scriptletDetails !== undefined ) {
+        if (scriptletDetails !== undefined) {
             return scriptletDetails || undefined;
         }
 
-        if ( this.isDevBuild === undefined ) {
+        if (this.isDevBuild === undefined) {
             this.isDevBuild = vAPI.webextFlavor.soup.has('devbuild') ||
                 µb.hiddenSettings.filterAuthorMode;
         }
 
-        if ( this.warSecret === undefined ) {
+        if (this.warSecret === undefined) {
             this.warSecret = vAPI.warSecret.long();
         }
 
@@ -289,25 +289,25 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
             debug: this.isDevBuild,
             debugScriptlets: µb.hiddenSettings.debugScriptlets,
         };
-        if ( logger.enabled ) {
+        if (logger.enabled) {
             options.scriptletGlobals.bcSecret = bcSecret;
             options.scriptletGlobals.logLevel = this.logLevel;
         }
 
         scriptletDetails = super.retrieve(request, options);
 
-        if ( scriptletDetails === undefined ) {
-            if ( request.nocache !== true ) {
+        if (scriptletDetails === undefined) {
+            if (request.nocache !== true) {
                 this.scriptletCache.add(hostname, null);
             }
             return;
         }
 
         const contentScript = [];
-        if ( scriptletDetails.mainWorld ) {
+        if (scriptletDetails.mainWorld) {
             contentScript.push(vAPI.scriptletsInjector(hostname, scriptletDetails));
         }
-        if ( scriptletDetails.isolatedWorld ) {
+        if (scriptletDetails.isolatedWorld) {
             contentScript.push(isolatedWorldInjector.assemble(hostname, scriptletDetails));
         }
 
@@ -317,7 +317,7 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
             filters: scriptletDetails.filters,
         };
 
-        if ( hostname !== '' && request.nocache !== true ) {
+        if (hostname !== '' && request.nocache !== true) {
             this.scriptletCache.add(hostname, cachedScriptletDetails);
         }
 
@@ -325,7 +325,7 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
     }
 
     injectNow(details) {
-        if ( typeof details.frameId !== 'number' ) { return; }
+        if (typeof details.frameId !== 'number') { return; }
 
         const hostname = hostnameFromURI(details.url);
         const domain = domainFromHostname(hostname);
@@ -338,27 +338,27 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
             domain,
             ancestors: details.ancestors,
         });
-        if ( scriptletDetails === undefined ) {
+        if (scriptletDetails === undefined) {
             contentScriptRegisterer.unregister(hostname);
             return;
         }
-        if ( Boolean(scriptletDetails.code) === false ) {
+        if (Boolean(scriptletDetails.code) === false) {
             return scriptletDetails;
         }
 
-        const contentScript = [ scriptletDetails.code ];
-        if ( logger.enabled ) {
+        const contentScript = [scriptletDetails.code];
+        if (logger.enabled) {
             contentScript.unshift(
                 onScriptletMessageInjector.assemble(scriptletDetails)
             );
         }
-        if ( µb.hiddenSettings.debugScriptletInjector ) {
+        if (µb.hiddenSettings.debugScriptletInjector) {
             contentScript.unshift('debugger');
         }
         const code = contentScript.join('\n\n');
 
         const isAlreadyInjected = contentScriptRegisterer.register(hostname, code);
-        if ( isAlreadyInjected !== true ) {
+        if (isAlreadyInjected !== true) {
             vAPI.tabs.executeScript(details.tabId, {
                 code,
                 frameId: details.frameId,
@@ -370,9 +370,9 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
     }
 
     toLogger(request, details) {
-        if ( details === undefined ) { return; }
-        if ( logger.enabled !== true ) { return; }
-        if ( Array.isArray(details.filters) === false ) { return; }
+        if (details === undefined) { return; }
+        if (logger.enabled !== true) { return; }
+        if (Array.isArray(details.filters) === false) { return; }
         µb.filteringContext
             .duplicate()
             .fromTabId(request.tabId)

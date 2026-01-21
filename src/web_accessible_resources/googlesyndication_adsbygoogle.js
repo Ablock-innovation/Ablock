@@ -16,22 +16,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
-    const init = ( ) => {
+    const init = () => {
         window.adsbygoogle = {
             loaded: true,
-            push: function() {
+            push: function () {
             }
         };
         const phs = document.querySelectorAll('.adsbygoogle');
         const css = 'height:1px!important;max-height:1px!important;max-width:1px!important;width:1px!important;';
-        for ( let i = 0; i < phs.length; i++ ) {
+        for (let i = 0; i < phs.length; i++) {
             const id = `aswift_${i}`;
-            if ( document.querySelector(`iframe#${id}`) !== null ) { continue; }
+            if (document.querySelector(`iframe#${id}`) !== null) { continue; }
             const fr = document.createElement('iframe');
             fr.id = id;
             fr.style = css;

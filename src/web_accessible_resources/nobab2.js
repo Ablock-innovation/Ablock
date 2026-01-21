@@ -16,15 +16,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
     const script = document.currentScript;
-    if ( script === null ) { return; }
+    if (script === null) { return; }
     const src = script.src;
-    if ( typeof src !== 'string' ) { return; }
+    if (typeof src !== 'string') { return; }
     // The scriplet is meant to act ONLY when it's being used as a redirection
     // for specific domains.
     const re = new RegExp(
@@ -37,6 +37,6 @@
         ].join('|') +
         ')/.'
     );
-    if ( re.test(src) === false ) { return; }
+    if (re.test(src) === false) { return; }
     window.nH7eXzOsG = 858;
 })();

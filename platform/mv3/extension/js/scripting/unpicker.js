@@ -16,40 +16,41 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(async ( ) => {
+(async () => {
 
-/******************************************************************************/
+    /******************************************************************************/
 
-const ubolOverlay = self.ubolOverlay;
-if ( ubolOverlay === undefined ) { return; }
-if ( ubolOverlay.file === '/unpicker-ui.html' ) { return; }
+    const ubolOverlay = self.ubolOverlay;
+    if (ubolOverlay === undefined) { return; }
+    if (ubolOverlay.file === '/unpicker-ui.html') { return; }
 
-/******************************************************************************/
+    /******************************************************************************/
 
-function onMessage(msg) {
-    switch ( msg.what ) {
-    case 'startCustomFilters':
-        return ubolOverlay.sendMessage({ what: 'startCustomFilters' });
-    case 'terminateCustomFilters':
-        return ubolOverlay.sendMessage({ what: 'terminateCustomFilters' });
-    case 'removeCustomFilters':
-        return ubolOverlay.sendMessage({ what: 'removeCustomFilters',
-            hostname: ubolOverlay.url.hostname,
-            selectors: [ msg.selector ],
-        });
-    default:
-        break;
+    function onMessage(msg) {
+        switch (msg.what) {
+            case 'startCustomFilters':
+                return ubolOverlay.sendMessage({ what: 'startCustomFilters' });
+            case 'terminateCustomFilters':
+                return ubolOverlay.sendMessage({ what: 'terminateCustomFilters' });
+            case 'removeCustomFilters':
+                return ubolOverlay.sendMessage({
+                    what: 'removeCustomFilters',
+                    hostname: ubolOverlay.url.hostname,
+                    selectors: [msg.selector],
+                });
+            default:
+                break;
+        }
     }
-}
 
-/******************************************************************************/
+    /******************************************************************************/
 
-await ubolOverlay.install('/unpicker-ui.html', onMessage);
+    await ubolOverlay.install('/unpicker-ui.html', onMessage);
 
-/******************************************************************************/
+    /******************************************************************************/
 
 })();
 

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -50,25 +50,25 @@ export function runAt(fn, when) {
             'interactive': 2, 'end': 2, '2': 2,
             'complete': 3, 'idle': 3, '3': 3,
         };
-        const tokens = Array.isArray(state) ? state : [ state ];
-        for ( const token of tokens ) {
+        const tokens = Array.isArray(state) ? state : [state];
+        for (const token of tokens) {
             const prop = `${token}`;
-            if ( Object.hasOwn(targets, prop) === false ) { continue; }
+            if (Object.hasOwn(targets, prop) === false) { continue; }
             return targets[prop];
         }
         return 0;
     };
     const runAt = intFromReadyState(when);
-    if ( intFromReadyState(document.readyState) >= runAt ) {
+    if (intFromReadyState(document.readyState) >= runAt) {
         fn(); return;
     }
-    const onStateChange = ( ) => {
-        if ( intFromReadyState(document.readyState) < runAt ) { return; }
+    const onStateChange = () => {
+        if (intFromReadyState(document.readyState) < runAt) { return; }
         fn();
         safe.removeEventListener.apply(document, args);
     };
     const safe = safeSelf();
-    const args = [ 'readystatechange', onStateChange, { capture: true } ];
+    const args = ['readystatechange', onStateChange, { capture: true }];
     safe.addEventListener.apply(document, args);
 }
 registerScriptlet(runAt, {
@@ -81,11 +81,11 @@ registerScriptlet(runAt, {
 /******************************************************************************/
 
 export function runAtHtmlElementFn(fn) {
-    if ( document.documentElement ) {
+    if (document.documentElement) {
         fn();
         return;
     }
-    const observer = new MutationObserver(( ) => {
+    const observer = new MutationObserver(() => {
         observer.disconnect();
         fn();
     });

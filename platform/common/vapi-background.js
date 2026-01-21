@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 // For background page
@@ -32,11 +32,11 @@ import webext from './webext.js';
 const manifest = browser.runtime.getManifest();
 
 vAPI.cantWebsocket =
-    browser.webRequest.ResourceType instanceof Object === false  ||
+    browser.webRequest.ResourceType instanceof Object === false ||
     browser.webRequest.ResourceType.WEBSOCKET !== 'websocket';
 
 vAPI.canWASM = vAPI.webextFlavor.soup.has('chromium') === false;
-if ( vAPI.canWASM === false ) {
+if (vAPI.canWASM === false) {
     const csp = manifest.content_security_policy;
     vAPI.canWASM = csp !== undefined && csp.indexOf("'wasm-unsafe-eval'") !== -1;
 }
@@ -47,28 +47,28 @@ vAPI.supportsUserStylesheets = vAPI.webextFlavor.soup.has('user_stylesheet');
 
 vAPI.app = {
     name: manifest.name.replace(/ dev\w+ build/, ''),
-    version: (( ) => {
+    version: (() => {
         let version = manifest.version_name || manifest.version;
         const match = /(\d+\.\d+\.\d+)(?:\.(\d+))?/.exec(version);
-        if ( match && match[2] ) {
+        if (match && match[2]) {
             const v = parseInt(match[2], 10);
             version = match[1] + (v < 100 ? 'b' + v : 'rc' + (v - 100));
         }
         return version;
     })(),
 
-    intFromVersion: function(s) {
+    intFromVersion: function (s) {
         const parts = s.match(/(?:^|\.|b|rc)\d+/g);
-        if ( parts === null ) { return 0; }
+        if (parts === null) { return 0; }
         let vint = 0;
-        for ( let i = 0; i < 4; i++ ) {
+        for (let i = 0; i < 4; i++) {
             const pstr = parts[i] || '';
             let pint;
-            if ( pstr === '' ) {
+            if (pstr === '') {
                 pint = 0;
-            } else if ( pstr.startsWith('.') || pstr.startsWith('b') ) {
+            } else if (pstr.startsWith('.') || pstr.startsWith('b')) {
                 pint = parseInt(pstr.slice(1), 10);
-            } else if ( pstr.startsWith('rc') ) {
+            } else if (pstr.startsWith('rc')) {
                 pint = parseInt(pstr.slice(2), 10) + 100;
             } else {
                 pint = parseInt(pstr, 10);
@@ -78,7 +78,7 @@ vAPI.app = {
         return vint;
     },
 
-    restart: function() {
+    restart: function () {
         browser.runtime.reload();
     },
 };
@@ -90,7 +90,7 @@ vAPI.app = {
 
 vAPI.generateSecret = (size = 1) => {
     let secret = '';
-    while ( size-- ) {
+    while (size--) {
         secret += (Math.floor(Math.random() * 2176782336) + 2176782336).toString(36).slice(1);
     }
     return secret;
@@ -156,8 +156,8 @@ vAPI.storage = {
 };
 
 // Not all platforms support getBytesInUse
-if ( webext.storage.local.getBytesInUse instanceof Function ) {
-    vAPI.storage.getBytesInUse = function(...args) {
+if (webext.storage.local.getBytesInUse instanceof Function) {
+    vAPI.storage.getBytesInUse = function (...args) {
         return webext.storage.local.getBytesInUse(...args).catch(reason => {
             console.log(reason);
         });
@@ -170,14 +170,14 @@ if ( webext.storage.local.getBytesInUse instanceof Function ) {
 // https://github.com/gorhill/uMatrix/issues/234
 // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/privacy/network
 
-// https://github.com/gorhill/uBlock/issues/2048
+// https://github.com/Ablock/Ablock/issues/2048
 //   Do not mess up with existing settings if not assigning them stricter
 //   values.
 
-vAPI.browserSettings = (( ) => {
+vAPI.browserSettings = (() => {
     // Not all platforms support `browser.privacy`.
     const bp = webext.privacy;
-    if ( bp instanceof Object === false ) { return; }
+    if (bp instanceof Object === false) { return; }
 
     return {
         // https://github.com/uBlockOrigin/uBlock-issues/issues/1723#issuecomment-919913361
@@ -185,72 +185,72 @@ vAPI.browserSettings = (( ) => {
             vAPI.webextFlavor.soup.has('firefox') &&
             vAPI.webextFlavor.soup.has('mobile'),
 
-        set: function(details) {
-            for ( const setting in details ) {
-                if ( Object.hasOwn(details, setting) === false ) { continue; }
-                switch ( setting ) {
-                case 'prefetching': {
-                    const enabled = !!details[setting];
-                    if ( enabled ) {
-                        bp.network.networkPredictionEnabled.clear({
-                            scope: 'regular',
-                        });
-                    } else {
-                        bp.network.networkPredictionEnabled.set({
-                            value: false,
-                            scope: 'regular',
-                        });
+        set: function (details) {
+            for (const setting in details) {
+                if (Object.hasOwn(details, setting) === false) { continue; }
+                switch (setting) {
+                    case 'prefetching': {
+                        const enabled = !!details[setting];
+                        if (enabled) {
+                            bp.network.networkPredictionEnabled.clear({
+                                scope: 'regular',
+                            });
+                        } else {
+                            bp.network.networkPredictionEnabled.set({
+                                value: false,
+                                scope: 'regular',
+                            });
+                        }
+                        if (vAPI.prefetching instanceof Function) {
+                            vAPI.prefetching(enabled);
+                        }
+                        break;
                     }
-                    if ( vAPI.prefetching instanceof Function ) {
-                        vAPI.prefetching(enabled);
+                    case 'hyperlinkAuditing': {
+                        if (details[setting]) {
+                            bp.websites.hyperlinkAuditingEnabled.clear({
+                                scope: 'regular',
+                            });
+                        } else {
+                            bp.websites.hyperlinkAuditingEnabled.set({
+                                value: false,
+                                scope: 'regular',
+                            });
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 'hyperlinkAuditing': {
-                    if ( details[setting] ) {
-                        bp.websites.hyperlinkAuditingEnabled.clear({
-                            scope: 'regular',
-                        });
-                    } else {
-                        bp.websites.hyperlinkAuditingEnabled.set({
-                            value: false,
-                            scope: 'regular',
-                        });
-                    }
-                    break;
-                }
-                case 'webrtcIPAddress': {
-                    // https://github.com/uBlockOrigin/uBlock-issues/issues/1928
-                    // https://www.reddit.com/r/uBlockOrigin/comments/sl7p74/
-                    //   Hypothetical: some browsers _think_ uBO is still using
-                    //   the setting possibly based on cached state from the
-                    //   past, and making an explicit API call that uBO is not
-                    //   using the setting appears to solve those unexpected
-                    //   reported occurrences of uBO interfering despite never
-                    //   using the API.
-                    const mustEnable = !details[setting];
-                    if ( this.canLeakLocalIPAddresses === false ) {
-                        if ( mustEnable && vAPI.webextFlavor.soup.has('chromium') ) {
+                    case 'webrtcIPAddress': {
+                        // https://github.com/uBlockOrigin/uBlock-issues/issues/1928
+                        // https://www.reddit.com/r/uBlockOrigin/comments/sl7p74/
+                        //   Hypothetical: some browsers _think_ uBO is still using
+                        //   the setting possibly based on cached state from the
+                        //   past, and making an explicit API call that uBO is not
+                        //   using the setting appears to solve those unexpected
+                        //   reported occurrences of uBO interfering despite never
+                        //   using the API.
+                        const mustEnable = !details[setting];
+                        if (this.canLeakLocalIPAddresses === false) {
+                            if (mustEnable && vAPI.webextFlavor.soup.has('chromium')) {
+                                bp.network.webRTCIPHandlingPolicy.clear({
+                                    scope: 'regular',
+                                });
+                            }
+                            continue;
+                        }
+                        if (mustEnable) {
+                            bp.network.webRTCIPHandlingPolicy.set({
+                                value: 'default_public_interface_only',
+                                scope: 'regular'
+                            });
+                        } else {
                             bp.network.webRTCIPHandlingPolicy.clear({
                                 scope: 'regular',
                             });
                         }
-                        continue;
+                        break;
                     }
-                    if ( mustEnable ) {
-                        bp.network.webRTCIPHandlingPolicy.set({
-                            value: 'default_public_interface_only',
-                            scope: 'regular'
-                        });
-                    } else {
-                        bp.network.webRTCIPHandlingPolicy.clear({
-                            scope: 'regular',
-                        });
-                    }
-                    break;
-                }
-                default:
-                    break;
+                    default:
+                        break;
                 }
             }
         }
@@ -260,7 +260,7 @@ vAPI.browserSettings = (( ) => {
 /******************************************************************************/
 /******************************************************************************/
 
-vAPI.isBehindTheSceneTabId = function(tabId) {
+vAPI.isBehindTheSceneTabId = function (tabId) {
     return tabId < 0;
 };
 
@@ -268,7 +268,7 @@ vAPI.unsetTabId = 0;
 vAPI.noTabId = -1;      // definitely not any existing tab
 
 // To ensure we always use a good tab id
-const toTabId = function(tabId) {
+const toTabId = function (tabId) {
     return typeof tabId === 'number' && isNaN(tabId) === false
         ? tabId
         : 0;
@@ -284,8 +284,8 @@ vAPI.Tabs = class {
         });
         browser.webNavigation.onCommitted.addListener(details => {
             const { frameId, tabId } = details;
-            if ( frameId === 0 && tabId > 0 && details.transitionType === 'reload' ) {
-                if ( vAPI.net && vAPI.net.hasUnprocessedRequest(tabId) ) {
+            if (frameId === 0 && tabId > 0 && details.transitionType === 'reload') {
+                if (vAPI.net && vAPI.net.hasUnprocessedRequest(tabId)) {
                     vAPI.net.removeUnprocessedRequest(tabId);
                 }
             }
@@ -299,13 +299,13 @@ vAPI.Tabs = class {
         });
         // https://github.com/uBlockOrigin/uBlock-issues/issues/151
         // https://github.com/uBlockOrigin/uBlock-issues/issues/680#issuecomment-515215220
-        if ( browser.windows instanceof Object ) {
+        if (browser.windows instanceof Object) {
             browser.windows.onFocusChanged.addListener(windowId => {
                 this.onFocusChangedHandler(windowId);
             });
         }
         browser.tabs.onRemoved.addListener((tabId, details) => {
-            if ( vAPI.net && vAPI.net.hasUnprocessedRequest(tabId) ) {
+            if (vAPI.net && vAPI.net.hasUnprocessedRequest(tabId)) {
                 vAPI.net.removeUnprocessedRequest(tabId);
             }
             this.onRemovedHandler(tabId, details);
@@ -323,10 +323,10 @@ vAPI.Tabs = class {
     }
 
     async get(tabId) {
-        if ( tabId === null ) {
+        if (tabId === null) {
             return this.getCurrent();
         }
-        if ( tabId <= 0 ) { return null; }
+        if (tabId <= 0) { return null; }
         let tab;
         try {
             tab = await webext.tabs.get(tabId);
@@ -342,7 +342,7 @@ vAPI.Tabs = class {
     }
 
     async insertCSS(tabId, details) {
-        if ( vAPI.supportsUserStylesheets ) {
+        if (vAPI.supportsUserStylesheets) {
             details.cssOrigin = 'user';
         }
         try {
@@ -363,7 +363,7 @@ vAPI.Tabs = class {
     }
 
     async removeCSS(tabId, details) {
-        if ( vAPI.supportsUserStylesheets ) {
+        if (vAPI.supportsUserStylesheets) {
             details.cssOrigin = 'user';
         }
         try {
@@ -382,11 +382,11 @@ vAPI.Tabs = class {
     // - popup: 'popup' => open in a new window
 
     async create(url, details) {
-        if ( details.active === undefined ) {
+        if (details.active === undefined) {
             details.active = true;
         }
 
-        const subWrapper = async ( ) => {
+        const subWrapper = async () => {
             const updateDetails = {
                 url: url,
                 active: !!details.active
@@ -395,13 +395,13 @@ vAPI.Tabs = class {
             // Opening a tab from incognito window won't focus the window
             // in which the tab was opened
             const focusWindow = tab => {
-                if ( tab.active && vAPI.windows instanceof Object ) {
+                if (tab.active && vAPI.windows instanceof Object) {
                     vAPI.windows.update(tab.windowId, { focused: true });
                 }
             };
 
-            if ( !details.tabId ) {
-                if ( details.index !== undefined ) {
+            if (!details.tabId) {
+                if (details.index !== undefined) {
                     updateDetails.index = details.index;
                 }
                 browser.tabs.create(updateDetails, focusWindow);
@@ -414,9 +414,9 @@ vAPI.Tabs = class {
                 updateDetails
             );
             // if the tab doesn't exist
-            if ( tab === null ) {
+            if (tab === null) {
                 browser.tabs.create(updateDetails, focusWindow);
-            } else if ( details.index !== undefined ) {
+            } else if (details.index !== undefined) {
                 browser.tabs.move(tab.id, { index: details.index });
             }
         };
@@ -432,7 +432,7 @@ vAPI.Tabs = class {
         //
         // https://github.com/uBlockOrigin/uBlock-issues/issues/2249
         //   Mind that the creation of the popup window might fail.
-        if ( details.popup !== undefined && vAPI.windows instanceof Object ) {
+        if (details.popup !== undefined && vAPI.windows instanceof Object) {
             const basicDetails = {
                 url: details.url,
                 type: details.popup,
@@ -442,13 +442,13 @@ vAPI.Tabs = class {
                 ? Object.assign({}, basicDetails, details.box)
                 : basicDetails;
             const win = await vAPI.windows.create(extraDetails);
-            if ( win === null ) {
-                if ( shouldRestorePosition === false ) { return; }
+            if (win === null) {
+                if (shouldRestorePosition === false) { return; }
                 return vAPI.windows.create(basicDetails);
             }
-            if ( shouldRestorePosition === false ) { return; }
-            if ( win.left === details.box.left ) {
-                if ( win.top === details.box.top ) { return; }
+            if (shouldRestorePosition === false) { return; }
+            if (win.left === details.box.left) {
+                if (win.top === details.box.top) { return; }
             }
             vAPI.windows.update(win.id, {
                 left: details.box.left,
@@ -457,13 +457,13 @@ vAPI.Tabs = class {
             return;
         }
 
-        if ( details.index !== -1 ) {
+        if (details.index !== -1) {
             subWrapper();
             return;
         }
 
         const tab = await vAPI.tabs.getCurrent();
-        if ( tab !== null ) {
+        if (tab !== null) {
             details.index = tab.index + 1;
         } else {
             details.index = undefined;
@@ -484,16 +484,16 @@ vAPI.Tabs = class {
 
     async open(details) {
         let targetURL = details.url;
-        if ( typeof targetURL !== 'string' || targetURL === '' ) {
+        if (typeof targetURL !== 'string' || targetURL === '') {
             return null;
         }
 
         // extension pages
-        if ( /^[\w-]{2,}:/.test(targetURL) !== true ) {
+        if (/^[\w-]{2,}:/.test(targetURL) !== true) {
             targetURL = vAPI.getURL(targetURL);
         }
 
-        if ( !details.select ) {
+        if (!details.select) {
             this.create(targetURL, details);
             return;
         }
@@ -507,18 +507,18 @@ vAPI.Tabs = class {
             : targetURL.slice(0, pos);
 
         const tabs = await vAPI.tabs.query({ url: targetURLWithoutHash });
-        if ( tabs.length === 0 ) {
+        if (tabs.length === 0) {
             this.create(targetURL, details);
             return;
         }
         let tab = tabs[0];
         const updateDetails = { active: true };
         // https://github.com/uBlockOrigin/uBlock-issues/issues/592
-        if ( tab.url.startsWith(targetURL) === false ) {
+        if (tab.url.startsWith(targetURL) === false) {
             updateDetails.url = targetURL;
         }
         tab = await vAPI.tabs.update(tab.id, updateDetails);
-        if ( vAPI.windows instanceof Object === false ) { return; }
+        if (vAPI.windows instanceof Object === false) { return; }
         vAPI.windows.update(tab.windowId, { focused: true });
     }
 
@@ -535,12 +535,12 @@ vAPI.Tabs = class {
     // Replace the URL of a tab. Noop if the tab does not exist.
     replace(tabId, url) {
         tabId = toTabId(tabId);
-        if ( tabId === 0 ) { return; }
+        if (tabId === 0) { return; }
 
         let targetURL = url;
 
         // extension pages
-        if ( /^[\w-]{2,}:/.test(targetURL) !== true ) {
+        if (/^[\w-]{2,}:/.test(targetURL) !== true) {
             targetURL = vAPI.getURL(targetURL);
         }
 
@@ -549,7 +549,7 @@ vAPI.Tabs = class {
 
     async remove(tabId) {
         tabId = toTabId(tabId);
-        if ( tabId === 0 ) { return; }
+        if (tabId === 0) { return; }
         try {
             await webext.tabs.remove(tabId);
         }
@@ -559,7 +559,7 @@ vAPI.Tabs = class {
 
     async reload(tabId, bypassCache = false) {
         tabId = toTabId(tabId);
-        if ( tabId === 0 ) { return; }
+        if (tabId === 0) { return; }
         try {
             await webext.tabs.reload(
                 tabId,
@@ -572,10 +572,10 @@ vAPI.Tabs = class {
 
     async select(tabId) {
         tabId = toTabId(tabId);
-        if ( tabId === 0 ) { return; }
+        if (tabId === 0) { return; }
         const tab = await vAPI.tabs.update(tabId, { active: true });
-        if ( tab === null ) { return; }
-        if ( vAPI.windows instanceof Object === false ) { return; }
+        if (tab === null) { return; }
+        if (vAPI.windows instanceof Object === false) { return; }
         vAPI.windows.update(tab.windowId, { focused: true });
     }
 
@@ -586,19 +586,19 @@ vAPI.Tabs = class {
     //   standard fields.
 
     sanitizeURL(url) {
-        if ( url.startsWith('data:') === false ) { return url; }
+        if (url.startsWith('data:') === false) { return url; }
         const pos = url.indexOf(',');
-        if ( pos === -1 ) { return url; }
+        if (pos === -1) { return url; }
         const s = url.slice(0, pos);
-        if ( s.search(/\s/) === -1 ) { return url; }
+        if (s.search(/\s/) === -1) { return url; }
         return s.replace(/\s+/, '') + url.slice(pos);
     }
 
     onCreatedNavigationTargetHandler(details) {
-        if ( typeof details.url !== 'string' ) {
+        if (typeof details.url !== 'string') {
             details.url = '';
         }
-        if ( /^https?:\/\//.test(details.url) === false ) {
+        if (/^https?:\/\//.test(details.url) === false) {
             details.frameId = 0;
             details.url = this.sanitizeURL(details.url);
             this.onNavigation(details);
@@ -614,13 +614,13 @@ vAPI.Tabs = class {
     onUpdatedHandler(tabId, changeInfo, tab) {
         // Ignore uninteresting update events
         const { status = '', title = '', url = '' } = changeInfo;
-        if ( status === '' && title === '' && url === '' ) { return; }
-        // https://github.com/gorhill/uBlock/issues/3073
+        if (status === '' && title === '' && url === '') { return; }
+        // https://github.com/Ablock/Ablock/issues/3073
         //   Fall back to `tab.url` when `changeInfo.url` is not set.
-        if ( url === '' ) {
+        if (url === '') {
             changeInfo.url = tab && tab.url;
         }
-        if ( changeInfo.url ) {
+        if (changeInfo.url) {
             changeInfo.url = this.sanitizeURL(changeInfo.url);
         }
         this.onUpdated(tabId, changeInfo, tab);
@@ -631,9 +631,9 @@ vAPI.Tabs = class {
     }
 
     onFocusChangedHandler(windowId) {
-        if ( windowId === browser.windows.WINDOW_ID_NONE ) { return; }
+        if (windowId === browser.windows.WINDOW_ID_NONE) { return; }
         vAPI.tabs.query({ active: true, windowId }).then(tabs => {
-            if ( tabs.length === 0 ) { return; }
+            if (tabs.length === 0) { return; }
             const tab = tabs[0];
             this.onActivated({ tabId: tab.id, windowId: tab.windowId });
         });
@@ -658,9 +658,9 @@ vAPI.Tabs = class {
 /******************************************************************************/
 /******************************************************************************/
 
-if ( webext.windows instanceof Object ) {
+if (webext.windows instanceof Object) {
     vAPI.windows = {
-        get: async function() {
+        get: async function () {
             let win;
             try {
                 win = await webext.windows.get(...arguments);
@@ -669,7 +669,7 @@ if ( webext.windows instanceof Object ) {
             }
             return win instanceof Object ? win : null;
         },
-        create: async function() {
+        create: async function () {
             let win;
             try {
                 win = await webext.windows.create(...arguments);
@@ -678,7 +678,7 @@ if ( webext.windows instanceof Object ) {
             }
             return win instanceof Object ? win : null;
         },
-        update: async function() {
+        update: async function () {
             let win;
             try {
                 win = await webext.windows.update(...arguments);
@@ -693,9 +693,9 @@ if ( webext.windows instanceof Object ) {
 /******************************************************************************/
 /******************************************************************************/
 
-if ( webext.browserAction instanceof Object ) {
+if (webext.browserAction instanceof Object) {
     vAPI.browserAction = {
-        setTitle: async function() {
+        setTitle: async function () {
             try {
                 await webext.browserAction.setTitle(...arguments);
             }
@@ -704,29 +704,29 @@ if ( webext.browserAction instanceof Object ) {
         },
     };
     // Not supported on Firefox for Android
-    if ( webext.browserAction.setIcon ) {
-        vAPI.browserAction.setBadgeTextColor = async function() {
+    if (webext.browserAction.setIcon) {
+        vAPI.browserAction.setBadgeTextColor = async function () {
             try {
                 await webext.browserAction.setBadgeTextColor(...arguments);
             }
             catch {
             }
         };
-        vAPI.browserAction.setBadgeBackgroundColor = async function() {
+        vAPI.browserAction.setBadgeBackgroundColor = async function () {
             try {
                 await webext.browserAction.setBadgeBackgroundColor(...arguments);
             }
             catch {
             }
         };
-        vAPI.browserAction.setBadgeText = async function() {
+        vAPI.browserAction.setBadgeText = async function () {
             try {
                 await webext.browserAction.setBadgeText(...arguments);
             }
             catch {
             }
         };
-        vAPI.browserAction.setIcon = async function() {
+        vAPI.browserAction.setIcon = async function () {
             try {
                 await webext.browserAction.setIcon(...arguments);
             }
@@ -757,26 +757,30 @@ if ( webext.browserAction instanceof Object ) {
     const browserAction = vAPI.browserAction;
     const titleTemplate = `${browser.runtime.getManifest().browser_action.default_title} ({badge})`;
     const icons = [
-        { path: {
-            '16': 'img/icon_16-off.png',
-            '32': 'img/icon_32-off.png',
-            '64': 'img/icon_64-off.png',
-        } },
-        { path: {
-            '16': 'img/icon_16.png',
-            '32': 'img/icon_32.png',
-            '64': 'img/icon_64.png',
-        } },
+        {
+            path: {
+                '16': 'img/icon_16-off.png',
+                '32': 'img/icon_32-off.png',
+                '64': 'img/icon_64-off.png',
+            }
+        },
+        {
+            path: {
+                '16': 'img/icon_16.png',
+                '32': 'img/icon_32.png',
+                '64': 'img/icon_64.png',
+            }
+        },
     ];
 
-    (( ) => {
-        if ( browserAction.setIcon === undefined ) { return; }
+    (() => {
+        if (browserAction.setIcon === undefined) { return; }
 
         // The global badge text and background color.
-        if ( browserAction.setBadgeBackgroundColor !== undefined ) {
+        if (browserAction.setBadgeBackgroundColor !== undefined) {
             browserAction.setBadgeBackgroundColor({ color: '#666666' });
         }
-        if ( browserAction.setBadgeTextColor !== undefined ) {
+        if (browserAction.setBadgeTextColor !== undefined) {
             browserAction.setBadgeTextColor({ color: '#FFFFFF' });
         }
 
@@ -789,18 +793,18 @@ if ( webext.browserAction instanceof Object ) {
         //
         // Firefox uses an internal cache for each setIcon's paths:
         // https://searchfox.org/mozilla-central/rev/5ff2d7683078c96e4b11b8a13674daded935aa44/browser/components/extensions/parent/ext-browserAction.js#631
-        if ( vAPI.webextFlavor.soup.has('chromium') === false ) { return; }
+        if (vAPI.webextFlavor.soup.has('chromium') === false) { return; }
 
         const imgs = [];
-        for ( let i = 0; i < icons.length; i++ ) {
-            for ( const key of Object.keys(icons[i].path) ) {
-                if ( parseInt(key, 10) >= 64 ) { continue; }
+        for (let i = 0; i < icons.length; i++) {
+            for (const key of Object.keys(icons[i].path)) {
+                if (parseInt(key, 10) >= 64) { continue; }
                 imgs.push({ i: i, p: key, cached: false });
             }
         }
 
         // https://github.com/uBlockOrigin/uBlock-issues/issues/296
-        const safeGetImageData = function(ctx, w, h) {
+        const safeGetImageData = function (ctx, w, h) {
             let data;
             try {
                 data = ctx.getImageData(0, 0, w, h);
@@ -809,20 +813,20 @@ if ( webext.browserAction instanceof Object ) {
             return data;
         };
 
-        const onLoaded = function() {
-            for ( const img of imgs ) {
-                if ( img.r.complete === false ) { return; }
+        const onLoaded = function () {
+            for (const img of imgs) {
+                if (img.r.complete === false) { return; }
             }
             const ctx = document.createElement('canvas')
                 .getContext('2d', { willReadFrequently: true });
-            const iconData = [ null, null ];
-            for ( const img of imgs ) {
-                if ( img.cached ) { continue; }
+            const iconData = [null, null];
+            for (const img of imgs) {
+                if (img.cached) { continue; }
                 const w = img.r.naturalWidth, h = img.r.naturalHeight;
                 ctx.width = w; ctx.height = h;
                 ctx.clearRect(0, 0, w, h);
                 ctx.drawImage(img.r, 0, 0);
-                if ( iconData[img.i] === null ) { iconData[img.i] = {}; }
+                if (iconData[img.i] === null) { iconData[img.i] = {}; }
                 const imgData = safeGetImageData(ctx, w, h);
                 if (
                     imgData instanceof Object === false ||
@@ -837,13 +841,13 @@ if ( webext.browserAction instanceof Object ) {
                 iconData[img.i][img.p] = imgData;
                 img.cached = true;
             }
-            for ( let i = 0; i < iconData.length; i++ ) {
-                if ( iconData[i] ) {
+            for (let i = 0; i < iconData.length; i++) {
+                if (iconData[i]) {
                     icons[i] = { imageData: iconData[i] };
                 }
             }
         };
-        for ( const img of imgs ) {
+        for (const img of imgs) {
             img.r = new Image();
             img.r.addEventListener('load', onLoaded, { once: true });
             img.r.src = icons[img.i].path[img.p];
@@ -855,12 +859,12 @@ if ( webext.browserAction instanceof Object ) {
     //        bit 2 = badge color
     //        bit 3 = hide badge
 
-    vAPI.setIcon = async function(tabId, details) {
+    vAPI.setIcon = async function (tabId, details) {
         tabId = toTabId(tabId);
-        if ( tabId === 0 ) { return; }
+        if (tabId === 0) { return; }
 
         const tab = await vAPI.tabs.get(tabId);
-        if ( tab === null ) { return; }
+        if (tab === null) { return; }
 
         const hasUnprocessedRequest = vAPI.net && vAPI.net.hasUnprocessedRequest(tabId);
         const { parts, state } = details;
@@ -868,19 +872,19 @@ if ( webext.browserAction instanceof Object ) {
             ? { badge: '!', color: '#FC0' }
             : details;
 
-        if ( browserAction.setIcon !== undefined ) {
-            if ( parts === undefined || (parts & 0b0001) !== 0 ) {
+        if (browserAction.setIcon !== undefined) {
+            if (parts === undefined || (parts & 0b0001) !== 0) {
                 browserAction.setIcon(
                     Object.assign({ tabId: tab.id }, icons[state])
                 );
             }
-            if ( (parts & 0b0010) !== 0 ) {
+            if ((parts & 0b0010) !== 0) {
                 browserAction.setBadgeText({
                     tabId: tab.id,
                     text: (parts & 0b1000) === 0 ? badge : ''
                 });
             }
-            if ( (parts & 0b0100) !== 0 ) {
+            if ((parts & 0b0100) !== 0) {
                 browserAction.setBadgeBackgroundColor({ tabId: tab.id, color });
             }
         }
@@ -888,20 +892,20 @@ if ( webext.browserAction instanceof Object ) {
         // Insert the badge text in the title if:
         // - the platform does not support browserAction.setIcon(); OR
         // - the rendering of the badge is disabled
-        if ( browserAction.setTitle !== undefined ) {
+        if (browserAction.setTitle !== undefined) {
             const title = titleTemplate.replace('{badge}',
                 state === 1 ? (badge !== '' ? badge : '0') : 'off'
             );
             browserAction.setTitle({ tabId: tab.id, title });
         }
 
-        if ( vAPI.contextMenu instanceof Object ) {
+        if (vAPI.contextMenu instanceof Object) {
             vAPI.contextMenu.onMustUpdate(tabId);
         }
     };
 
-    vAPI.setDefaultIcon = function(flavor, text) {
-        if ( browserAction.setIcon === undefined ) { return; }
+    vAPI.setDefaultIcon = function (flavor, text) {
+        if (browserAction.setIcon === undefined) { return; }
         browserAction.setIcon({
             path: {
                 '16': `img/icon_16${flavor}.png`,
@@ -916,7 +920,7 @@ if ( webext.browserAction instanceof Object ) {
     };
 }
 
-browser.browserAction.onClicked.addListener(function(tab) {
+browser.browserAction.onClicked.addListener(function (tab) {
     vAPI.tabs.open({
         select: true,
         url: `popup-fenix.html?tabId=${tab.id}&intab=1`,
@@ -943,24 +947,24 @@ vAPI.messaging = {
     listeners: new Map(),
     defaultHandler: null,
     PRIVILEGED_ORIGIN: vAPI.getURL('').slice(0, -1),
-    NOOPFUNC: function(){},
+    NOOPFUNC: function () { },
     UNHANDLED: 'vAPI.messaging.notHandled',
 
-    listen: function(details) {
+    listen: function (details) {
         this.listeners.set(details.name, {
             fn: details.listener,
             privileged: details.privileged === true
         });
     },
 
-    onPortDisconnect: function(port) {
+    onPortDisconnect: function (port) {
         this.ports.delete(port.name);
         void browser.runtime.lastError;
     },
 
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/Port
     //   port.sender is always present for onConnect() listeners.
-    onPortConnect: function(port) {
+    onPortConnect: function (port) {
         port.onDisconnect.addListener(port =>
             this.onPortDisconnect(port)
         );
@@ -975,7 +979,7 @@ vAPI.messaging = {
         portDetails.privileged = origin !== undefined
             ? origin === this.PRIVILEGED_ORIGIN
             : url.startsWith(this.PRIVILEGED_ORIGIN);
-        if ( tab ) {
+        if (tab) {
             portDetails.tabId = tab.id;
             portDetails.tabURL = tab.url;
         }
@@ -984,11 +988,11 @@ vAPI.messaging = {
         port.sender = undefined;
     },
 
-    setup: function(defaultHandler) {
-        if ( this.defaultHandler !== null ) { return; }
+    setup: function (defaultHandler) {
+        if (this.defaultHandler !== null) { return; }
 
-        if ( typeof defaultHandler !== 'function' ) {
-            defaultHandler = function() {
+        if (typeof defaultHandler !== 'function') {
+            defaultHandler = function () {
                 return this.UNHANDLED;
             };
         }
@@ -1005,60 +1009,60 @@ vAPI.messaging = {
             vAPI.webextFlavor.major < 61
         ) {
             browser.tabs.onRemoved.addListener(tabId => {
-                for ( const { port, tabId: portTabId } of this.ports.values() ) {
-                    if ( portTabId !== tabId ) { continue; }
+                for (const { port, tabId: portTabId } of this.ports.values()) {
+                    if (portTabId !== tabId) { continue; }
                     this.onPortDisconnect(port);
                 }
             });
         }
     },
 
-    onFrameworkMessage: function(request, port, callback) {
+    onFrameworkMessage: function (request, port, callback) {
         const portDetails = this.ports.get(port.name) || {};
         const tabId = portDetails.tabId;
         const msg = request.msg;
-        switch ( msg.what ) {
-        case 'localStorage': {
-            if ( portDetails.privileged !== true ) { break; }
-            const args = msg.args || [];
-            vAPI.localStorage[msg.fn](...args).then(result => {
-                callback(result);
-            });
-            break;
-        }
-        case 'userCSS': {
-            if ( tabId === undefined ) { break; }
-            const promises = [];
-            if ( msg.add ) {
-                const details = {
-                    code: undefined,
-                    frameId: portDetails.frameId,
-                    matchAboutBlank: true,
-                    runAt: 'document_start',
-                };
-                for ( const cssText of msg.add ) {
-                    details.code = cssText;
-                    promises.push(vAPI.tabs.insertCSS(tabId, details));
-                }
+        switch (msg.what) {
+            case 'localStorage': {
+                if (portDetails.privileged !== true) { break; }
+                const args = msg.args || [];
+                vAPI.localStorage[msg.fn](...args).then(result => {
+                    callback(result);
+                });
+                break;
             }
-            if ( msg.remove ) {
-                const details = {
-                    code: undefined,
-                    frameId: portDetails.frameId,
-                    matchAboutBlank: true,
-                };
-                for ( const cssText of msg.remove ) {
-                    details.code = cssText;
-                    promises.push(vAPI.tabs.removeCSS(tabId, details));
+            case 'userCSS': {
+                if (tabId === undefined) { break; }
+                const promises = [];
+                if (msg.add) {
+                    const details = {
+                        code: undefined,
+                        frameId: portDetails.frameId,
+                        matchAboutBlank: true,
+                        runAt: 'document_start',
+                    };
+                    for (const cssText of msg.add) {
+                        details.code = cssText;
+                        promises.push(vAPI.tabs.insertCSS(tabId, details));
+                    }
                 }
+                if (msg.remove) {
+                    const details = {
+                        code: undefined,
+                        frameId: portDetails.frameId,
+                        matchAboutBlank: true,
+                    };
+                    for (const cssText of msg.remove) {
+                        details.code = cssText;
+                        promises.push(vAPI.tabs.removeCSS(tabId, details));
+                    }
+                }
+                Promise.all(promises).then(() => {
+                    callback();
+                });
+                break;
             }
-            Promise.all(promises).then(( ) => {
-                callback();
-            });
-            break;
-        }
-        default:
-            break;
+            default:
+                break;
         }
     },
 
@@ -1092,44 +1096,44 @@ vAPI.messaging = {
 
     callbackWrapperJunkyard: [],
 
-    callbackWrapperFactory: function(port, msgId) {
+    callbackWrapperFactory: function (port, msgId) {
         return this.callbackWrapperJunkyard.length !== 0
             ? this.callbackWrapperJunkyard.pop().init(port, msgId)
             : new this.CallbackWrapper(this, port, msgId);
     },
 
-    onPortMessage: function(request, port) {
+    onPortMessage: function (request, port) {
         // prepare response
         let callback = this.NOOPFUNC;
-        if ( request.msgId !== undefined ) {
+        if (request.msgId !== undefined) {
             callback = this.callbackWrapperFactory(port, request.msgId).callback;
         }
 
         // Content process to main process: framework handler.
-        if ( request.channel === 'vapi' ) {
+        if (request.channel === 'vapi') {
             this.onFrameworkMessage(request, port, callback);
             return;
         }
 
         // Auxiliary process to main process: specific handler
         const portDetails = this.ports.get(port.name);
-        if ( portDetails === undefined ) { return; }
+        if (portDetails === undefined) { return; }
 
         const listenerDetails = this.listeners.get(request.channel);
         let r = this.UNHANDLED;
         if (
             (listenerDetails !== undefined) &&
             (listenerDetails.privileged === false || portDetails.privileged)
-            
+
         ) {
             r = listenerDetails.fn(request.msg, portDetails, callback);
         }
-        if ( r !== this.UNHANDLED ) { return; }
+        if (r !== this.UNHANDLED) { return; }
 
         // Auxiliary process to main process: default handler
-        if ( portDetails.privileged ) {
+        if (portDetails.privileged) {
             r = this.defaultHandler(request.msg, portDetails, callback);
-            if ( r !== this.UNHANDLED ) { return; }
+            if (r !== this.UNHANDLED) { return; }
         }
 
         // Auxiliary process to main process: no handler
@@ -1147,11 +1151,11 @@ vAPI.messaging = {
 /******************************************************************************/
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/3474
-// https://github.com/gorhill/uBlock/issues/2823
+// https://github.com/Ablock/Ablock/issues/3474
+// https://github.com/Ablock/Ablock/issues/2823
 //   Foil ability of web pages to identify uBO through
 //   its web accessible resources.
-// https://github.com/gorhill/uBlock/issues/3497
+// https://github.com/Ablock/Ablock/issues/3497
 //   Prevent web pages from interfering with uBO's element picker
 // https://github.com/uBlockOrigin/uBlock-issues/issues/550
 //   Support using a new secret for every network request.
@@ -1168,28 +1172,28 @@ vAPI.messaging = {
 
     const guard = details => {
         const match = reSecret.exec(details.url);
-        if ( match === null ) { return { cancel: true }; }
+        if (match === null) { return { cancel: true }; }
         const secret = match[1];
-        if ( longSecrets.has(secret) ) { return; }
+        if (longSecrets.has(secret)) { return; }
         const pos = shortSecrets.indexOf(secret);
-        if ( pos === -1 ) { return { cancel: true }; }
+        if (pos === -1) { return { cancel: true }; }
         shortSecrets.splice(pos, 1);
     };
 
     browser.webRequest.onBeforeRequest.addListener(
         guard,
         {
-            urls: [ root + 'web_accessible_resources/*' ]
+            urls: [root + 'web_accessible_resources/*']
         },
-        [ 'blocking' ]
+        ['blocking']
     );
 
     vAPI.warSecret = {
-        short: ( ) => {
-            if ( shortSecrets.length !== 0 ) {
-                if ( (Date.now() - lastShortSecretTime) > 5000 ) {
+        short: () => {
+            if (shortSecrets.length !== 0) {
+                if ((Date.now() - lastShortSecretTime) > 5000) {
                     shortSecrets.splice(0);
-                } else if ( shortSecrets.length > 256 ) {
+                } else if (shortSecrets.length > 256) {
                     shortSecrets.splice(0, shortSecrets.length - 192);
                 }
             }
@@ -1199,7 +1203,7 @@ vAPI.messaging = {
             return secret;
         },
         long: previous => {
-            if ( previous !== undefined ) {
+            if (previous !== undefined) {
                 longSecrets.delete(previous);
             }
             const secret = vAPI.generateSecret(3);
@@ -1216,8 +1220,8 @@ vAPI.Net = class {
         this.validTypes = new Set();
         {
             const wrrt = browser.webRequest.ResourceType;
-            for ( const typeKey in wrrt ) {
-                if ( Object.hasOwn(wrrt, typeKey) ) {
+            for (const typeKey in wrrt) {
+                if (Object.hasOwn(wrrt, typeKey)) {
                     this.validTypes.add(wrrt[typeKey]);
                 }
             }
@@ -1231,13 +1235,13 @@ vAPI.Net = class {
         browser.webRequest.onBeforeRequest.addListener(
             details => {
                 this.normalizeDetails(details);
-                if ( this.suspendDepth !== 0 && details.tabId >= 0 ) {
+                if (this.suspendDepth !== 0 && details.tabId >= 0) {
                     return this.suspendOneRequest(details);
                 }
                 return this.onBeforeSuspendableRequest(details);
             },
-            this.denormalizeFilters({ urls: [ 'http://*/*', 'https://*/*' ] }),
-            [ 'blocking' ]
+            this.denormalizeFilters({ urls: ['http://*/*', 'https://*/*'] }),
+            ['blocking']
         );
 
         vAPI.setDefaultIcon('-loading', '');
@@ -1247,9 +1251,9 @@ vAPI.Net = class {
     normalizeDetails(/* details */) {
     }
     denormalizeFilters(filters) {
-        const urls = filters.urls || [ '<all_urls>' ];
+        const urls = filters.urls || ['<all_urls>'];
         let types = filters.types;
-        if ( Array.isArray(types) ) {
+        if (Array.isArray(types)) {
             types = this.denormalizeTypes(types);
         }
         if (
@@ -1257,10 +1261,10 @@ vAPI.Net = class {
             (types === undefined || types.indexOf('websocket') !== -1) &&
             (urls.indexOf('<all_urls>') === -1)
         ) {
-            if ( urls.indexOf('ws://*/*') === -1 ) {
+            if (urls.indexOf('ws://*/*') === -1) {
                 urls.push('ws://*/*');
             }
-            if ( urls.indexOf('wss://*/*') === -1 ) {
+            if (urls.indexOf('wss://*/*') === -1) {
                 urls.push('wss://*/*');
             }
         }
@@ -1281,29 +1285,29 @@ vAPI.Net = class {
         );
     }
     onBeforeSuspendableRequest(details) {
-        if ( this.suspendableListener !== undefined ) {
+        if (this.suspendableListener !== undefined) {
             return this.suspendableListener(details);
         }
         this.onUnprocessedRequest(details);
     }
     setSuspendableListener(listener) {
-        for ( const [ tabId, requests ] of this.unprocessedTabs ) {
+        for (const [tabId, requests] of this.unprocessedTabs) {
             let i = requests.length;
-            while ( i-- ) {
+            while (i--) {
                 const r = listener(requests[i]);
-                if ( r === undefined || r.cancel !== true ) {
+                if (r === undefined || r.cancel !== true) {
                     requests.splice(i, 1);
                 }
             }
-            if ( requests.length !== 0 ) { continue; }
+            if (requests.length !== 0) { continue; }
             this.unprocessedTabs.delete(tabId);
         }
-        if ( this.unprocessedTabs.size !== 0 ) {
+        if (this.unprocessedTabs.size !== 0) {
             this.deferredSuspendableListener = listener;
             listener = details => {
-                const { tabId, type  } = details;
-                if ( type === 'main_frame' && this.unprocessedTabs.has(tabId) ) {
-                    if ( this.removeUnprocessedRequest(tabId) ) {
+                const { tabId, type } = details;
+                if (type === 'main_frame' && this.unprocessedTabs.has(tabId)) {
+                    if (this.removeUnprocessedRequest(tabId)) {
                         return this.suspendableListener(details);
                     }
                 }
@@ -1315,7 +1319,7 @@ vAPI.Net = class {
     }
     removeListener(which, clientListener) {
         const actualListener = this.listenerMap.get(clientListener);
-        if ( actualListener === undefined ) { return; }
+        if (actualListener === undefined) { return; }
         this.listenerMap.delete(clientListener);
         browser.webRequest[which].removeListener(actualListener);
     }
@@ -1332,32 +1336,32 @@ vAPI.Net = class {
     }
     onUnprocessedRequest(details) {
         const { tabId } = details;
-        if ( tabId === -1 ) { return; }
-        if ( this.unprocessedTabs.size === 0 ) {
+        if (tabId === -1) { return; }
+        if (this.unprocessedTabs.size === 0) {
             vAPI.setDefaultIcon('-loading', '!');
         }
         let requests = this.unprocessedTabs.get(tabId);
-        if ( requests === undefined ) {
+        if (requests === undefined) {
             this.unprocessedTabs.set(tabId, (requests = []));
         }
         requests.push(Object.assign({}, details));
     }
     hasUnprocessedRequest(tabId) {
-        if ( this.unprocessedTabs.size === 0 ) { return false; }
-        if ( tabId === undefined ) { return true; }
+        if (this.unprocessedTabs.size === 0) { return false; }
+        if (tabId === undefined) { return true; }
         return this.unprocessedTabs.has(tabId);
     }
     removeUnprocessedRequest(tabId) {
-        if ( this.deferredSuspendableListener === undefined ) {
+        if (this.deferredSuspendableListener === undefined) {
             this.unprocessedTabs.clear();
             return true;
         }
-        if ( tabId !== undefined ) {
+        if (tabId !== undefined) {
             this.unprocessedTabs.delete(tabId);
         } else {
             this.unprocessedTabs.clear();
         }
-        if ( this.unprocessedTabs.size !== 0 ) { return false; }
+        if (this.unprocessedTabs.size !== 0) { return false; }
         this.suspendableListener = this.deferredSuspendableListener;
         this.deferredSuspendableListener = undefined;
         return true;
@@ -1370,18 +1374,18 @@ vAPI.Net = class {
         this.suspendDepth += 1;
     }
     unsuspend({ all = false, discard = false } = {}) {
-        if ( this.suspendDepth === 0 ) { return; }
-        if ( all ) {
+        if (this.suspendDepth === 0) { return; }
+        if (all) {
             this.suspendDepth = 0;
         } else {
             this.suspendDepth -= 1;
         }
-        if ( this.suspendDepth !== 0 ) { return; }
+        if (this.suspendDepth !== 0) { return; }
         this.unsuspendAllRequests(discard);
     }
     headerValue(headers, name) {
-        for ( const header of headers ) {
-            if ( header.name.toLowerCase() === name ) {
+        for (const header of headers) {
+            if (header.name.toLowerCase() === name) {
                 return header.value.trim();
             }
         }
@@ -1397,7 +1401,7 @@ vAPI.Net = class {
 
 // To be defined by platform-specific code.
 
-vAPI.scriptletsInjector = (( ) => {
+vAPI.scriptletsInjector = (() => {
     self.uBO_scriptletsInjected = '';
 }).toString();
 
@@ -1410,23 +1414,23 @@ vAPI.scriptletsInjector = (( ) => {
 vAPI.contextMenu = webext.menus && {
     _callback: null,
     _hash: '',
-    onMustUpdate: function() {},
-    setEntries: function(entries, callback) {
+    onMustUpdate: function () { },
+    setEntries: function (entries, callback) {
         entries = entries || [];
         const hash = entries.map(v => v.id).join();
-        if ( hash === this._hash ) { return; }
+        if (hash === this._hash) { return; }
         this._hash = hash;
         webext.menus.removeAll();
-        for ( const entry of entries ) {
+        for (const entry of entries) {
             webext.menus.create(JSON.parse(JSON.stringify(entry)));
         }
         const n = entries.length;
         callback = callback || null;
-        if ( callback === this._callback ) { return; }
-        if ( n !== 0 && callback !== null ) {
+        if (callback === this._callback) { return; }
+        if (n !== 0 && callback !== null) {
             webext.menus.onClicked.addListener(callback);
             this._callback = callback;
-        } else if ( n === 0 && this._callback !== null ) {
+        } else if (n === 0 && this._callback !== null) {
             webext.menus.onClicked.removeListener(this._callback);
             this._callback = null;
         }
@@ -1441,16 +1445,16 @@ vAPI.commands = browser.commands;
 /******************************************************************************/
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/531
+// https://github.com/Ablock/Ablock/issues/531
 //   Storage area dedicated to admin settings. Read-only.
 
-// https://github.com/gorhill/uBlock/commit/43a5ed735b95a575a9339b6e71a1fcb27a99663b#commitcomment-13965030
+// https://github.com/Ablock/Ablock/commit/43a5ed735b95a575a9339b6e71a1fcb27a99663b#commitcomment-13965030
 // Not all Chromium-based browsers support managed storage. Merely testing or
 // exception handling in this case does NOT work: I don't know why. The
 // extension on Opera ends up in a non-sensical state, whereas vAPI become
 // undefined out of nowhere. So only solution left is to test explicitly for
 // Opera.
-// https://github.com/gorhill/uBlock/issues/900
+// https://github.com/Ablock/Ablock/issues/900
 // Also, UC Browser: http://www.upsieutoc.com/image/WXuH
 
 // https://github.com/uBlockOrigin/uAssets/discussions/16939
@@ -1458,15 +1462,15 @@ vAPI.commands = browser.commands;
 //   call on `storage.managed`. The side effect is that any changes to admin
 //   settings will require an extra extension restart to take effect.
 
-vAPI.adminStorage = (( ) => {
-    if ( webext.storage.managed instanceof Object === false ) {
+vAPI.adminStorage = (() => {
+    if (webext.storage.managed instanceof Object === false) {
         return {
-            get: function() {
+            get: function () {
                 return Promise.resolve();
             },
         };
     }
-    const cacheManagedStorage = async ( ) => {
+    const cacheManagedStorage = async () => {
         let store;
         try {
             store = await webext.storage.managed.get();
@@ -1476,11 +1480,11 @@ vAPI.adminStorage = (( ) => {
     };
 
     return {
-        get: async function(key) {
+        get: async function (key) {
             let bin;
             try {
                 bin = await vAPI.storage.get('cachedManagedStorage') || {};
-                if ( Object.keys(bin).length === 0 ) {
+                if (Object.keys(bin).length === 0) {
                     bin = await webext.storage.managed.get() || {};
                 } else {
                     bin = bin.cachedManagedStorage;
@@ -1489,21 +1493,21 @@ vAPI.adminStorage = (( ) => {
                 bin = {};
             }
             cacheManagedStorage();
-            if ( key === undefined || key === null ) {
+            if (key === undefined || key === null) {
                 return bin;
             }
-            if ( typeof key === 'string' && bin instanceof Object ) {
+            if (typeof key === 'string' && bin instanceof Object) {
                 return bin[key];
             }
             const out = {};
-            if ( Array.isArray(key) ) {
-                for ( const k of key ) {
-                    if ( bin[k] === undefined ) { continue; }
+            if (Array.isArray(key)) {
+                for (const k of key) {
+                    if (bin[k] === undefined) { continue; }
                     out[k] = bin[k];
                 }
                 return out;
             }
-            for ( const [ k, v ] of Object.entries(key) ) {
+            for (const [k, v] of Object.entries(key)) {
                 out[k] = bin[k] !== undefined ? bin[k] : v;
             }
             return out;
@@ -1524,37 +1528,37 @@ vAPI.adminStorage = (( ) => {
 //       implementation at this point, but we override with the
 //       background-side implementation.
 vAPI.localStorage = {
-    start: async function() {
-        if ( this.cache instanceof Promise ) { return this.cache; }
-        if ( this.cache instanceof Object ) { return this.cache; }
+    start: async function () {
+        if (this.cache instanceof Promise) { return this.cache; }
+        if (this.cache instanceof Object) { return this.cache; }
         this.cache = vAPI.storage.get('localStorage').then(bin => {
             this.cache = bin && bin.localStorage || {};
         });
         return this.cache;
     },
-    clear: function() {
+    clear: function () {
         this.cache = {};
         return vAPI.storage.set({ localStorage: this.cache });
     },
-    getItem: function(key) {
-        if ( this.cache instanceof Object === false ) {
+    getItem: function (key) {
+        if (this.cache instanceof Object === false) {
             console.info(`localStorage.getItem('${key}') not ready`);
             return null;
         }
         const value = this.cache[key];
         return value !== undefined ? value : null;
     },
-    getItemAsync: async function(key) {
+    getItemAsync: async function (key) {
         await this.start();
         const value = this.cache[key];
         return value !== undefined ? value : null;
     },
-    removeItem: async function(key) {
+    removeItem: async function (key) {
         this.setItem(key);
     },
-    setItem: async function(key, value = undefined) {
+    setItem: async function (key, value = undefined) {
         await this.start();
-        if ( value === this.cache[key] ) { return; }
+        if (value === this.cache[key]) { return; }
         this.cache[key] = value;
         return vAPI.storage.set({ localStorage: this.cache });
     },
@@ -1568,9 +1572,9 @@ vAPI.localStorage.start();
 
 // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/sync
 
-vAPI.cloud = (( ) => {
+vAPI.cloud = (() => {
     // Not all platforms support `webext.storage.sync`.
-    if ( webext.storage.sync instanceof Object === false ) { return; }
+    if (webext.storage.sync instanceof Object === false) { return; }
 
     // Currently, only Chromium supports the following constants -- these
     // values will be assumed for platforms which do not define them.
@@ -1586,12 +1590,12 @@ vAPI.cloud = (( ) => {
     const chunkCountPerFetch = 16; // Must be a power of 2
     const maxChunkCountPerItem = Math.floor(MAX_ITEMS * 0.75) & ~(chunkCountPerFetch - 1);
 
-    // https://github.com/gorhill/uBlock/issues/3006
+    // https://github.com/Ablock/Ablock/issues/3006
     //   For Firefox, we will use a lower ratio to allow for more overhead for
     //   the infrastructure. Unfortunately this leads to less usable space for
     //   actual data, but all of this is provided for free by browser vendors,
     //   so we need to accept and deal with these limitations.
-    const evalMaxChunkSize = function() {
+    const evalMaxChunkSize = function () {
         return Math.floor(
             QUOTA_BYTES_PER_ITEM *
             (vAPI.webextFlavor.soup.has('firefox') ? 0.6 : 0.75)
@@ -1602,7 +1606,7 @@ vAPI.cloud = (( ) => {
 
     // The real actual webextFlavor value may not be set in stone, so listen
     // for possible future changes.
-    window.addEventListener('webextFlavor', function() {
+    window.addEventListener('webextFlavor', function () {
         maxChunkSize = evalMaxChunkSize();
     }, { once: true });
 
@@ -1622,9 +1626,9 @@ vAPI.cloud = (( ) => {
     // good thing given chrome.storage.sync.MAX_WRITE_OPERATIONS_PER_MINUTE
     // and chrome.storage.sync.MAX_WRITE_OPERATIONS_PER_HOUR.
 
-    const getCoarseChunkCount = async function(datakey) {
+    const getCoarseChunkCount = async function (datakey) {
         const keys = {};
-        for ( let i = 0; i < maxChunkCountPerItem; i += 16 ) {
+        for (let i = 0; i < maxChunkCountPerItem; i += 16) {
             keys[datakey + i.toString()] = '';
         }
         let bin;
@@ -1634,28 +1638,28 @@ vAPI.cloud = (( ) => {
             return String(reason);
         }
         let chunkCount = 0;
-        for ( let i = 0; i < maxChunkCountPerItem; i += 16 ) {
-            if ( bin[datakey + i.toString()] === '' ) { break; }
+        for (let i = 0; i < maxChunkCountPerItem; i += 16) {
+            if (bin[datakey + i.toString()] === '') { break; }
             chunkCount = i + 16;
         }
         return chunkCount;
     };
 
-    const deleteChunks = async function(datakey, start) {
+    const deleteChunks = async function (datakey, start) {
         const keys = [];
 
         const n = await getCoarseChunkCount(datakey);
-        for ( let i = start; i < n; i++ ) {
+        for (let i = start; i < n; i++) {
             keys.push(datakey + i.toString());
         }
-        if ( keys.length !== 0 ) {
+        if (keys.length !== 0) {
             webext.storage.sync.remove(keys);
         }
     };
 
-    const push = async function(details) {
+    const push = async function (details) {
         const { datakey, data, encode } = details;
-        if ( data === undefined || typeof data === 'string' && data === '' ) {
+        if (data === undefined || typeof data === 'string' && data === '') {
             return deleteChunks(datakey, 0);
         }
         const item = {
@@ -1674,7 +1678,7 @@ vAPI.cloud = (( ) => {
         //   "plus its key length."
         const bin = {};
         const chunkCount = Math.ceil(encoded.length / maxChunkSize);
-        for ( let i = 0; i < chunkCount; i++ ) {
+        for (let i = 0; i < chunkCount; i++) {
             bin[datakey + i.toString()]
                 = encoded.substr(i * maxChunkSize, maxChunkSize);
         }
@@ -1696,15 +1700,15 @@ vAPI.cloud = (( ) => {
         }
     };
 
-    const pull = async function(details) {
+    const pull = async function (details) {
         const { datakey, decode } = details;
 
         const result = await getCoarseChunkCount(datakey);
-        if ( typeof result !== 'number' ) {
+        if (typeof result !== 'number') {
             return result;
         }
         const chunkKeys = {};
-        for ( let i = 0; i < result; i++ ) {
+        for (let i = 0; i < result; i++) {
             chunkKeys[datakey + i.toString()] = '';
         }
 
@@ -1723,9 +1727,9 @@ vAPI.cloud = (( ) => {
         //   undefined.
         let encoded = [];
         let i = 0;
-        for (;;) {
+        for (; ;) {
             const slice = bin[datakey + i.toString()];
-            if ( slice === '' || slice === undefined ) { break; }
+            if (slice === '' || slice === undefined) { break; }
             encoded.push(slice);
             i += 1;
         }
@@ -1733,10 +1737,10 @@ vAPI.cloud = (( ) => {
 
         let entry = null;
         try {
-            if ( decode instanceof Function ) {
+            if (decode instanceof Function) {
                 entry = await decode(encoded) || null;
             }
-            if ( typeof entry === 'string' ) {
+            if (typeof entry === 'string') {
                 entry = JSON.parse(entry);
             }
         } catch {
@@ -1744,14 +1748,14 @@ vAPI.cloud = (( ) => {
         return entry;
     };
 
-    const used = async function(datakey) {
-        if ( webext.storage.sync.getBytesInUse instanceof Function === false ) {
+    const used = async function (datakey) {
+        if (webext.storage.sync.getBytesInUse instanceof Function === false) {
             return;
         }
         const coarseCount = await getCoarseChunkCount(datakey);
-        if ( typeof coarseCount !== 'number' ) { return; }
+        if (typeof coarseCount !== 'number') { return; }
         const keys = [];
-        for ( let i = 0; i < coarseCount; i++ ) {
+        for (let i = 0; i < coarseCount; i++) {
             keys.push(`${datakey}${i}`);
         }
         let results;
@@ -1762,19 +1766,19 @@ vAPI.cloud = (( ) => {
             ]);
         } catch {
         }
-        if ( Array.isArray(results) === false ) { return; }
+        if (Array.isArray(results) === false) { return; }
         return { used: results[0], total: results[1], max: QUOTA_BYTES };
     };
 
-    const getOptions = function(callback) {
-        if ( typeof callback !== 'function' ) { return; }
+    const getOptions = function (callback) {
+        if (typeof callback !== 'function') { return; }
         callback(options);
     };
 
-    const setOptions = function(details, callback) {
-        if ( typeof details !== 'object' || details === null ) { return; }
+    const setOptions = function (details, callback) {
+        if (typeof details !== 'object' || details === null) { return; }
 
-        if ( typeof details.deviceName === 'string' ) {
+        if (typeof details.deviceName === 'string') {
             vAPI.localStorage.setItem('deviceName', details.deviceName);
             options.deviceName = details.deviceName;
         }
@@ -1794,7 +1798,7 @@ vAPI.alarms = {
     },
     createIfNotPresent(name, ...args) {
         webext.alarms.get(name).then(details => {
-            if ( details !== undefined ) { return; }
+            if (details !== undefined) { return; }
             webext.alarms.create(name, ...args);
         });
     },

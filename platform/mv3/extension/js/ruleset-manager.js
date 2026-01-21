@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import {
@@ -51,16 +51,16 @@ const STRICTBLOCK_PRIORITY = 29;
 /******************************************************************************/
 
 const isStrictBlockRule = rule => {
-    if ( rule.priority !== STRICTBLOCK_PRIORITY ) { return false; }
-    if ( rule.condition?.resourceTypes === undefined ) { return false; }
-    if ( rule.condition.resourceTypes.length !== 1 ) { return false; }
-    if ( rule.condition.resourceTypes[0] !== 'main_frame' ) { return false; }
-    if ( rule.action.type === 'redirect' ) {
+    if (rule.priority !== STRICTBLOCK_PRIORITY) { return false; }
+    if (rule.condition?.resourceTypes === undefined) { return false; }
+    if (rule.condition.resourceTypes.length !== 1) { return false; }
+    if (rule.condition.resourceTypes[0] !== 'main_frame') { return false; }
+    if (rule.action.type === 'redirect') {
         const substitution = rule.action.redirect.regexSubstitution;
         return substitution !== undefined &&
             substitution.includes('/strictblock.');
     }
-    if ( rule.action.type === 'allow' ) {
+    if (rule.action.type === 'allow') {
         return Array.isArray(rule.condition?.requestDomains);
     }
     return false;
@@ -69,12 +69,12 @@ const isStrictBlockRule = rule => {
 /******************************************************************************/
 
 function getRulesetDetails() {
-    if ( getRulesetDetails.rulesetDetailsPromise !== undefined ) {
+    if (getRulesetDetails.rulesetDetailsPromise !== undefined) {
         return getRulesetDetails.rulesetDetailsPromise;
     }
     getRulesetDetails.rulesetDetailsPromise =
         fetchJSON('/rulesets/ruleset-details').then(entries => {
-            const rulesMap = new Map(entries.map(entry => [ entry.id, entry ]));
+            const rulesMap = new Map(entries.map(entry => [entry.id, entry]));
             return rulesMap;
         });
     return getRulesetDetails.rulesetDetailsPromise;
@@ -86,7 +86,7 @@ async function pruneInvalidRegexRules(realm, rulesIn, rejected = []) {
     const validateRegex = regex => {
         return dnr.isRegexSupported({ regex, isCaseSensitive: false }).then(result => {
             pruneInvalidRegexRules.validated.set(regex, result?.reason || true);
-            if ( result.isSupported ) { return true; }
+            if (result.isSupported) { return true; }
             rejected.push({ regex, reason: result?.reason });
             return false;
         });
@@ -94,16 +94,16 @@ async function pruneInvalidRegexRules(realm, rulesIn, rejected = []) {
 
     // Validate regex-based rules
     const toCheck = [];
-    for ( const rule of rulesIn ) {
-        if ( rule.condition?.regexFilter === undefined ) {
+    for (const rule of rulesIn) {
+        if (rule.condition?.regexFilter === undefined) {
             toCheck.push(true);
             continue;
         }
         const { regexFilter } = rule.condition;
         const reason = pruneInvalidRegexRules.validated.get(regexFilter);
-        if ( reason !== undefined ) {
+        if (reason !== undefined) {
             toCheck.push(reason === true);
-            if ( reason === true  ) { continue; }
+            if (reason === true) { continue; }
             rejected.push({ regex: regexFilter, reason });
             continue;
         }
@@ -113,7 +113,7 @@ async function pruneInvalidRegexRules(realm, rulesIn, rejected = []) {
     // Collate results
     const isValid = await Promise.all(toCheck);
 
-    if ( rejected.length !== 0 ) {
+    if (rejected.length !== 0) {
         ubolLog(`${realm} realm: rejected regexes:\n`,
             rejected.map(e => `${e.regex} → ${e.reason}`).join('\n')
         );
@@ -135,10 +135,10 @@ async function getDynamicRegexRuleCount() {
 
 async function updateRegexRules(currentRules, addRules, removeRuleIds) {
     // Remove existing regex-related block rules
-    for ( const rule of currentRules ) {
-        if ( rule.id === 0 ) { continue; }
-        if ( rule.id >= SPECIAL_RULES_REALM ) { continue; }
-        if ( rule.condition.regexFilter === undefined ) { continue; }
+    for (const rule of currentRules) {
+        if (rule.id === 0) { continue; }
+        if (rule.id >= SPECIAL_RULES_REALM) { continue; }
+        if (rule.condition.regexFilter === undefined) { continue; }
         removeRuleIds.push(rule.id);
     }
 
@@ -146,24 +146,24 @@ async function updateRegexRules(currentRules, addRules, removeRuleIds) {
 
     // Fetch regexes for all enabled rulesets
     const toFetch = [];
-    for ( const details of rulesetDetails ) {
-        if ( details.rules.regex === 0 ) { continue; }
+    for (const details of rulesetDetails) {
+        if (details.rules.regex === 0) { continue; }
         toFetch.push(fetchJSON(`/rulesets/regex/${details.id}`));
     }
     const regexRulesets = await Promise.all(toFetch);
 
     // Collate all regexes rules
     const allRules = [];
-    for ( const rules of regexRulesets ) {
-        if ( Array.isArray(rules) === false ) { continue; }
-        for ( const rule of rules ) {
+    for (const rules of regexRulesets) {
+        if (Array.isArray(rules) === false) { continue; }
+        for (const rule of rules) {
             allRules.push(rule);
         }
     }
-    if ( allRules.length === 0 ) { return; }
+    if (allRules.length === 0) { return; }
 
     const validRules = await pruneInvalidRegexRules('regexes', allRules);
-    if ( validRules.length === 0 ) { return; }
+    if (validRules.length === 0) { return; }
 
     ubolLog(`Add ${validRules.length} DNR regex rules`);
     addRules.push(...validRules);
@@ -176,29 +176,29 @@ async function updateDynamicRules() {
 
     // Remove potentially left-over rules from previous version
     const removeRuleIds = [];
-    for ( const rule of currentRules ) {
-        if ( rule.id >= SPECIAL_RULES_REALM ) { continue; }
+    for (const rule of currentRules) {
+        if (rule.id >= SPECIAL_RULES_REALM) { continue; }
         removeRuleIds.push(rule.id);
         rule.id = 0;
     }
 
     const addRules = [];
     await updateRegexRules(currentRules, addRules, removeRuleIds);
-    if ( addRules.length === 0 && removeRuleIds.length === 0 ) { return; }
+    if (addRules.length === 0 && removeRuleIds.length === 0) { return; }
 
     const dynamicRegexCountBefore = await getDynamicRegexRuleCount();
     let dynamicRegexCountAfter = 0;
     let ruleId = 1;
-    for ( const rule of addRules ) {
-        if ( rule?.condition.regexFilter ) { dynamicRegexCountAfter += 1; }
+    for (const rule of addRules) {
+        if (rule?.condition.regexFilter) { dynamicRegexCountAfter += 1; }
         rule.id = ruleId++;
     }
-    if ( dynamicRegexCountAfter !== 0 ) {
+    if (dynamicRegexCountAfter !== 0) {
         ubolLog(`Using ${dynamicRegexCountAfter}/${dnr.MAX_NUMBER_OF_REGEX_RULES} dynamic regex-based DNR rules`);
     }
     // If we increase the number of dynamic regex rules, reset session rules to
     // reduce risk of hitting maximum regex count
-    if ( dynamicRegexCountAfter > dynamicRegexCountBefore ) {
+    if (dynamicRegexCountAfter > dynamicRegexCountBefore) {
         await clearSessionRules();
     }
 
@@ -206,19 +206,19 @@ async function updateDynamicRules() {
 
     try {
         await dnr.updateDynamicRules({ addRules, removeRuleIds });
-        if ( removeRuleIds.length !== 0 ) {
+        if (removeRuleIds.length !== 0) {
             ubolLog(`Remove ${removeRuleIds.length} dynamic DNR rules`);
         }
-        if ( addRules.length !== 0 ) {
+        if (addRules.length !== 0) {
             ubolLog(`Add ${addRules.length} dynamic DNR rules`);
         }
-    } catch(reason) {
+    } catch (reason) {
         ubolErr(`updateDynamicRules/${reason}`);
         response.error = `${reason}`;
     }
 
     const result = await updateSessionRules();
-    if ( result?.error ) {
+    if (result?.error) {
         response.error ||= result.error;
     }
 
@@ -230,8 +230,8 @@ async function updateDynamicRules() {
 async function getEffectiveDynamicRules() {
     const allRules = await dnr.getDynamicRules();
     const dynamicRules = [];
-    for ( const rule of allRules ) {
-        if ( rule.id >= USER_RULES_BASE_RULE_ID ) { continue; }
+    for (const rule of allRules) {
+        if (rule.id >= USER_RULES_BASE_RULE_ID) { continue; }
         dynamicRules.push(rule);
     }
     return dynamicRules;
@@ -241,17 +241,17 @@ async function getEffectiveDynamicRules() {
 
 async function updateStrictBlockRules(currentRules, addRules, removeRuleIds) {
     // Remove existing strictblock-related rules
-    for ( const rule of currentRules ) {
-        if ( isStrictBlockRule(rule) === false ) { continue; }
+    for (const rule of currentRules) {
+        if (isStrictBlockRule(rule) === false) { continue; }
         removeRuleIds.push(rule.id);
     }
 
-    if ( rulesetConfig.strictBlockMode === false ) { return; }
+    if (rulesetConfig.strictBlockMode === false) { return; }
 
     // https://github.com/uBlockOrigin/uBOL-home/issues/428#issuecomment-3172663563
     // https://bugs.webkit.org/show_bug.cgi?id=298199
     // https://developer.apple.com/forums/thread/756214
-    if ( webextFlavor === 'safari' ) { return; }
+    if (webextFlavor === 'safari') { return; }
 
     const [
         hasOmnipotence,
@@ -266,7 +266,7 @@ async function updateStrictBlockRules(currentRules, addRules, removeRuleIds) {
     ]);
 
     // Strict-block rules can only be enforced with omnipotence
-    if ( hasOmnipotence === false ) {
+    if (hasOmnipotence === false) {
         localRemove('excludedStrictBlockHostnames');
         sessionRemove('excludedStrictBlockHostnames');
         return;
@@ -274,37 +274,37 @@ async function updateStrictBlockRules(currentRules, addRules, removeRuleIds) {
 
     // Fetch strick-block rules
     const toFetch = [];
-    for ( const details of rulesetDetails ) {
-        if ( details.rules.strictblock === 0 ) { continue; }
+    for (const details of rulesetDetails) {
+        if (details.rules.strictblock === 0) { continue; }
         toFetch.push(fetchJSON(`/rulesets/strictblock/${details.id}`));
     }
     const rulesets = await Promise.all(toFetch);
 
     const substitution = `${runtime.getURL('/strictblock.html')}#\\0`;
     const allRules = [];
-    for ( const rules of rulesets ) {
-        if ( Array.isArray(rules) === false ) { continue; }
-        for ( const rule of rules ) {
+    for (const rules of rulesets) {
+        if (Array.isArray(rules) === false) { continue; }
+        for (const rule of rules) {
             rule.action.redirect.regexSubstitution = substitution;
             allRules.push(rule);
         }
     }
 
     const validRules = await pruneInvalidRegexRules('strictblock', allRules);
-    if ( validRules.length === 0 ) { return; }
+    if (validRules.length === 0) { return; }
     ubolLog(`Add ${validRules.length} DNR strictblock rules`);
-    for ( const rule of validRules ) {
+    for (const rule of validRules) {
         rule.priority = STRICTBLOCK_PRIORITY;
         addRules.push(rule);
     }
 
     const allExcluded = permanentlyExcluded.concat(temporarilyExcluded);
-    if ( allExcluded.length === 0 ) { return; }
+    if (allExcluded.length === 0) { return; }
     addRules.unshift({
         action: { type: 'allow' },
         condition: {
             requestDomains: allExcluded,
-            resourceTypes: [ 'main_frame' ],
+            resourceTypes: ['main_frame'],
         },
         priority: STRICTBLOCK_PRIORITY,
     });
@@ -312,7 +312,7 @@ async function updateStrictBlockRules(currentRules, addRules, removeRuleIds) {
 }
 
 async function excludeFromStrictBlock(hostname, permanent) {
-    if ( typeof hostname !== 'string' || hostname === '' ) { return; }
+    if (typeof hostname !== 'string' || hostname === '') { return; }
     const readFn = permanent ? localRead : sessionRead;
     const hostnames = new Set(await readFn('excludedStrictBlockHostnames'));
     hostnames.add(hostname);
@@ -323,12 +323,12 @@ async function excludeFromStrictBlock(hostname, permanent) {
 
 async function setStrictBlockMode(state, force = false) {
     const newState = Boolean(state);
-    if ( force === false ) {
-        if ( newState === rulesetConfig.strictBlockMode ) { return; }
+    if (force === false) {
+        if (newState === rulesetConfig.strictBlockMode) { return; }
     }
     rulesetConfig.strictBlockMode = newState;
-    const promises = [ saveRulesetConfig() ];
-    if ( newState === false ) {
+    const promises = [saveRulesetConfig()];
+    if (newState === false) {
         promises.push(
             localRemove('excludedStrictBlockHostnames'),
             sessionRemove('excludedStrictBlockHostnames')
@@ -345,37 +345,37 @@ async function updateSessionRules() {
     const removeRuleIds = [];
     const currentRules = await dnr.getSessionRules();
     await updateStrictBlockRules(currentRules, addRulesUnfiltered, removeRuleIds);
-    if ( addRulesUnfiltered.length === 0 && removeRuleIds.length === 0 ) { return; }
+    if (addRulesUnfiltered.length === 0 && removeRuleIds.length === 0) { return; }
     const maxRegexCount = dnr.MAX_NUMBER_OF_REGEX_RULES * 0.95;
     const dynamicRegexCount = await getDynamicRegexRuleCount();
     let regexCount = dynamicRegexCount;
     let ruleId = 1;
-    for ( const rule of addRulesUnfiltered ) {
+    for (const rule of addRulesUnfiltered) {
         rule.id = ruleId++;
-        if ( Boolean(rule?.condition.regexFilter) === false ) { continue; }
+        if (Boolean(rule?.condition.regexFilter) === false) { continue; }
         regexCount += 1;
-        if ( regexCount < maxRegexCount ) { continue; }
+        if (regexCount < maxRegexCount) { continue; }
         rule.id = 0;
     }
     const sessionRegexCount = regexCount - dynamicRegexCount;
     const addRules = addRulesUnfiltered.filter(a => a.id !== 0);
     const rejectedRuleCount = addRulesUnfiltered.length - addRules.length;
-    if ( rejectedRuleCount !== 0 ) {
+    if (rejectedRuleCount !== 0) {
         ubolLog(`Too many regex-based filters, ${rejectedRuleCount} session rules dropped`);
     }
-    if ( sessionRegexCount !== 0 ) {
+    if (sessionRegexCount !== 0) {
         ubolLog(`Using ${sessionRegexCount}/${dnr.MAX_NUMBER_OF_REGEX_RULES} session regex-based DNR rules`);
     }
     const response = {};
     try {
         await dnr.updateSessionRules({ addRules, removeRuleIds });
-        if ( removeRuleIds.length !== 0 ) {
+        if (removeRuleIds.length !== 0) {
             ubolLog(`Remove ${removeRuleIds.length} session DNR rules`);
         }
-        if ( addRules.length !== 0 ) {
+        if (addRules.length !== 0) {
             ubolLog(`Add ${addRules.length} session DNR rules`);
         }
-    } catch(reason) {
+    } catch (reason) {
         ubolErr(`updateSessionRules/${reason}`);
         response.error = `${reason}`;
     }
@@ -384,7 +384,7 @@ async function updateSessionRules() {
 
 async function clearSessionRules() {
     const currentRules = await dnr.getSessionRules();
-    if ( currentRules.length === 0 ) { return; }
+    if (currentRules.length === 0) { return; }
     const removeRuleIds = currentRules.map(a => a.id);
     return dnr.updateSessionRules({ removeRuleIds });
 }
@@ -394,8 +394,8 @@ async function clearSessionRules() {
 async function getEffectiveSessionRules() {
     const allRules = await dnr.getSessionRules();
     const sessionRules = [];
-    for ( const rule of allRules ) {
-        if ( rule.id >= USER_RULES_BASE_RULE_ID ) { continue; }
+    for (const rule of allRules) {
+        if (rule.id >= USER_RULES_BASE_RULE_ID) { continue; }
         sessionRules.push(rule);
     }
     return sessionRules;
@@ -404,12 +404,12 @@ async function getEffectiveSessionRules() {
 /******************************************************************************/
 
 async function filteringModesToDNR(modes) {
-    const noneHostnames = new Set([ ...modes.none ]);
-    const notNoneHostnames = new Set([ ...modes.basic, ...modes.optimal, ...modes.complete ]);
+    const noneHostnames = new Set([...modes.none]);
+    const notNoneHostnames = new Set([...modes.basic, ...modes.optimal, ...modes.complete]);
     const requestDomains = [];
     const excludedRequestDomains = [];
     const allowEverywhere = noneHostnames.has('all-urls');
-    if ( allowEverywhere ) {
+    if (allowEverywhere) {
         excludedRequestDomains.push(...notNoneHostnames);
     } else {
         requestDomains.push(...noneHostnames);
@@ -424,7 +424,7 @@ async function filteringModesToDNR(modes) {
         allowEverywhere,
         TRUSTED_DIRECTIVE_PRIORITY
     ).then(modified => {
-        if ( modified === false ) { return; }
+        if (modified === false) { return; }
         ubolLog(`${allowEverywhere ? 'Enabled' : 'Disabled'} DNR filtering for ${noneCount} sites`);
     });
 }
@@ -434,13 +434,13 @@ async function filteringModesToDNR(modes) {
 export async function getDefaultRulesetsFromEnv() {
     const dropCountry = lang => {
         const pos = lang.indexOf('-');
-        if ( pos === -1 ) { return lang; }
+        if (pos === -1) { return lang; }
         return lang.slice(0, pos);
     };
 
     const langSet = new Set();
 
-    for ( const lang of navigator.languages.map(dropCountry) ) {
+    for (const lang of navigator.languages.map(dropCountry)) {
         langSet.add(lang);
     }
     langSet.add(dropCountry(i18n.getUILanguage()));
@@ -455,26 +455,26 @@ export async function getDefaultRulesetsFromEnv() {
 
     const rulesetDetails = await getRulesetDetails();
     const out = [];
-    for ( const ruleset of rulesetDetails.values() ) {
+    for (const ruleset of rulesetDetails.values()) {
         const { id, enabled } = ruleset;
-        if ( enabled ) {
+        if (enabled) {
             out.push(id);
             continue;
         }
-        if ( typeof ruleset.lang === 'string' ) {
-            if ( reTargetLang.test(ruleset.lang) ) {
+        if (typeof ruleset.lang === 'string') {
+            if (reTargetLang.test(ruleset.lang)) {
                 out.push(id);
                 continue;
             }
         }
-        if ( typeof ruleset.tags === 'string' ) {
-            if ( reMobile?.test(ruleset.tags) ) {
+        if (typeof ruleset.tags === 'string') {
+            if (reMobile?.test(ruleset.tags)) {
                 out.push(id);
                 continue;
             }
         }
     }
-   
+
     return out;
 }
 
@@ -492,20 +492,20 @@ async function patchDefaultRulesets() {
     ]);
     const toAdd = [];
     const toRemove = [];
-    for ( const id of newDefaultIds ) {
-        if ( oldDefaultIds.includes(id) ) { continue; }
+    for (const id of newDefaultIds) {
+        if (oldDefaultIds.includes(id)) { continue; }
         toAdd.push(id);
     }
-    for ( const id of oldDefaultIds ) {
-        if ( newDefaultIds.includes(id) ) { continue; }
+    for (const id of oldDefaultIds) {
+        if (newDefaultIds.includes(id)) { continue; }
         toRemove.push(id);
     }
-    for ( const id of rulesetConfig.enabledRulesets ) {
-        if ( staticRulesetIds.includes(id) ) { continue; }
+    for (const id of rulesetConfig.enabledRulesets) {
+        if (staticRulesetIds.includes(id)) { continue; }
         toRemove.push(id);
     }
     localWrite('defaultRulesetIds', newDefaultIds);
-    if ( toAdd.length === 0 && toRemove.length === 0 ) { return; }
+    if (toAdd.length === 0 && toRemove.length === 0) { return; }
     const enabledRulesets = new Set(rulesetConfig.enabledRulesets);
     toAdd.forEach(id => enabledRulesets.add(id));
     toRemove.forEach(id => enabledRulesets.delete(id));
@@ -528,47 +528,47 @@ async function enableRulesets(ids) {
         getRulesetDetails(),
     ]);
 
-    for ( const token of adminIds ) {
+    for (const token of adminIds) {
         const c0 = token.charAt(0);
         const id = token.slice(1);
-        if ( c0 === '+' ) {
+        if (c0 === '+') {
             afterIds.add(id);
-        } else if ( c0 === '-' ) {
+        } else if (c0 === '-') {
             afterIds.delete(id);
         }
     }
 
     const enableRulesetSet = new Set();
     const disableRulesetSet = new Set();
-    for ( const id of afterIds ) {
-        if ( beforeIds.has(id) ) { continue; }
+    for (const id of afterIds) {
+        if (beforeIds.has(id)) { continue; }
         enableRulesetSet.add(id);
     }
-    for ( const id of beforeIds ) {
-        if ( afterIds.has(id) ) { continue; }
+    for (const id of beforeIds) {
+        if (afterIds.has(id)) { continue; }
         disableRulesetSet.add(id);
     }
 
     // Be sure the rulesets to enable/disable do exist in the current version,
     // otherwise the API throws.
-    for ( const id of enableRulesetSet ) {
-        if ( rulesetDetails.has(id) ) { continue; }
+    for (const id of enableRulesetSet) {
+        if (rulesetDetails.has(id)) { continue; }
         enableRulesetSet.delete(id);
     }
-    for ( const id of disableRulesetSet ) {
-        if ( rulesetDetails.has(id) ) { continue; }
+    for (const id of disableRulesetSet) {
+        if (rulesetDetails.has(id)) { continue; }
         disableRulesetSet.delete(id);
     }
 
-    if ( enableRulesetSet.size === 0 && disableRulesetSet.size === 0 ) { return; }
+    if (enableRulesetSet.size === 0 && disableRulesetSet.size === 0) { return; }
 
     const enableRulesetIds = Array.from(enableRulesetSet);
     const disableRulesetIds = Array.from(disableRulesetSet);
 
-    if ( enableRulesetIds.length !== 0 ) {
+    if (enableRulesetIds.length !== 0) {
         ubolLog(`Enable rulesets: ${enableRulesetIds}`);
     }
-    if ( disableRulesetIds.length !== 0 ) {
+    if (disableRulesetIds.length !== 0) {
         ubolLog(`Disable ruleset: ${disableRulesetIds}`);
     }
 
@@ -583,7 +583,7 @@ async function enableRulesets(ids) {
     });
 
     const result = await updateDynamicRules();
-    if ( result?.error ) {
+    if (result?.error) {
         response.error ||= result.error;
     }
 
@@ -619,9 +619,9 @@ async function getEnabledRulesetsDetails() {
         getRulesetDetails(),
     ]);
     const out = [];
-    for ( const id of ids ) {
+    for (const id of ids) {
         const ruleset = rulesetDetails.get(id);
-        if ( ruleset === undefined ) { continue; }
+        if (ruleset === undefined) { continue; }
         out.push(ruleset);
     }
     return out;
@@ -632,8 +632,8 @@ async function getEnabledRulesetsDetails() {
 async function getEffectiveUserRules() {
     const allRules = await dnr.getDynamicRules();
     const userRules = [];
-    for ( const rule of allRules ) {
-        if ( rule.id < USER_RULES_BASE_RULE_ID ) { continue; }
+    for (const rule of allRules) {
+        if (rule.id < USER_RULES_BASE_RULE_ID) { continue; }
         userRules.push(rule);
     }
     return userRules;
@@ -654,24 +654,24 @@ async function updateUserRules() {
 
     const parsed = rulesFromText(effectiveRulesText);
     const { rules } = parsed;
-    const removeRuleIds = [ ...userRules.map(a => a.id) ];
+    const removeRuleIds = [...userRules.map(a => a.id)];
     const rejectedRegexes = [];
     const addRules = await pruneInvalidRegexRules('user', rules, rejectedRegexes);
     const out = { added: 0, removed: 0, errors: [] };
 
-    if ( rejectedRegexes.length !== 0 ) {
+    if (rejectedRegexes.length !== 0) {
         rejectedRegexes.forEach(e =>
             out.errors.push(`regexFilter: ${e.regex} → ${e.reason}`)
         );
     }
 
-    if ( removeRuleIds.length === 0 && addRules.length === 0 ) {
+    if (removeRuleIds.length === 0 && addRules.length === 0) {
         await localRemove('userDnrRuleCount');
         return out;
     }
 
     let ruleId = 0;
-    for ( const rule of addRules ) {
+    for (const rule of addRules) {
         rule.id = USER_RULES_BASE_RULE_ID + ruleId++;
         rule.priority = (rule.priority || 1) + USER_RULES_PRIORITY;
     }
@@ -683,20 +683,20 @@ async function updateUserRules() {
     try {
         await dnr.updateDynamicRules({ removeRuleIds });
         await dnr.updateDynamicRules({ addRules });
-        if ( removeRuleIds.length !== 0 ) {
+        if (removeRuleIds.length !== 0) {
             ubolLog(`updateUserRules() / Removed ${removeRuleIds.length} dynamic DNR rules`);
         }
-        if ( addRules.length !== 0 ) {
+        if (addRules.length !== 0) {
             ubolLog(`updateUserRules() / Added ${addRules.length} DNR rules`);
         }
         out.added = addRules.length;
         out.removed = removeRuleIds.length;
-    } catch(reason) {
+    } catch (reason) {
         ubolErr(`updateUserRules/${reason}`);
         out.errors.push(`${reason}`);
     } finally {
         const userRules = await getEffectiveUserRules();
-        if ( userRules.length === 0 ) {
+        if (userRules.length === 0) {
             await localRemove('userDnrRuleCount');
         } else {
             await localWrite('userDnrRuleCount', addRules.length);

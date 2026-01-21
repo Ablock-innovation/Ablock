@@ -16,12 +16,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 
-if ( typeof vAPI === 'object' && vAPI.domFilterer ) {
+if (typeof vAPI === 'object' && vAPI.domFilterer) {
     vAPI.domFilterer.toggle(false);
 }
 
@@ -38,7 +38,7 @@ if ( typeof vAPI === 'object' && vAPI.domFilterer ) {
     - Remove the following code
     - Add code beyond the following code
     Reason:
-    - https://github.com/gorhill/uBlock/pull/3721
+    - https://github.com/Ablock/Ablock/pull/3721
     - uBO never uses the return value from injected content scripts
 
 **/

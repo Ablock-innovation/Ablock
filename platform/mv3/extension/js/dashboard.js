@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$ } from './dom.js';
@@ -42,7 +42,7 @@ dom.attr('a', 'target', '_blank');
 dom.on('#dashboard-nav', 'click', '.tabButton', ev => {
     const { pane } = ev.target.dataset;
     dom.body.dataset.pane = pane;
-    if ( pane === 'settings' ) {
+    if (pane === 'settings') {
         localRemove('dashboard.activePane');
     } else {
         localWrite('dashboard.activePane', pane);
@@ -50,13 +50,13 @@ dom.on('#dashboard-nav', 'click', '.tabButton', ev => {
 });
 
 localRead('dashboard.activePane').then(pane => {
-    if ( typeof pane !== 'string' ) { return; }
+    if (typeof pane !== 'string') { return; }
     dom.body.dataset.pane = pane;
 });
 
 // Update troubleshooting on-demand
 const tsinfoObserver = new IntersectionObserver(entries => {
-    if ( entries.every(a => a.isIntersecting === false) ) { return; }
+    if (entries.every(a => a.isIntersecting === false)) { return; }
     import('./troubleshooting.js').then(module => {
         return module.getTroubleshootingInfo();
     }).then(config => {
@@ -81,7 +81,7 @@ export function nodeFromTemplate(templateId, nodeSelector) {
 /******************************************************************************/
 
 export function hashFromIterable(iter) {
-    if ( Boolean(iter) === false ) { return ''; }
+    if (Boolean(iter) === false) { return ''; }
     return Array.from(iter).sort().join('\n');
 }
 

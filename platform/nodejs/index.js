@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* globals process */
@@ -65,7 +65,7 @@ function loadJSON(path) {
 /******************************************************************************/
 
 async function enableWASM() {
-    const wasmModuleFetcher = function(path) {
+    const wasmModuleFetcher = function (path) {
         const require = createRequire(import.meta.url); // jshint ignore:line
         const wasm = new Uint8Array(require(`${path}.wasm.json`));
         return WebAssembly.compile(wasm);
@@ -76,7 +76,7 @@ async function enableWASM() {
             snfe.enableWASM(wasmModuleFetcher, './js/wasm/'),
         ]);
         return results.every(a => a === true);
-    } catch(reason) {
+    } catch (reason) {
         console.log(reason);
     }
     return false;
@@ -85,7 +85,7 @@ async function enableWASM() {
 /******************************************************************************/
 
 function pslInit(raw) {
-    if ( typeof raw === 'string' && raw.trim() !== '' ) {
+    if (typeof raw === 'string' && raw.trim() !== '') {
         publicSuffixList.parse(raw, domainToASCII);
         return publicSuffixList;
     }
@@ -96,12 +96,12 @@ function pslInit(raw) {
         // Use loadJSON() because require() would keep the string in memory.
         serialized = loadJSON('build/publicsuffixlist.json');
     } catch (error) {
-        if ( process.env.npm_lifecycle_event !== 'build' ) {
+        if (process.env.npm_lifecycle_event !== 'build') {
             // This should never happen except during package building.
             console.error(error);
         }
     }
-    if ( serialized !== null ) {
+    if (serialized !== null) {
         publicSuffixList.fromSelfie(serialized);
         return publicSuffixList;
     }
@@ -110,7 +110,7 @@ function pslInit(raw) {
         resolve(__dirname, './assets/thirdparties/publicsuffix.org/list/effective_tld_names.dat'),
         'utf8'
     );
-    if ( typeof raw !== 'string' || raw.trim() === '' ) {
+    if (typeof raw !== 'string' || raw.trim() === '') {
         console.error('Unable to populate public suffix list');
         return;
     }
@@ -121,11 +121,11 @@ function pslInit(raw) {
 /******************************************************************************/
 
 function compileList({ name, raw }, compiler, writer, options = {}) {
-    if ( typeof raw !== 'string' || raw === '' ) { return; }
+    if (typeof raw !== 'string' || raw === '') { return; }
     const lineIter = new LineIterator(raw);
     const events = Array.isArray(options.events) ? options.events : undefined;
 
-    if ( name ) {
+    if (name) {
         writer.properties.set('name', name);
     }
 
@@ -133,17 +133,17 @@ function compileList({ name, raw }, compiler, writer, options = {}) {
         maxTokenLength: snfe.MAX_TOKEN_LENGTH,
     });
 
-    while ( lineIter.eot() === false ) {
+    while (lineIter.eot() === false) {
         let line = lineIter.next();
-        while ( line.endsWith(' \\') ) {
-            if ( lineIter.peek(4) !== '    ' ) { break; }
+        while (line.endsWith(' \\')) {
+            if (lineIter.peek(4) !== '    ') { break; }
             line = line.slice(0, -2).trim() + lineIter.next().trim();
         }
         parser.parse(line);
-        if ( parser.isFilter() === false ) { continue; }
-        if ( parser.isNetworkFilter() === false ) { continue; }
-        if ( compiler.compile(parser, writer) ) { continue; }
-        if ( compiler.error !== undefined && events !== undefined ) {
+        if (parser.isFilter() === false) { continue; }
+        if (parser.isNetworkFilter() === false) { continue; }
+        if (compiler.compile(parser, writer)) { continue; }
+        if (compiler.error !== undefined && events !== undefined) {
             options.events.push({
                 type: 'error',
                 text: compiler.error
@@ -157,14 +157,14 @@ function compileList({ name, raw }, compiler, writer, options = {}) {
 /******************************************************************************/
 
 async function useLists(lists, options = {}) {
-    if ( useLists.promise !== null ) {
+    if (useLists.promise !== null) {
         throw new Error('Pending useLists() operation');
     }
 
     // Remove all filters
     snfe.reset();
 
-    if ( Array.isArray(lists) === false || lists.length === 0 ) {
+    if (Array.isArray(lists) === false || lists.length === 0) {
         return;
     }
 
@@ -172,9 +172,9 @@ async function useLists(lists, options = {}) {
 
     const consumeList = list => {
         let { compiled } = list;
-        if ( typeof compiled !== 'string' || compiled === '' ) {
+        if (typeof compiled !== 'string' || compiled === '') {
             const writer = new CompiledListWriter();
-            if ( compiler === null ) {
+            if (compiler === null) {
                 compiler = snfe.createCompiler();
             }
             compiled = compileList(list, compiler, writer, options);
@@ -184,7 +184,7 @@ async function useLists(lists, options = {}) {
 
     // Populate filtering engine with resolved filter lists
     const promises = [];
-    for ( const list of lists ) {
+    for (const list of lists) {
         promises.push(Promise.resolve(list).then(list => consumeList(list)));
     }
 
@@ -206,7 +206,7 @@ let snfeProxyInstance = null;
 
 class StaticNetFilteringEngine {
     constructor() {
-        if ( snfeProxyInstance !== null ) {
+        if (snfeProxyInstance !== null) {
             throw new Error('Only a single instance is supported.');
         }
         snfeProxyInstance = this;
@@ -231,7 +231,7 @@ class StaticNetFilteringEngine {
     filterQuery(details) {
         fctx.redirectURL = undefined;
         const directives = snfe.filterQuery(fctx.fromDetails(details));
-        if ( directives === undefined ) { return; }
+        if (directives === undefined) { return; }
         return { redirectURL: fctx.redirectURL, directives };
     }
 
@@ -264,7 +264,7 @@ class StaticNetFilteringEngine {
     static async create({ noPSL = false } = {}) {
         const instance = new StaticNetFilteringEngine();
 
-        if ( noPSL !== true && !pslInit() ) {
+        if (noPSL !== true && !pslInit()) {
             throw new Error('Failed to initialize public suffix list.');
         }
 
@@ -272,7 +272,7 @@ class StaticNetFilteringEngine {
     }
 
     static async release() {
-        if ( snfeProxyInstance === null ) { return; }
+        if (snfeProxyInstance === null) { return; }
         snfeProxyInstance = null;
         await useLists([]);
     }
@@ -284,7 +284,7 @@ class StaticNetFilteringEngine {
 // This is because some of the code (e.g. publicsuffixlist.js) sets
 // module.exports. Once all included files are written like ES modules, using
 // export statements, this should no longer be necessary.
-if ( typeof module !== 'undefined' && typeof exports !== 'undefined' ) {
+if (typeof module !== 'undefined' && typeof exports !== 'undefined') {
     module.exports = exports; // eslint-disable-line no-undef
 }
 

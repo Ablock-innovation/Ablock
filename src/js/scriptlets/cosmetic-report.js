@@ -16,125 +16,125 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 
-(( ) => {
-// >>>>>>>> start of private namespace
+(() => {
+    // >>>>>>>> start of private namespace
 
-/******************************************************************************/
+    /******************************************************************************/
 
-if ( typeof vAPI !== 'object' ) { return; }
-if ( typeof vAPI.domFilterer !== 'object' ) { return; }
-if ( vAPI.domFilterer === null ) { return; }
+    if (typeof vAPI !== 'object') { return; }
+    if (typeof vAPI.domFilterer !== 'object') { return; }
+    if (vAPI.domFilterer === null) { return; }
 
-/******************************************************************************/
+    /******************************************************************************/
 
-const rePseudoElements = /:(?::?after|:?before|:[a-z-]+)$/;
+    const rePseudoElements = /:(?::?after|:?before|:[a-z-]+)$/;
 
-const hasSelector = selector => {
-    try {
-        return document.querySelector(selector) !== null;
-    }
-    catch {
-    }
-    return false;
-};
+    const hasSelector = selector => {
+        try {
+            return document.querySelector(selector) !== null;
+        }
+        catch {
+        }
+        return false;
+    };
 
-const safeQuerySelector = selector => {
-    const safeSelector = rePseudoElements.test(selector)
-        ? selector.replace(rePseudoElements, '')
-        : selector;
-    try {
-        return document.querySelector(safeSelector);
-    }
-    catch {
-    }
-    return null;
-};
+    const safeQuerySelector = selector => {
+        const safeSelector = rePseudoElements.test(selector)
+            ? selector.replace(rePseudoElements, '')
+            : selector;
+        try {
+            return document.querySelector(safeSelector);
+        }
+        catch {
+        }
+        return null;
+    };
 
-const safeGroupSelectors = selectors => {
-    const arr = Array.isArray(selectors)
-        ? selectors
-        : Array.from(selectors);
-    return arr.map(s => {
-        return rePseudoElements.test(s)
-            ? s.replace(rePseudoElements, '')
-            : s;
-    }).join(',\n');
-};
+    const safeGroupSelectors = selectors => {
+        const arr = Array.isArray(selectors)
+            ? selectors
+            : Array.from(selectors);
+        return arr.map(s => {
+            return rePseudoElements.test(s)
+                ? s.replace(rePseudoElements, '')
+                : s;
+        }).join(',\n');
+    };
 
-const allSelectors = vAPI.domFilterer.getAllSelectors();
-const matchedSelectors = [];
+    const allSelectors = vAPI.domFilterer.getAllSelectors();
+    const matchedSelectors = [];
 
-if ( Array.isArray(allSelectors.declarative) ) {
-    const declarativeSet = new Set();
-    for ( const block of allSelectors.declarative ) {
-        for ( const selector of block.split(',\n') ) {
-            declarativeSet.add(selector);
+    if (Array.isArray(allSelectors.declarative)) {
+        const declarativeSet = new Set();
+        for (const block of allSelectors.declarative) {
+            for (const selector of block.split(',\n')) {
+                declarativeSet.add(selector);
+            }
+        }
+        if (hasSelector(safeGroupSelectors(declarativeSet))) {
+            for (const selector of declarativeSet) {
+                if (safeQuerySelector(selector) === null) { continue; }
+                matchedSelectors.push(`##${selector}`);
+            }
         }
     }
-    if ( hasSelector(safeGroupSelectors(declarativeSet)) ) {
-        for ( const selector of declarativeSet ) {
-            if ( safeQuerySelector(selector) === null ) { continue; }
-            matchedSelectors.push(`##${selector}`);
-        }
-    }
-}
 
-if (
-    Array.isArray(allSelectors.procedural) &&
-    allSelectors.procedural.length !== 0
-) {
-    for ( const pselector of allSelectors.procedural ) {
-        if ( pselector.hit === false && pselector.exec().length === 0 ) { continue; }
-        matchedSelectors.push(`##${pselector.raw}`);
-    }
-}
-
-if ( Array.isArray(allSelectors.exceptions) ) {
-    const exceptionDict = new Map();
-    for ( const selector of allSelectors.exceptions ) {
-        if ( selector.charCodeAt(0) !== 0x7B /* '{' */ ) {
-            exceptionDict.set(selector, selector);
-            continue;
-        }
-        const details = JSON.parse(selector);
-        if (
-            details.action !== undefined &&
-            details.tasks === undefined &&
-            details.action[0] === 'style'
-        ) {
-            exceptionDict.set(details.selector, details.raw);
-            continue;
-        }
-        const pselector = vAPI.domFilterer.createProceduralFilter(details);
-        if ( pselector.test() === false ) { continue; }
-        matchedSelectors.push(`#@#${pselector.raw}`);
-    }
     if (
-        exceptionDict.size !== 0 &&
-        hasSelector(safeGroupSelectors(exceptionDict.keys()))
+        Array.isArray(allSelectors.procedural) &&
+        allSelectors.procedural.length !== 0
     ) {
-        for ( const [ selector, raw ] of exceptionDict ) {
-            if ( safeQuerySelector(selector) === null ) { continue; }
-            matchedSelectors.push(`#@#${raw}`);
+        for (const pselector of allSelectors.procedural) {
+            if (pselector.hit === false && pselector.exec().length === 0) { continue; }
+            matchedSelectors.push(`##${pselector.raw}`);
         }
     }
-}
 
-if ( self.uBO_scriptletsInjected !== undefined ) {
-    matchedSelectors.push(...self.uBO_scriptletsInjected);
-}
+    if (Array.isArray(allSelectors.exceptions)) {
+        const exceptionDict = new Map();
+        for (const selector of allSelectors.exceptions) {
+            if (selector.charCodeAt(0) !== 0x7B /* '{' */) {
+                exceptionDict.set(selector, selector);
+                continue;
+            }
+            const details = JSON.parse(selector);
+            if (
+                details.action !== undefined &&
+                details.tasks === undefined &&
+                details.action[0] === 'style'
+            ) {
+                exceptionDict.set(details.selector, details.raw);
+                continue;
+            }
+            const pselector = vAPI.domFilterer.createProceduralFilter(details);
+            if (pselector.test() === false) { continue; }
+            matchedSelectors.push(`#@#${pselector.raw}`);
+        }
+        if (
+            exceptionDict.size !== 0 &&
+            hasSelector(safeGroupSelectors(exceptionDict.keys()))
+        ) {
+            for (const [selector, raw] of exceptionDict) {
+                if (safeQuerySelector(selector) === null) { continue; }
+                matchedSelectors.push(`#@#${raw}`);
+            }
+        }
+    }
 
-if ( matchedSelectors.length === 0 ) { return; }
+    if (self.uBO_scriptletsInjected !== undefined) {
+        matchedSelectors.push(...self.uBO_scriptletsInjected);
+    }
 
-return matchedSelectors;
+    if (matchedSelectors.length === 0) { return; }
 
-/******************************************************************************/
+    return matchedSelectors;
 
-// <<<<<<<< end of private namespace
+    /******************************************************************************/
+
+    // <<<<<<<< end of private namespace
 })();
 

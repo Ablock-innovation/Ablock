@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -39,9 +39,9 @@ vAPI.Tabs = class extends vAPI.Tabs {
     }
 
     onCreatedHandler(tab) {
-        if ( typeof tab.openerTabId === 'number' ) { return; }
-        if ( tab.index !== 0 ) { return; }
-        if ( tab.url !== '' ) { return; }
+        if (typeof tab.openerTabId === 'number') { return; }
+        if (tab.index !== 0) { return; }
+        if (tab.url !== '') { return; }
         this.tabIds.add(tab.id);
     }
 
@@ -51,7 +51,7 @@ vAPI.Tabs = class extends vAPI.Tabs {
     }
 
     onCommittedHandler(details) {
-        if ( details.frameId === 0 ) {
+        if (details.frameId === 0) {
             this.synthesizeNavigationTargetEvent(details);
         }
         super.onCommittedHandler(details);
@@ -63,12 +63,12 @@ vAPI.Tabs = class extends vAPI.Tabs {
     }
 
     synthesizeNavigationTargetEvent(details) {
-        if ( this.tabIds.has(details.tabId) === false ) { return; }
+        if (this.tabIds.has(details.tabId) === false) { return; }
         this.tabIds.delete(details.tabId);
         const isClientRedirect =
             Array.isArray(details.transitionQualifiers) &&
             details.transitionQualifiers.includes('client_redirect');
-        if ( isClientRedirect === false ) { return; }
+        if (isClientRedirect === false) { return; }
         this.onCreatedNavigationTargetHandler({
             tabId: details.tabId,
             sourceTabId: details.tabId,
@@ -82,9 +82,9 @@ vAPI.Tabs = class extends vAPI.Tabs {
 
 {
     const extToTypeMap = new Map([
-        ['eot','font'],['otf','font'],['svg','font'],['ttf','font'],['woff','font'],['woff2','font'],
-        ['mp3','media'],['mp4','media'],['webm','media'],
-        ['gif','image'],['ico','image'],['jpeg','image'],['jpg','image'],['png','image'],['webp','image']
+        ['eot', 'font'], ['otf', 'font'], ['svg', 'font'], ['ttf', 'font'], ['woff', 'font'], ['woff2', 'font'],
+        ['mp3', 'media'], ['mp4', 'media'], ['webm', 'media'],
+        ['gif', 'image'], ['ico', 'image'], ['jpeg', 'image'], ['jpg', 'image'], ['png', 'image'], ['webp', 'image']
     ]);
 
     const parsedURL = new URL('https://www.example.org/');
@@ -95,32 +95,32 @@ vAPI.Tabs = class extends vAPI.Tabs {
         normalizeDetails(details) {
             // Chromium 63+ supports the `initiator` property, which contains
             // the URL of the origin from which the network request was made
-            if ( details.initiator && details.initiator !== 'null' ) {
+            if (details.initiator && details.initiator !== 'null') {
                 details.documentUrl = details.initiator;
             }
             const type = details.type;
-            if ( type === 'imageset' ) {
+            if (type === 'imageset') {
                 details.type = 'image';
                 return;
             }
-            if ( type !== 'other' ) { return; }
+            if (type !== 'other') { return; }
             // Try to map known "extension" part of URL to request type
-            if ( details.responseHeaders === undefined ) {
+            if (details.responseHeaders === undefined) {
                 parsedURL.href = details.url;
                 const path = parsedURL.pathname;
                 const pos = path.indexOf('.', path.length - 6);
-                if ( pos !== -1 ) {
+                if (pos !== -1) {
                     details.type = extToTypeMap.get(path.slice(pos + 1)) || type;
                 }
                 return;
             }
             // Try to extract type from response headers
             const ctype = this.headerValue(details.responseHeaders, 'content-type');
-            if ( ctype.startsWith('font/') ) {
+            if (ctype.startsWith('font/')) {
                 details.type = 'font';
-            } else if ( ctype.startsWith('image/') ) {
+            } else if (ctype.startsWith('image/')) {
                 details.type = 'image';
-            } else if ( ctype.startsWith('audio/') || ctype.startsWith('video/') ) {
+            } else if (ctype.startsWith('audio/') || ctype.startsWith('video/')) {
                 details.type = 'media';
             }
         }
@@ -129,18 +129,18 @@ vAPI.Tabs = class extends vAPI.Tabs {
         //   Some types can be mapped from 'other', thus include 'other' if and
         //   only if the caller is interested in at least one of those types
         denormalizeTypes(types) {
-            if ( types.length === 0 ) {
+            if (types.length === 0) {
                 return Array.from(this.validTypes);
             }
             const out = new Set();
-            for ( const type of types ) {
-                if ( this.validTypes.has(type) ) {
+            for (const type of types) {
+                if (this.validTypes.has(type)) {
                     out.add(type);
                 }
             }
-            if ( out.has('other') === false ) {
-                for ( const type of extToTypeMap.values() ) {
-                    if ( out.has(type) ) {
+            if (out.has('other') === false) {
+                for (const type of extToTypeMap.values()) {
+                    if (out.has(type)) {
                         out.add('other');
                         break;
                     }
@@ -153,18 +153,18 @@ vAPI.Tabs = class extends vAPI.Tabs {
         //   Do not interfere with root document
         suspendOneRequest(details) {
             this.onBeforeSuspendableRequest(details);
-            if ( details.type === 'main_frame' ) { return; }
+            if (details.type === 'main_frame') { return; }
             return { cancel: true };
         }
 
         unsuspendAllRequests(discard = false) {
-            if ( discard === true ) { return; }
+            if (discard === true) { return; }
             const toReload = [];
-            for ( const tabId of this.unprocessedTabs.keys() ) {
+            for (const tabId of this.unprocessedTabs.keys()) {
                 toReload.push(tabId);
             }
             this.removeUnprocessedRequest();
-            for ( const tabId of toReload ) {
+            for (const tabId of toReload) {
                 vAPI.tabs.reload(tabId);
             }
         }
@@ -177,10 +177,10 @@ vAPI.Tabs = class extends vAPI.Tabs {
 //   Use `X-DNS-Prefetch-Control` to workaround Chromium's disregard of the
 //   setting "Predict network actions to improve page load performance".
 
-vAPI.prefetching = (( ) => {
+vAPI.prefetching = (() => {
     let listening = false;
 
-    const onHeadersReceived = function(details) {
+    const onHeadersReceived = function (details) {
         details.responseHeaders.push({
             name: 'X-DNS-Prefetch-Control',
             value: 'off'
@@ -190,17 +190,17 @@ vAPI.prefetching = (( ) => {
 
     return state => {
         const wr = chrome.webRequest;
-        if ( state && listening ) {
+        if (state && listening) {
             wr.onHeadersReceived.removeListener(onHeadersReceived);
             listening = false;
-        } else if ( !state && !listening ) {
+        } else if (!state && !listening) {
             wr.onHeadersReceived.addListener(
                 onHeadersReceived,
                 {
-                    urls: [ 'http://*/*', 'https://*/*' ],
-                    types: [ 'main_frame', 'sub_frame' ]
+                    urls: ['http://*/*', 'https://*/*'],
+                    types: ['main_frame', 'sub_frame']
                 },
-                [ 'blocking', 'responseHeaders' ]
+                ['blocking', 'responseHeaders']
             );
             listening = true;
         }
@@ -209,16 +209,16 @@ vAPI.prefetching = (( ) => {
 
 /******************************************************************************/
 
-vAPI.scriptletsInjector = (( ) => {
+vAPI.scriptletsInjector = (() => {
     const parts = [
         '(',
-        function(details) {
-            if ( self.uBO_scriptletsInjected !== undefined ) { return; }
+        function (details) {
+            if (self.uBO_scriptletsInjected !== undefined) { return; }
             const doc = document;
             const { location } = doc;
-            if ( location === null ) { return; }
+            if (location === null) { return; }
             const { hostname } = location;
-            if ( hostname !== '' && details.hostname !== hostname ) { return; }
+            if (hostname !== '' && details.hostname !== hostname) { return; }
             let script;
             try {
                 script = doc.createElement('script');
@@ -227,14 +227,14 @@ vAPI.scriptletsInjector = (( ) => {
                 self.uBO_scriptletsInjected = details.filters;
             } catch {
             }
-            if ( script ) {
+            if (script) {
                 script.remove();
                 script.textContent = '';
             }
             return 0;
         }.toString(),
         ')(',
-            'json-slot',
+        'json-slot',
         ');',
     ];
     const jsonSlot = parts.indexOf('json-slot');

@@ -16,13 +16,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(function() {
+(function () {
     'use strict';
     const head = document.head;
-    if ( !head ) { return; }
+    if (!head) { return; }
     const style = document.createElement('style');
     style.textContent = [
         'body {',

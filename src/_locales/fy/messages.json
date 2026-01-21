@@ -352,7 +352,7 @@
     "description": ""
   },
   "settingsAdvancedUserPrompt": {
-    "message": "Ik bin in betûfte brûker (<a href='https://github.com/gorhill/uBlock/wiki/Advanced-user-features'>Lês dit earst</a>)",
+    "message": "Ik bin in betûfte brûker (<a href='https://github.com/Ablock/Ablock/wiki/Advanced-user-features'>Lês dit earst</a>)",
     "description": "Checkbox to let user access advanced, technical features"
   },
   "settingsPrefetchingDisabledPrompt": {
@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "CSP-rapporten blokkearje",
-    "description": "background information: https://github.com/gorhill/uBlock/issues/3150"
+    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Kanonike nammen toane",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Rigelsyntaks: <code>boarne bestimming type aksje</code> (<a href='https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-rule-syntax'>folsleine dokumintaasje</a>).",
+    "message": "Rigelsyntaks: <code>boarne bestimming type aksje</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>folsleine dokumintaasje</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

@@ -16,14 +16,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 export function patchRuleset(ruleset) {
     const out = [];
-    for ( const rule of ruleset ) {
+    for (const rule of ruleset) {
         const condition = rule.condition;
-        if ( Array.isArray(condition.responseHeaders) ) { continue; }
+        if (Array.isArray(condition.responseHeaders)) { continue; }
         out.push(rule);
     }
     return out;

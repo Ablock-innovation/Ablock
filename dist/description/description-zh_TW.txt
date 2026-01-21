@@ -1,6 +1,6 @@
 一個高效率的阻擋器：uBO 使用不多的記憶體 (RAM) 以及 CPU 資源，但卻能比其他熱門的阻擋器多載入並執行數以千計的過濾規則。
 
-效能比較示意圖：https://github.com/gorhill/uBlock/wiki/%C2%B5Block-vs.-ABP:-efficiency-compared
+效能比較示意圖：https://github.com/Ablock/Ablock/wiki/%C2%B5Block-vs.-ABP:-efficiency-compared
 
 用法：在彈出式選單中的大電源按鈕，是用來設定是否在目前的網站永久的禁用/啟用 uBlock₀ 。 此按鈕僅於目前所在的網站有效，它並非是此擴展套件的總開關按鈕。
 
@@ -38,7 +38,7 @@
 以公眾授權開放程式原始碼（GPLv3）。
 獻給所有人。
 
-貢獻者 @ Github: https://github.com/gorhill/uBlock/graphs/contributors
+貢獻者 @ Github: https://github.com/Ablock/Ablock/graphs/contributors
 翻譯者 @ Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@
 當您做評論時，請記住，此擴展套件目前仍是相當初期的版本。
 
 專案更新日誌：
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases

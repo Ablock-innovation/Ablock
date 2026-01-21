@@ -16,32 +16,32 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 (async function uBOL_cssUser() {
 
-/******************************************************************************/
+    /******************************************************************************/
 
-const docURL = new URL(document.baseURI);
-const details = await chrome.runtime.sendMessage({
-    what: 'injectCustomFilters',
-    hostname: docURL.hostname,
-}).catch(( ) => {
-});
+    const docURL = new URL(document.baseURI);
+    const details = await chrome.runtime.sendMessage({
+        what: 'injectCustomFilters',
+        hostname: docURL.hostname,
+    }).catch(() => {
+    });
 
-if ( details?.proceduralSelectors?.length ) {
-    if ( self.ProceduralFiltererAPI ) {
-        self.customProceduralFiltererAPI = new self.ProceduralFiltererAPI();
-        self.customProceduralFiltererAPI.addSelectors(
-            details.proceduralSelectors.map(a => JSON.parse(a))
-        );
+    if (details?.proceduralSelectors?.length) {
+        if (self.ProceduralFiltererAPI) {
+            self.customProceduralFiltererAPI = new self.ProceduralFiltererAPI();
+            self.customProceduralFiltererAPI.addSelectors(
+                details.proceduralSelectors.map(a => JSON.parse(a))
+            );
+        }
     }
-}
 
-self.customFilters = details;
+    self.customFilters = details;
 
-/******************************************************************************/
+    /******************************************************************************/
 
 })();
 

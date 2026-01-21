@@ -16,35 +16,35 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-// https://github.com/gorhill/uBlock/issues/533#issuecomment-164292868
+// https://github.com/Ablock/Ablock/issues/533#issuecomment-164292868
 // If WebRTC is supported, there won't be an exception if we
 // try to instantiate a peer connection object.
 
-// https://github.com/gorhill/uBlock/issues/533#issuecomment-168097594
+// https://github.com/Ablock/Ablock/issues/533#issuecomment-168097594
 // Because Chromium leaks WebRTC connections after they have been closed
 // and forgotten, we need to test for WebRTC support inside an iframe, this
 // way the closed and forgottetn WebRTC connections are properly garbage
 // collected.
 
-(function() {
+(function () {
     let pc = null;
     try {
         const PC = self.RTCPeerConnection || self.webkitRTCPeerConnection;
-        if ( PC ) {
+        if (PC) {
             pc = new PC(null);
         }
     } catch (ex) {
         console.error(ex);
     }
-    if ( pc !== null ) {
+    if (pc !== null) {
         pc.close();
     }
 
     window.top.postMessage(
         pc !== null ? 'webRTCSupported' : 'webRTCNotSupported',
-        window.location.origin        
+        window.location.origin
     );
 })();

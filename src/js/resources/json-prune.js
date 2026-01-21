@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -43,9 +43,9 @@ function jsonPrune(
     const stackNeedleDetails = safe.initPattern(stackNeedle, { canNegate: true });
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 3);
     JSON.parse = new Proxy(JSON.parse, {
-        apply: function(target, thisArg, args) {
+        apply: function (target, thisArg, args) {
             const objBefore = Reflect.apply(target, thisArg, args);
-            if ( rawPrunePaths === '' ) {
+            if (rawPrunePaths === '') {
                 safe.uboLog(logPrefix, safe.JSON_stringify(objBefore, null, 2));
             }
             const objAfter = objectPruneFn(
@@ -55,9 +55,9 @@ function jsonPrune(
                 stackNeedleDetails,
                 extraArgs
             );
-            if ( objAfter === undefined ) { return objBefore; }
+            if (objAfter === undefined) { return objBefore; }
             safe.uboLog(logPrefix, 'Pruned');
-            if ( safe.logLevel > 1 ) {
+            if (safe.logLevel > 1) {
                 safe.uboLog(logPrefix, `After pruning:\n${safe.JSON_stringify(objAfter, null, 2)}`);
             }
             return objAfter;
@@ -84,21 +84,21 @@ function jsonPruneFetchResponse(
     const propNeedles = parsePropertiesToMatchFn(extraArgs.propsToMatch, 'url');
     const stackNeedle = safe.initPattern(extraArgs.stackToMatch || '', { canNegate: true });
     const logall = rawPrunePaths === '';
-    const applyHandler = function(target, thisArg, args) {
+    const applyHandler = function (target, thisArg, args) {
         const fetchPromise = Reflect.apply(target, thisArg, args);
-        if ( propNeedles.size !== 0 ) {
+        if (propNeedles.size !== 0) {
             const props = collateFetchArgumentsFn(...args);
             const matched = matchObjectPropertiesFn(propNeedles, props);
-            if ( matched === undefined ) { return fetchPromise; }
-            if ( safe.logLevel > 1 ) {
+            if (matched === undefined) { return fetchPromise; }
+            if (safe.logLevel > 1) {
                 safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
             }
         }
         return fetchPromise.then(responseBefore => {
             const response = responseBefore.clone();
             return response.json().then(objBefore => {
-                if ( typeof objBefore !== 'object' ) { return responseBefore; }
-                if ( logall ) {
+                if (typeof objBefore !== 'object') { return responseBefore; }
+                if (logall) {
                     safe.uboLog(logPrefix, safe.JSON_stringify(objBefore, null, 2));
                     return responseBefore;
                 }
@@ -109,7 +109,7 @@ function jsonPruneFetchResponse(
                     stackNeedle,
                     extraArgs
                 );
-                if ( typeof objAfter !== 'object' ) { return responseBefore; }
+                if (typeof objAfter !== 'object') { return responseBefore; }
                 safe.uboLog(logPrefix, 'Pruned');
                 const responseAfter = Response.json(objAfter, {
                     status: responseBefore.status,
@@ -163,13 +163,13 @@ function jsonPruneXhrResponse(
         open(method, url, ...args) {
             const xhrDetails = { method, url };
             let outcome = 'match';
-            if ( propNeedles.size !== 0 ) {
-                if ( matchObjectPropertiesFn(propNeedles, xhrDetails) === undefined ) {
+            if (propNeedles.size !== 0) {
+                if (matchObjectPropertiesFn(propNeedles, xhrDetails) === undefined) {
                     outcome = 'nomatch';
                 }
             }
-            if ( outcome === 'match' ) {
-                if ( safe.logLevel > 1 ) {
+            if (outcome === 'match') {
+                if (safe.logLevel > 1) {
                     safe.uboLog(logPrefix, `Matched optional "propsToMatch", "${extraArgs.propsToMatch}"`);
                 }
                 xhrInstances.set(this, xhrDetails);
@@ -179,29 +179,29 @@ function jsonPruneXhrResponse(
         get response() {
             const innerResponse = super.response;
             const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails === undefined ) {
+            if (xhrDetails === undefined) {
                 return innerResponse;
             }
             const responseLength = typeof innerResponse === 'string'
                 ? innerResponse.length
                 : undefined;
-            if ( xhrDetails.lastResponseLength !== responseLength ) {
+            if (xhrDetails.lastResponseLength !== responseLength) {
                 xhrDetails.response = undefined;
                 xhrDetails.lastResponseLength = responseLength;
             }
-            if ( xhrDetails.response !== undefined ) {
+            if (xhrDetails.response !== undefined) {
                 return xhrDetails.response;
             }
             let objBefore;
-            if ( typeof innerResponse === 'object' ) {
+            if (typeof innerResponse === 'object') {
                 objBefore = innerResponse;
-            } else if ( typeof innerResponse === 'string' ) {
+            } else if (typeof innerResponse === 'string') {
                 try {
                     objBefore = safe.JSON_parse(innerResponse);
                 } catch {
                 }
             }
-            if ( typeof objBefore !== 'object' ) {
+            if (typeof objBefore !== 'object') {
                 return (xhrDetails.response = innerResponse);
             }
             const objAfter = objectPruneFn(
@@ -212,7 +212,7 @@ function jsonPruneXhrResponse(
                 extraArgs
             );
             let outerResponse;
-            if ( typeof objAfter === 'object' ) {
+            if (typeof objAfter === 'object') {
                 outerResponse = typeof innerResponse === 'string'
                     ? safe.JSON_stringify(objAfter)
                     : objAfter;
@@ -248,10 +248,10 @@ function evaldataPrune(
     rawPrunePaths = '',
     rawNeedlePaths = ''
 ) {
-    proxyApplyFn('eval', function(context) {
+    proxyApplyFn('eval', function (context) {
         const before = context.reflect();
-        if ( typeof before !== 'object' ) { return before; }
-        if ( before === null ) { return null; }
+        if (typeof before !== 'object') { return before; }
+        if (before === null) { return null; }
         const after = objectPruneFn(before, rawPrunePaths, rawNeedlePaths);
         return after || before;
     });

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* globals process */
@@ -98,26 +98,26 @@ async function matchRequests(engine, requests) {
 
     const start = process.hrtime.bigint();
 
-    for ( let i = 0; i < requests.length; i++ ) {
+    for (let i = 0; i < requests.length; i++) {
         const request = requests[i];
         const reqstart = process.hrtime.bigint();
         details.type = WEBREQUEST_OPTIONS[request.cpt];
         details.url = request.url;
         details.originURL = request.frameUrl;
         const r = engine.matchRequest(details);
-        if ( r === 0 ) {
+        if (r === 0) {
             notBlockedCount += 1;
-        } else if ( r === 1 ) {
+        } else if (r === 1) {
             blockedCount += 1;
         } else {
             unblockedCount += 1;
         }
-        if ( NEED_RESULTS !== true ) { continue; }
+        if (NEED_RESULTS !== true) { continue; }
         const reqstop = process.hrtime.bigint();
         details.r = r;
         details.f = r !== 0 ? engine.toLogData().raw : undefined;
         details.t = Math.round(Number(reqstop - reqstart) / 10) / 100;
-        results.push([ i, Object.assign({}, details) ]);
+        results.push([i, Object.assign({}, details)]);
     }
 
     const stop = process.hrtime.bigint();
@@ -128,31 +128,31 @@ async function matchRequests(engine, requests) {
     console.log(`\tUnblocked: ${unblockedCount} requests`);
     console.log(`\tAverage: ${nanoToMicro((stop - start) / BigInt(requests.length))} per request`);
 
-    if ( RECORD ) {
+    if (RECORD) {
         write('data/snfe.json', JSON.stringify(results, null, 2));
     }
 
-    if ( COMPARE ) {
+    if (COMPARE) {
         const diffs = await compare(results);
-        if ( Array.isArray(diffs) ) {
+        if (Array.isArray(diffs)) {
             write('data/snfe.diffs.json', JSON.stringify(diffs, null, 2));
         }
         console.log(`Compare: ${diffs.length} requests differ`);
     }
 
-    if ( MAXCOST ) {
-        const costly = results.slice().sort((a,b) => b[1].t - a[1].t).slice(0, 1000);
+    if (MAXCOST) {
+        const costly = results.slice().sort((a, b) => b[1].t - a[1].t).slice(0, 1000);
         write('data/snfe.maxcost.json', JSON.stringify(costly, null, 2));
     }
 
-    if ( MEDCOST ) {
+    if (MEDCOST) {
         const median = results.length >>> 1;
-        const costly = results.slice().sort((a,b) => b[1].t - a[1].t).slice(median - 500, median + 500);
+        const costly = results.slice().sort((a, b) => b[1].t - a[1].t).slice(median - 500, median + 500);
         write('data/snfe.medcost.json', JSON.stringify(costly, null, 2));
     }
 
-    if ( MINCOST ) {
-        const costly = results.slice().sort((a,b) => b[1].t - a[1].t).slice(-1000);
+    if (MINCOST) {
+        const costly = results.slice().sort((a, b) => b[1].t - a[1].t).slice(-1000);
         write('data/snfe.mincost.json', JSON.stringify(costly, null, 2));
     }
 }
@@ -162,18 +162,18 @@ async function compare(results) {
     try {
         const raw = await read('data/snfe.json');
         before = new Map(JSON.parse(raw));
-    } catch(ex) {
+    } catch (ex) {
         console.log(ex);
         console.log('Nothing to compare');
         return;
     }
     const after = new Map(results);
     const diffs = [];
-    for ( let i = 0; i < results.length; i++ ) {
+    for (let i = 0; i < results.length; i++) {
         const a = before.get(i);
         const b = after.get(i);
-        if ( a.r === b.r ) { continue; }
-        diffs.push([ i, {
+        if (a.r === b.r) { continue; }
+        diffs.push([i, {
             type: a.type,
             url: a.url,
             originURL: a.originURL,
@@ -204,53 +204,53 @@ async function matchRequestModifiers(engine, requests) {
     let modifiedCount = 0;
 
     const start = process.hrtime.bigint();
-    for ( let i = 0; i < requests.length; i++ ) {
+    for (let i = 0; i < requests.length; i++) {
         const request = requests[i];
         details.type = WEBREQUEST_OPTIONS[request.cpt];
         details.url = request.url;
         details.originURL = request.frameUrl;
         const r = engine.matchRequest(details);
         let modified = false;
-        if ( r !== 1 && details.type === 'sub_frame' ) {
+        if (r !== 1 && details.type === 'sub_frame') {
             const reqstart = process.hrtime.bigint();
             const directives = engine.matchAndFetchModifiers(details, 'csp');
-            if ( directives !== undefined ) {
+            if (directives !== undefined) {
                 modified = true;
-                if ( NEED_RESULTS ) {
+                if (NEED_RESULTS) {
                     const reqstop = process.hrtime.bigint();
                     details.f = directives.map(a => `${a.result}:${a.logData().raw}`).sort();
                     details.t = Math.round(Number(reqstop - reqstart) / 10) / 100;
-                    results['csp'].push([ i, Object.assign({}, details) ]);
+                    results['csp'].push([i, Object.assign({}, details)]);
                 }
             }
         }
-        if ( r === 1 ) {
+        if (r === 1) {
             const reqstart = process.hrtime.bigint();
             const directives = engine.matchAndFetchModifiers(details, 'redirect-rule');
-            if ( directives !== undefined ) {
+            if (directives !== undefined) {
                 modified = true;
-                if ( NEED_RESULTS ) {
+                if (NEED_RESULTS) {
                     const reqstop = process.hrtime.bigint();
                     details.f = directives.map(a => `${a.result}:${a.logData().raw}`).sort();
                     details.t = Math.round(Number(reqstop - reqstart) / 10) / 100;
-                    results['redirect-rule'].push([ i, Object.assign({}, details) ]);
+                    results['redirect-rule'].push([i, Object.assign({}, details)]);
                 }
             }
         }
-        if ( r !== 1 && engine.hasQuery(details) ) {
+        if (r !== 1 && engine.hasQuery(details)) {
             const reqstart = process.hrtime.bigint();
             const directives = engine.matchAndFetchModifiers(details, 'removeparam');
-            if ( directives !== undefined ) {
+            if (directives !== undefined) {
                 modified = true;
-                if ( NEED_RESULTS ) {
+                if (NEED_RESULTS) {
                     const reqstop = process.hrtime.bigint();
                     details.f = directives.map(a => `${a.result}:${a.logData().raw}`).sort();
                     details.t = Math.round(Number(reqstop - reqstart) / 10) / 100;
-                    results['removeparam'].push([ i, Object.assign({}, details) ]);
+                    results['removeparam'].push([i, Object.assign({}, details)]);
                 }
             }
         }
-        if ( modified ) {
+        if (modified) {
             modifiedCount += 1;
         }
     }
@@ -260,13 +260,13 @@ async function matchRequestModifiers(engine, requests) {
     console.log(`\t${modifiedCount} modifiers found`);
     console.log(`\tAverage: ${nanoToMicro((stop - start) / BigInt(requests.length))} per request`);
 
-    if ( RECORD ) {
+    if (RECORD) {
         write('data/snfe.modifiers.json', JSON.stringify(results, null, 2));
     }
 
-    if ( COMPARE ) {
+    if (COMPARE) {
         const diffs = await compareModifiers(results);
-        if ( Array.isArray(diffs) ) {
+        if (Array.isArray(diffs)) {
             write('data/snfe.modifiers.diffs.json', JSON.stringify(diffs, null, 2));
         }
         console.log(`Compare: ${diffs.length} modified requests differ`);
@@ -278,19 +278,19 @@ async function compareModifiers(afterResults) {
     try {
         const raw = await read('data/snfe.modifiers.json');
         beforeResults = JSON.parse(raw);
-    } catch(ex) {
+    } catch (ex) {
         console.log(ex);
         console.log('Nothing to compare');
         return;
     }
     const diffs = [];
-    for ( const modifier of [ 'csp', 'redirect-rule', 'removeparam' ] ) {
+    for (const modifier of ['csp', 'redirect-rule', 'removeparam']) {
         const before = new Map(beforeResults[modifier]);
         const after = new Map(afterResults[modifier]);
-        for ( const [ i, b ] of before ) {
+        for (const [i, b] of before) {
             const a = after.get(i);
-            if ( a !== undefined && JSON.stringify(a.f) === JSON.stringify(b.f) ) { continue; }
-            diffs.push([ i, {
+            if (a !== undefined && JSON.stringify(a.f) === JSON.stringify(b.f)) { continue; }
+            diffs.push([i, {
                 type: b.type,
                 url: b.url,
                 originURL: b.originURL,
@@ -298,10 +298,10 @@ async function compareModifiers(afterResults) {
                 after: a !== undefined ? { f: a.f, t: a.t } : null,
             }]);
         }
-        for ( const [ i, a ] of after ) {
+        for (const [i, a] of after) {
             const b = before.get(i);
-            if ( b !== undefined ) { continue; }
-            diffs.push([ i, {
+            if (b !== undefined) { continue; }
+            diffs.push([i, {
                 type: a.type,
                 url: a.url,
                 originURL: a.originURL,
@@ -316,13 +316,13 @@ async function compareModifiers(afterResults) {
 /******************************************************************************/
 
 async function bench() {
-    if ( WASM ) {
+    if (WASM) {
         try {
             const result = await enableWASM();
-            if ( result === true ) {
+            if (result === true) {
                 console.log('WASM code paths enabled');
             }
-        } catch(ex) {
+        } catch (ex) {
             console.log(ex);
         }
     }
@@ -356,7 +356,7 @@ async function bench() {
     console.log(`Filter lists parsed-compiled-loaded in ${nanoToMilli(stop - start)}`);
 
     // Dry run to let JS engine optimize hot JS code paths
-    for ( let i = 0; i < requests.length; i += 8 ) {
+    for (let i = 0; i < requests.length; i += 8) {
         const request = requests[i];
         void engine.matchRequest({
             type: WEBREQUEST_OPTIONS[request.cpt],
@@ -365,7 +365,7 @@ async function bench() {
         });
     }
 
-    if ( MODIFIERS === false ) {
+    if (MODIFIERS === false) {
         matchRequests(engine, requests);
     } else {
         matchRequestModifiers(engine, requests);

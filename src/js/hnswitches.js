@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { LineIterator } from './text-utils.js';
@@ -33,13 +33,13 @@ const decomposedSource = [];
 
 const switchBitOffsets = Object.create(null);
 Object.assign(switchBitOffsets, {
-       'no-strict-blocking':  0,
-                'no-popups':  2,
-    'no-cosmetic-filtering':  4,
-          'no-remote-fonts':  6,
-           'no-large-media':  8,
-           'no-csp-reports': 10,
-             'no-scripting': 12,
+    'no-strict-blocking': 0,
+    'no-popups': 2,
+    'no-cosmetic-filtering': 4,
+    'no-remote-fonts': 6,
+    'no-large-media': 8,
+    'no-csp-reports': 10,
+    'no-scripting': 12,
 });
 
 const switchStateToNameMap = Object.create(null);
@@ -50,10 +50,10 @@ Object.assign(switchStateToNameMap, {
 
 const nameToSwitchStateMap = Object.create(null);
 Object.assign(nameToSwitchStateMap, {
-     'true': 1,
+    'true': 1,
     'false': 2,
-       'on': 1,
-      'off': 2,
+    'on': 1,
+    'off': 2,
 });
 
 /******************************************************************************/
@@ -82,15 +82,15 @@ class DynamicSwitchRuleFiltering {
 
     assign(from) {
         // Remove rules not in other
-        for ( const hn of this.switches.keys() ) {
-            if ( from.switches.has(hn) === false ) {
+        for (const hn of this.switches.keys()) {
+            if (from.switches.has(hn) === false) {
                 this.switches.delete(hn);
                 this.changed = true;
             }
         }
         // Add/change rules in other
-        for ( const [hn, bits] of from.switches ) {
-            if ( this.switches.get(hn) !== bits ) {
+        for (const [hn, bits] of from.switches) {
+            if (this.switches.get(hn) !== bits) {
                 this.switches.set(hn, bits);
                 this.changed = true;
             }
@@ -100,8 +100,8 @@ class DynamicSwitchRuleFiltering {
     copyRules(from, srcHostname) {
         const thisBits = this.switches.get(srcHostname);
         const fromBits = from.switches.get(srcHostname);
-        if ( fromBits !== thisBits ) {
-            if ( fromBits !== undefined ) {
+        if (fromBits !== thisBits) {
+            if (fromBits !== undefined) {
                 this.switches.set(srcHostname, fromBits);
             } else {
                 this.switches.delete(srcHostname);
@@ -117,12 +117,12 @@ class DynamicSwitchRuleFiltering {
 
     toggle(switchName, hostname, newVal) {
         const bitOffset = switchBitOffsets[switchName];
-        if ( bitOffset === undefined ) { return false; }
-        if ( newVal === this.evaluate(switchName, hostname) ) { return false; }
+        if (bitOffset === undefined) { return false; }
+        if (newVal === this.evaluate(switchName, hostname)) { return false; }
         let bits = this.switches.get(hostname) || 0;
         bits &= ~(3 << bitOffset);
         bits |= newVal << bitOffset;
-        if ( bits === 0 ) {
+        if (bits === 0) {
             this.switches.delete(hostname);
         } else {
             this.switches.set(hostname, bits);
@@ -133,21 +133,21 @@ class DynamicSwitchRuleFiltering {
 
     toggleOneZ(switchName, hostname, newState) {
         const bitOffset = switchBitOffsets[switchName];
-        if ( bitOffset === undefined ) { return false; }
+        if (bitOffset === undefined) { return false; }
         let state = this.evaluateZ(switchName, hostname);
-        if ( newState === state ) { return false; }
-        if ( newState === undefined ) {
+        if (newState === state) { return false; }
+        if (newState === undefined) {
             newState = !state;
         }
         let bits = this.switches.get(hostname) || 0;
         bits &= ~(3 << bitOffset);
-        if ( bits === 0 ) {
+        if (bits === 0) {
             this.switches.delete(hostname);
         } else {
             this.switches.set(hostname, bits);
         }
         state = this.evaluateZ(switchName, hostname);
-        if ( state !== newState ) {
+        if (state !== newState) {
             this.switches.set(hostname, bits | ((newState ? 1 : 2) << bitOffset));
         }
         this.changed = true;
@@ -160,11 +160,11 @@ class DynamicSwitchRuleFiltering {
         // Turn off all descendant switches, they will inherit the state of the
         // branch's origin.
         const targetLen = targetHostname.length;
-        for ( const hostname of this.switches.keys() ) {
-            if ( hostname === targetHostname ) { continue; }
-            if ( hostname.length <= targetLen ) { continue; }
-            if ( hostname.endsWith(targetHostname) === false ) { continue; }
-            if ( hostname.charAt(hostname.length - targetLen - 1) !== '.' ) {
+        for (const hostname of this.switches.keys()) {
+            if (hostname === targetHostname) { continue; }
+            if (hostname.length <= targetLen) { continue; }
+            if (hostname.endsWith(targetHostname) === false) { continue; }
+            if (hostname.charAt(hostname.length - targetLen - 1) !== '.') {
                 continue;
             }
             this.toggle(switchName, hostname, 0);
@@ -174,7 +174,7 @@ class DynamicSwitchRuleFiltering {
     }
 
     toggleZ(switchName, hostname, deep, newState) {
-        if ( deep === true ) {
+        if (deep === true) {
             return this.toggleBranchZ(switchName, hostname, newState);
         }
         return this.toggleOneZ(switchName, hostname, newState);
@@ -186,24 +186,24 @@ class DynamicSwitchRuleFiltering {
 
     evaluate(switchName, hostname) {
         const bits = this.switches.get(hostname);
-        if ( bits === undefined ) { return 0; }
+        if (bits === undefined) { return 0; }
         let bitOffset = switchBitOffsets[switchName];
-        if ( bitOffset === undefined ) { return 0; }
+        if (bitOffset === undefined) { return 0; }
         return (bits >>> bitOffset) & 3;
     }
 
     evaluateZ(switchName, hostname) {
         const bitOffset = switchBitOffsets[switchName];
-        if ( bitOffset === undefined ) {
+        if (bitOffset === undefined) {
             this.r = 0;
             return false;
         }
         this.n = switchName;
-        for ( const shn of decomposeHostname(hostname, decomposedSource) ) {
+        for (const shn of decomposeHostname(hostname, decomposedSource)) {
             let bits = this.switches.get(shn);
-            if ( bits === undefined ) { continue; }
+            if (bits === undefined) { continue; }
             bits = bits >>> bitOffset & 3;
-            if ( bits === 0 ) { continue; }
+            if (bits === 0) { continue; }
             this.z = shn;
             this.r = bits;
             return bits === 1;
@@ -222,14 +222,14 @@ class DynamicSwitchRuleFiltering {
 
     toArray() {
         const out = [];
-        for ( const hostname of this.switches.keys() ) {
+        for (const hostname of this.switches.keys()) {
             const prettyHn = hostname.includes('xn--') && punycode
                 ? punycode.toUnicode(hostname)
                 : hostname;
-            for ( const switchName in switchBitOffsets ) {
-                if ( switchBitOffsets[switchName] === undefined ) { continue; }
+            for (const switchName in switchBitOffsets) {
+                if (switchBitOffsets[switchName] === undefined) { continue; }
                 const val = this.evaluate(switchName, hostname);
-                if ( val === 0 ) { continue; }
+                if (val === 0) { continue; }
                 out.push(`${switchName}: ${prettyHn} ${switchStateToNameMap[val]}`);
             }
         }
@@ -242,32 +242,32 @@ class DynamicSwitchRuleFiltering {
 
     fromString(text, append) {
         const lineIter = new LineIterator(text);
-        if ( append !== true ) { this.reset(); }
-        while ( lineIter.eot() === false ) {
+        if (append !== true) { this.reset(); }
+        while (lineIter.eot() === false) {
             this.addFromRuleParts(lineIter.next().trim().split(/\s+/));
         }
     }
 
     validateRuleParts(parts) {
-        if ( parts.length < 3 ) { return; }
-        if ( parts[0].endsWith(':') === false ) { return; }
-        if ( nameToSwitchStateMap[parts[2]] === undefined ) { return; }
-        if ( reNotASCII.test(parts[1]) && punycode !== undefined ) {
+        if (parts.length < 3) { return; }
+        if (parts[0].endsWith(':') === false) { return; }
+        if (nameToSwitchStateMap[parts[2]] === undefined) { return; }
+        if (reNotASCII.test(parts[1]) && punycode !== undefined) {
             parts[1] = punycode.toASCII(parts[1]);
         }
         return parts;
     }
 
     addFromRuleParts(parts) {
-        if ( this.validateRuleParts(parts) === undefined ) { return false; }
+        if (this.validateRuleParts(parts) === undefined) { return false; }
         const switchName = parts[0].slice(0, -1);
-        if ( switchBitOffsets[switchName] === undefined ) { return false; }
+        if (switchBitOffsets[switchName] === undefined) { return false; }
         this.toggle(switchName, parts[1], nameToSwitchStateMap[parts[2]]);
         return true;
     }
 
     removeFromRuleParts(parts) {
-        if ( this.validateRuleParts(parts) !== undefined ) {
+        if (this.validateRuleParts(parts) !== undefined) {
             this.toggle(parts[0].slice(0, -1), parts[1], 0);
             return true;
         }

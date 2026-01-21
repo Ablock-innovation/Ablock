@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -29,7 +29,7 @@ import { localRead, localWrite, sendMessage } from './ext.js';
 export const rulesetMap = new Map();
 
 let cachedRulesetData = {};
-let hideUnusedSet = new Set([ 'ads', 'regions' ]);
+let hideUnusedSet = new Set(['ads', 'regions']);
 
 /******************************************************************************/
 
@@ -43,11 +43,11 @@ function renderTotalRuleCounts() {
     let rulesetCount = 0;
     let filterCount = 0;
     let ruleCount = 0;
-    for ( const liEntry of qsa$('#lists .listEntry[data-role="leaf"][data-rulesetid]') ) {
-        if ( qs$(liEntry, 'input[type="checkbox"]:checked') === null ) { continue; }
+    for (const liEntry of qsa$('#lists .listEntry[data-role="leaf"][data-rulesetid]')) {
+        if (qs$(liEntry, 'input[type="checkbox"]:checked') === null) { continue; }
         rulesetCount += 1;
         const stats = rulesetStats(liEntry.dataset.rulesetid);
-        if ( stats === undefined ) { continue; }
+        if (stats === undefined) { continue; }
         ruleCount += stats.ruleCount;
         filterCount += stats.filterCount;
     }
@@ -68,14 +68,14 @@ function updateNodes(listEntries) {
     const sublistSelector = '.listEntry[data-rulesetid] > .detailbar input';
     const checkedSublistSelector = `${sublistSelector}:checked`;
     const adminSublistSelector = '.listEntry.fromAdmin[data-rulesetid] > .detailbar input';
-    for ( const listEntry of qsa$(listEntries, '.listEntry[data-nodeid]') ) {
+    for (const listEntry of qsa$(listEntries, '.listEntry[data-nodeid]')) {
         const countElem = qs$(listEntry, ':scope > .detailbar .count');
-        if ( countElem === null ) { continue; }
+        if (countElem === null) { continue; }
         const totalCount = qsa$(listEntry, sublistSelector).length;
         const checkedCount = qsa$(listEntry, checkedSublistSelector).length;
         dom.text(countElem, `${checkedCount}/${totalCount}`);
         const checkboxElem = qs$(listEntry, ':scope > .detailbar .checkbox');
-        if ( checkboxElem === null ) { continue; }
+        if (checkboxElem === null) { continue; }
         const checkboxInput = qs$(checkboxElem, 'input');
         dom.prop(checkboxInput, 'checked', checkedCount !== 0);
         dom.cl.toggle(checkboxElem, 'partial',
@@ -92,7 +92,7 @@ function updateNodes(listEntries) {
 
 function rulesetStats(rulesetId) {
     const rulesetDetails = rulesetMap.get(rulesetId);
-    if ( rulesetDetails === undefined ) { return; }
+    if (rulesetDetails === undefined) { return; }
     const { rules, filters } = rulesetDetails;
     const ruleCount = rules.plain + rules.regex;
     const filterCount = filters.accepted;
@@ -103,12 +103,12 @@ function rulesetStats(rulesetId) {
 
 function isAdminRuleset(listkey) {
     const { adminRulesets = [] } = cachedRulesetData;
-    for ( const id of adminRulesets ) {
+    for (const id of adminRulesets) {
         const pos = id.indexOf(listkey);
-        if ( pos === 0 ) { return true; }
-        if ( pos !== 1 ) { continue; }
+        if (pos === 0) { return true; }
+        if (pos !== 1) { continue; }
         const c = id.charAt(0);
-        if ( c === '+' || c === '-' ) { return true; }
+        if (c === '+' || c === '-') { return true; }
     }
     return false;
 }
@@ -127,15 +127,15 @@ export function renderFilterLists(rulesetData) {
 
     const initializeListEntry = (ruleset, listEntry) => {
         const on = enabledRulesets.includes(ruleset.id);
-        if ( dom.cl.has(listEntry, 'toggled') === false ) {
+        if (dom.cl.has(listEntry, 'toggled') === false) {
             dom.prop(qs$(listEntry, ':scope > .detailbar input'), 'checked', on);
         }
-        if ( ruleset.homeURL ) {
+        if (ruleset.homeURL) {
             dom.attr(qs$(listEntry, 'a.support'), 'href', ruleset.homeURL);
         }
         dom.cl.toggle(listEntry, 'isDefault', ruleset.enabled === true);
         const stats = rulesetStats(ruleset.id);
-        if ( stats === undefined ) { return; }
+        if (stats === undefined) { return; }
         listEntry.title = listStatsTemplate
             .replace('{{ruleCount}}', renderNumber(stats.ruleCount))
             .replace('{{filterCount}}', renderNumber(stats.filterCount));
@@ -149,8 +149,8 @@ export function renderFilterLists(rulesetData) {
     };
 
     // Update already rendered DOM lists
-    if ( shouldUpdate ) {
-        for ( const listEntry of qsa$('#lists .listEntry[data-rulesetid]') ) {
+    if (shouldUpdate) {
+        for (const listEntry of qsa$('#lists .listEntry[data-rulesetid]')) {
             const rulesetid = listEntry.dataset.rulesetid;
             const ruleset = rulesetMap.get(rulesetid);
             initializeListEntry(ruleset, listEntry);
@@ -161,10 +161,10 @@ export function renderFilterLists(rulesetData) {
     }
 
     const createListEntry = (listDetails, depth) => {
-        if ( listDetails.lists === undefined ) {
+        if (listDetails.lists === undefined) {
             return nodeFromTemplate('listEntryLeaf', '.listEntry');
         }
-        if ( depth !== 0 ) {
+        if (depth !== 0) {
             return nodeFromTemplate('listEntryNode', '.listEntry');
         }
         return nodeFromTemplate('listEntryRoot', '.listEntry');
@@ -173,20 +173,20 @@ export function renderFilterLists(rulesetData) {
     const createListEntries = (parentkey, listTree, depth = 0) => {
         const listEntries = nodeFromTemplate('listEntries', '.listEntries');
         const treeEntries = Object.entries(listTree);
-        if ( depth !== 0 ) {
+        if (depth !== 0) {
             const reEmojis = /\p{Emoji}+/gu;
-            treeEntries.sort((a ,b) => {
+            treeEntries.sort((a, b) => {
                 const ap = a[1].preferred === true;
                 const bp = b[1].preferred === true;
-                if ( ap !== bp ) { return ap ? -1 : 1; }
+                if (ap !== bp) { return ap ? -1 : 1; }
                 const as = (a[1].title || a[0]).replace(reEmojis, '');
                 const bs = (b[1].title || b[0]).replace(reEmojis, '');
                 return as.localeCompare(bs);
             });
         }
-        for ( const [ listkey, listDetails ] of treeEntries ) {
+        for (const [listkey, listDetails] of treeEntries) {
             const listEntry = createListEntry(listDetails, depth);
-            if ( listDetails.lists === undefined ) {
+            if (listDetails.lists === undefined) {
                 listEntry.dataset.rulesetid = listkey;
             } else {
                 listEntry.dataset.nodeid = listkey;
@@ -195,8 +195,8 @@ export function renderFilterLists(rulesetData) {
             qs$(listEntry, ':scope > .detailbar .listname').append(
                 i18n.patchUnicodeFlags(listDetails.name)
             );
-            if ( listDetails.lists !== undefined ) {
-                listEntry.append(createListEntries(listkey, listDetails.lists, depth+1));
+            if (listDetails.lists !== undefined) {
+                listEntry.append(createListEntries(listkey, listDetails.lists, depth + 1));
                 dom.cl.toggle(listEntry, 'expanded', true/*listIsExpanded(listkey)*/);
                 //updateListNode(listEntry);
             } else {
@@ -238,12 +238,12 @@ export function renderFilterLists(rulesetData) {
             'misc',
             rulesetDetails.filter(ruleset =>
                 ruleset.group === undefined &&
-                typeof ruleset.lang !== 'string' 
+                typeof ruleset.lang !== 'string'
             ),
         ], [
             'regions',
             rulesetDetails.filter(ruleset =>
-                ruleset.group === 'regions' 
+                ruleset.group === 'regions'
             ),
         ],
     ]);
@@ -253,19 +253,19 @@ export function renderFilterLists(rulesetData) {
     // Build list tree
     const listTree = {};
     const groupNames = new Map();
-    for ( const [ nodeid, rulesets ] of groups ) {
+    for (const [nodeid, rulesets] of groups) {
         let name = groupNames.get(nodeid);
-        if ( name === undefined ) {
+        if (name === undefined) {
             name = i18n$(`3pGroup${nodeid.charAt(0).toUpperCase()}${nodeid.slice(1)}`);
             groupNames.set(nodeid, name);
         }
         const details = { name, lists: {} };
         listTree[nodeid] = details;
-        for ( const ruleset of rulesets ) {
-            if ( ruleset.parent !== undefined ) {
+        for (const ruleset of rulesets) {
+            if (ruleset.parent !== undefined) {
                 let lists = details.lists;
-                for ( const parent of ruleset.parent.split('|') ) {
-                    if ( lists[parent] === undefined ) {
+                for (const parent of ruleset.parent.split('|')) {
+                    if (lists[parent] === undefined) {
                         lists[parent] = { name: parent, lists: {} };
                     }
                     lists = lists[parent].lists;
@@ -278,19 +278,19 @@ export function renderFilterLists(rulesetData) {
     }
     // Replace composite list with only one sublist with sublist itself
     const promoteLonelySublist = (parent, depth = 0) => {
-        if ( Boolean(parent.lists) === false ) { return parent; }
+        if (Boolean(parent.lists) === false) { return parent; }
         const childKeys = Object.keys(parent.lists);
-        for ( const childKey of childKeys ) {
+        for (const childKey of childKeys) {
             const child = promoteLonelySublist(parent.lists[childKey], depth + 1);
-            if ( child === parent.lists[childKey] ) { continue; }
+            if (child === parent.lists[childKey]) { continue; }
             parent.lists[child.id] = child;
             delete parent.lists[childKey];
         }
-        if ( depth === 0 ) { return parent; }
-        if ( childKeys.length > 1 ) { return parent; }
+        if (depth === 0) { return parent; }
+        if (childKeys.length > 1) { return parent; }
         return parent.lists[childKeys[0]]
     };
-    for ( const key of Object.keys(listTree) ) {
+    for (const key of Object.keys(listTree)) {
         promoteLonelySublist(listTree[key]);
     }
     const listEntries = createListEntries('root', listTree);
@@ -309,23 +309,23 @@ export function renderFilterLists(rulesetData) {
 
 function mustHideUnusedLists(which) {
     const hideAll = hideUnusedSet.has('*');
-    if ( which === '*' ) { return hideAll; }
+    if (which === '*') { return hideAll; }
     return hideUnusedSet.has(which) !== hideAll;
 }
 
 function toggleHideUnusedLists(which) {
     const doesHideAll = hideUnusedSet.has('*');
-    if ( which === '*' ) {
+    if (which === '*') {
         const mustHide = doesHideAll === false;
         hideUnusedSet.clear();
-        if ( mustHide ) {
+        if (mustHide) {
             hideUnusedSet.add(which);
         }
         dom.cl.toggle('#lists', 'hideUnused', mustHide);
         dom.cl.toggle('.listEntry[data-nodeid]', 'hideUnused', mustHide);
     } else {
         const doesHide = hideUnusedSet.has(which);
-        if ( doesHide ) {
+        if (doesHide) {
             hideUnusedSet.delete(which);
         } else {
             hideUnusedSet.add(which);
@@ -346,9 +346,9 @@ dom.on('#lists', 'click', '.listEntry[data-nodeid] > .detailbar, .listExpander',
 
 // Initialize from saved state.
 localRead('hideUnusedFilterLists').then(value => {
-    if ( Array.isArray(value) === false ) { return; }
+    if (Array.isArray(value) === false) { return; }
     hideUnusedSet = new Set(value);
-    for ( const listEntry of qsa$('[data-nodeid]') ) {
+    for (const listEntry of qsa$('[data-nodeid]')) {
         dom.cl.toggle(listEntry, 'hideUnused',
             hideUnusedSet.has(listEntry.dataset.nodeid)
         );
@@ -357,18 +357,18 @@ localRead('hideUnusedFilterLists').then(value => {
 
 /******************************************************************************/
 
-const searchFilterLists = ( ) => {
+const searchFilterLists = () => {
     const pattern = dom.prop('#findInLists', 'value') || '';
     dom.cl.toggle('#lists', 'searchMode', pattern !== '');
-    if ( pattern === '' ) { return; }
+    if (pattern === '') { return; }
     const re = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    for ( const listEntry of qsa$('#lists [data-role="leaf"]') ) {
-        if ( dom.cl.has(listEntry, 'fromAdmin') ) { continue; }
+    for (const listEntry of qsa$('#lists [data-role="leaf"]')) {
+        if (dom.cl.has(listEntry, 'fromAdmin')) { continue; }
         const rulesetid = listEntry.dataset.rulesetid;
         const rulesetDetails = rulesetMap.get(rulesetid);
-        if ( rulesetDetails === undefined ) { continue; }
+        if (rulesetDetails === undefined) { continue; }
         let haystack = perListHaystack.get(rulesetDetails);
-        if ( haystack === undefined ) {
+        if (haystack === undefined) {
             haystack = [
                 rulesetDetails.name,
                 listEntry.dataset.nodeid,
@@ -379,7 +379,7 @@ const searchFilterLists = ( ) => {
         }
         dom.cl.toggle(listEntry, 'searchMatch', re.test(haystack));
     }
-    for ( const listEntry of qsa$('#lists .listEntry:not([data-role="leaf"])') ) {
+    for (const listEntry of qsa$('#lists .listEntry:not([data-role="leaf"])')) {
         dom.cl.toggle(listEntry, 'searchMatch',
             qs$(listEntry, '.listEntries .listEntry.searchMatch') !== null
         );
@@ -392,16 +392,16 @@ dom.on('#findInLists', 'input', searchFilterLists);
 
 /******************************************************************************/
 
-const applyEnabledRulesets = (( ) => {
-    const apply = async ( ) => {
+const applyEnabledRulesets = (() => {
+    const apply = async () => {
         dom.cl.add(dom.body, 'committing');
 
         const enabledRulesets = [];
-        for ( const liEntry of qsa$('#lists .listEntry[data-role="leaf"][data-rulesetid]') ) {
+        for (const liEntry of qsa$('#lists .listEntry[data-role="leaf"][data-rulesetid]')) {
             const checked = qs$(liEntry, 'input[type="checkbox"]:checked') !== null;
-            if ( checked === false ) { continue; }
+            if (checked === false) { continue; }
             const { rulesetid } = liEntry.dataset;
-            if ( dom.cl.has(liEntry, 'fromAdmin') ) { continue; }
+            if (dom.cl.has(liEntry, 'fromAdmin')) { continue; }
             enabledRulesets.push(rulesetid);
         }
 
@@ -409,7 +409,7 @@ const applyEnabledRulesets = (( ) => {
 
         const modified = hashFromIterable(enabledRulesets) !==
             hashFromIterable(cachedRulesetData.enabledRulesets);
-        if ( modified ) {
+        if (modified) {
             const result = await sendMessage({
                 what: 'applyRulesets',
                 enabledRulesets,
@@ -422,20 +422,20 @@ const applyEnabledRulesets = (( ) => {
 
     let timer;
 
-    self.addEventListener('beforeunload', ( ) => {
-        if ( timer !== undefined ) { return; }
+    self.addEventListener('beforeunload', () => {
+        if (timer !== undefined) { return; }
         self.clearTimeout(timer);
         timer = undefined;
         apply();
     });
 
-    return function() {
-        if ( timer !== undefined ) {
+    return function () {
+        if (timer !== undefined) {
             self.clearTimeout(timer);
         }
-        timer = self.setTimeout(( ) => {
+        timer = self.setTimeout(() => {
             timer = undefined;
-            if ( dom.cl.has(dom.body, 'committing') ) {
+            if (dom.cl.has(dom.body, 'committing')) {
                 applyEnabledRulesets();
             } else {
                 apply();
@@ -447,11 +447,11 @@ const applyEnabledRulesets = (( ) => {
 dom.on('#lists', 'change', '.listEntry input[type="checkbox"]', ev => {
     const input = ev.target;
     const listEntry = input.closest('.listEntry');
-    if ( listEntry === null ) { return; }
-    if ( listEntry.dataset.nodeid !== undefined ) {
+    if (listEntry === null) { return; }
+    if (listEntry.dataset.nodeid !== undefined) {
         const checkAll = input.checked ||
             dom.cl.has(qs$(listEntry, ':scope > .detailbar .checkbox'), 'partial');
-        for ( const subListEntry of qsa$(listEntry, ':scope > .listEntries .listEntry[data-rulesetid]') ) {
+        for (const subListEntry of qsa$(listEntry, ':scope > .listEntries .listEntry[data-rulesetid]')) {
             dom.cl.add(subListEntry, 'toggled');
             dom.prop(qsa$(subListEntry, ':scope > .detailbar input'), 'checked', checkAll);
         }

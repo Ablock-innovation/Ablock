@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -48,7 +48,7 @@ import µb from './background.js';
 
 /******************************************************************************/
 
-µb.getBytesInUse = async function() {
+µb.getBytesInUse = async function () {
     const promises = [];
     let bytesInUse;
 
@@ -69,14 +69,14 @@ import µb from './background.js';
     const results = await Promise.all(promises);
 
     const processCount = count => {
-        if ( typeof count !== 'number' ) { return; }
-        if ( bytesInUse === undefined ) { bytesInUse = 0; }
+        if (typeof count !== 'number') { return; }
+        if (bytesInUse === undefined) { bytesInUse = 0; }
         bytesInUse += count;
         return bytesInUse;
     };
 
     processCount(results[0]);
-    if ( results.length > 1 && results[1] instanceof Object ) {
+    if (results.length > 1 && results[1] instanceof Object) {
         processCount(results[1].usage);
     }
     µb.storageUsed = bytesInUse;
@@ -89,17 +89,17 @@ import µb from './background.js';
     const requestStats = µb.requestStats;
     let requestStatsDisabled = false;
 
-    µb.loadLocalSettings = async ( ) => {
+    µb.loadLocalSettings = async () => {
         requestStatsDisabled = µb.hiddenSettings.requestStatsDisabled;
-        if ( requestStatsDisabled ) { return; }
+        if (requestStatsDisabled) { return; }
         return Promise.all([
             vAPI.sessionStorage.get('requestStats'),
             vAPI.storage.get('requestStats'),
-            vAPI.storage.get([ 'blockedRequestCount', 'allowedRequestCount' ]),
-        ]).then(([ a, b, c ]) => {
-            if ( a instanceof Object && a.requestStats ) { return a.requestStats; }
-            if ( b instanceof Object && b.requestStats ) { return b.requestStats; }
-            if ( c instanceof Object && Object.keys(c).length === 2 ) {
+            vAPI.storage.get(['blockedRequestCount', 'allowedRequestCount']),
+        ]).then(([a, b, c]) => {
+            if (a instanceof Object && a.requestStats) { return a.requestStats; }
+            if (b instanceof Object && b.requestStats) { return b.requestStats; }
+            if (c instanceof Object && Object.keys(c).length === 2) {
                 return {
                     blockedCount: c.blockedRequestCount,
                     allowedCount: c.allowedRequestCount,
@@ -115,21 +115,21 @@ import µb from './background.js';
     const SAVE_DELAY_IN_MINUTES = 3.6;
     const QUICK_SAVE_DELAY_IN_SECONDS = 23;
 
-    const stopTimers = ( ) => {
+    const stopTimers = () => {
         vAPI.alarms.clear('saveLocalSettings');
         quickSaveTimer.off();
         saveTimer.off();
     };
 
-    const saveTimer = vAPI.defer.create(( ) => {
+    const saveTimer = vAPI.defer.create(() => {
         µb.saveLocalSettings();
     });
 
-    const quickSaveTimer = vAPI.defer.create(( ) => {
-        if ( vAPI.sessionStorage.unavailable !== true ) {
+    const quickSaveTimer = vAPI.defer.create(() => {
+        if (vAPI.sessionStorage.unavailable !== true) {
             vAPI.sessionStorage.set({ requestStats: requestStats });
         }
-        if ( requestStatsDisabled ) { return; }
+        if (requestStatsDisabled) { return; }
         saveTimer.on({ min: SAVE_DELAY_IN_MINUTES });
         vAPI.alarms.createIfNotPresent('saveLocalSettings', {
             delayInMinutes: SAVE_DELAY_IN_MINUTES + 0.5
@@ -142,18 +142,18 @@ import µb from './background.js';
         quickSaveTimer.on({ sec: QUICK_SAVE_DELAY_IN_SECONDS });
     };
 
-    µb.saveLocalSettings = ( ) => {
+    µb.saveLocalSettings = () => {
         stopTimers();
-        if ( requestStatsDisabled ) { return; }
+        if (requestStatsDisabled) { return; }
         return vAPI.storage.set({ requestStats: µb.requestStats });
     };
 
     onBroadcast(msg => {
-        if ( msg.what !== 'hiddenSettingsChanged' ) { return; }
+        if (msg.what !== 'hiddenSettingsChanged') { return; }
         const newState = µb.hiddenSettings.requestStatsDisabled;
-        if ( requestStatsDisabled === newState ) { return; }
+        if (requestStatsDisabled === newState) { return; }
         requestStatsDisabled = newState;
-        if ( newState ) {
+        if (newState) {
             stopTimers();
             µb.requestStats.blockedCount = µb.requestStats.allowedCount = 0;
         } else {
@@ -164,7 +164,7 @@ import µb from './background.js';
 
 /******************************************************************************/
 
-µb.loadUserSettings = async function() {
+µb.loadUserSettings = async function () {
     const usDefault = this.userSettingsDefault;
 
     const results = await Promise.all([
@@ -173,18 +173,18 @@ import µb from './background.js';
     ]);
 
     const usUser = results[0] instanceof Object && results[0] ||
-                   Object.assign(usDefault);
+        Object.assign(usDefault);
 
-    if ( Array.isArray(results[1]) ) {
+    if (Array.isArray(results[1])) {
         const adminSettings = results[1];
-        for ( const entry of adminSettings ) {
-            if ( entry.length < 1 ) { continue; }
+        for (const entry of adminSettings) {
+            if (entry.length < 1) { continue; }
             const name = entry[0];
-            if ( Object.hasOwn(usDefault, name) === false ) { continue; }
+            if (Object.hasOwn(usDefault, name) === false) { continue; }
             const value = entry.length < 2
                 ? usDefault[name]
                 : this.settingValueFromString(usDefault, name, entry[1]);
-            if ( value === undefined ) { continue; }
+            if (value === undefined) { continue; }
             usUser[name] = usDefault[name] = value;
         }
     }
@@ -192,7 +192,7 @@ import µb from './background.js';
     return usUser;
 };
 
-µb.saveUserSettings = function() {
+µb.saveUserSettings = function () {
     // `externalLists` will be deprecated in some future, it is kept around
     // for forward compatibility purpose, and should reflect the content of
     // `importedLists`.
@@ -208,12 +208,12 @@ import µb from './background.js';
     );
 
     const toRemove = [];
-    for ( const key in this.userSettings ) {
-        if ( Object.hasOwn(this.userSettings, key) === false ) { continue; }
-        if ( Object.hasOwn(toSave, key) ) { continue; }
+    for (const key in this.userSettings) {
+        if (Object.hasOwn(this.userSettings, key) === false) { continue; }
+        if (Object.hasOwn(toSave, key)) { continue; }
         toRemove.push(key);
     }
-    if ( toRemove.length !== 0 ) {
+    if (toRemove.length !== 0) {
         vAPI.storage.remove(toRemove);
     }
     vAPI.storage.set(toSave);
@@ -223,7 +223,7 @@ import µb from './background.js';
 
 // Admin hidden settings have precedence over user hidden settings.
 
-µb.loadHiddenSettings = async function() {
+µb.loadHiddenSettings = async function () {
     const hsDefault = this.hiddenSettingsDefault;
     const hsAdmin = this.hiddenSettingsAdmin;
     const hsUser = this.hiddenSettings;
@@ -237,53 +237,53 @@ import µb from './background.js';
         vAPI.storage.get('hiddenSettings'),
     ]);
 
-    if ( results[0] instanceof Object ) {
+    if (results[0] instanceof Object) {
         const {
             advancedSettings,
             disableDashboard,
             disabledPopupPanelParts
         } = results[0];
-        if ( Array.isArray(advancedSettings) ) {
-            for ( const entry of advancedSettings ) {
-                if ( entry.length < 1 ) { continue; }
+        if (Array.isArray(advancedSettings)) {
+            for (const entry of advancedSettings) {
+                if (entry.length < 1) { continue; }
                 const name = entry[0];
-                if ( Object.hasOwn(hsDefault, name) === false ) { continue; }
+                if (Object.hasOwn(hsDefault, name) === false) { continue; }
                 const value = entry.length < 2
                     ? hsDefault[name]
                     : this.hiddenSettingValueFromString(name, entry[1]);
-                if ( value === undefined ) { continue; }
+                if (value === undefined) { continue; }
                 hsDefault[name] = hsAdmin[name] = hsUser[name] = value;
             }
         }
         µb.noDashboard = disableDashboard === true;
-        if ( Array.isArray(disabledPopupPanelParts) ) {
+        if (Array.isArray(disabledPopupPanelParts)) {
             const partNameToBit = new Map([
-                [  'globalStats', 0b00010 ],
-                [   'basicTools', 0b00100 ],
-                [   'extraTools', 0b01000 ],
-                [ 'overviewPane', 0b10000 ],
+                ['globalStats', 0b00010],
+                ['basicTools', 0b00100],
+                ['extraTools', 0b01000],
+                ['overviewPane', 0b10000],
             ]);
             let bits = hsDefault.popupPanelDisabledSections;
-            for ( const part of disabledPopupPanelParts ) {
+            for (const part of disabledPopupPanelParts) {
                 const bit = partNameToBit.get(part);
-                if ( bit === undefined ) { continue; }
+                if (bit === undefined) { continue; }
                 bits |= bit;
             }
             hsDefault.popupPanelDisabledSections =
-            hsAdmin.popupPanelDisabledSections =
-            hsUser.popupPanelDisabledSections = bits;
+                hsAdmin.popupPanelDisabledSections =
+                hsUser.popupPanelDisabledSections = bits;
         }
     }
 
     const hs = results[1] instanceof Object && results[1].hiddenSettings || {};
-    if ( Object.keys(hsAdmin).length === 0 && Object.keys(hs).length === 0 ) {
+    if (Object.keys(hsAdmin).length === 0 && Object.keys(hs).length === 0) {
         return;
     }
 
-    for ( const key in hsDefault ) {
-        if ( Object.hasOwn(hsDefault, key) === false ) { continue; }
-        if ( Object.hasOwn(hsAdmin, name) ) { continue; }
-        if ( typeof hs[key] !== typeof hsDefault[key] ) { continue; }
+    for (const key in hsDefault) {
+        if (Object.hasOwn(hsDefault, key) === false) { continue; }
+        if (Object.hasOwn(hsAdmin, name)) { continue; }
+        if (typeof hs[key] !== typeof hsDefault[key]) { continue; }
         this.hiddenSettings[key] = hs[key];
     }
     broadcast({ what: 'hiddenSettingsChanged' });
@@ -293,7 +293,7 @@ import µb from './background.js';
 // This way the new default values in the future will properly apply for
 // those which were not modified by the user.
 
-µb.saveHiddenSettings = function() {
+µb.saveHiddenSettings = function () {
     vAPI.storage.set({
         hiddenSettings: this.getModifiedSettings(
             this.hiddenSettings,
@@ -303,7 +303,7 @@ import µb from './background.js';
 };
 
 onBroadcast(msg => {
-    if ( msg.what !== 'hiddenSettingsChanged' ) { return; }
+    if (msg.what !== 'hiddenSettingsChanged') { return; }
     const µbhs = µb.hiddenSettings;
     ubologSet(µbhs.consoleLogLevel === 'info');
     vAPI.net.setOptions({
@@ -320,59 +320,59 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.hiddenSettingsFromString = function(raw) {
+µb.hiddenSettingsFromString = function (raw) {
     const out = Object.assign({}, this.hiddenSettingsDefault);
     const lineIter = new LineIterator(raw);
-    while ( lineIter.eot() === false ) {
+    while (lineIter.eot() === false) {
         const line = lineIter.next();
         const matches = /^\s*(\S+)\s+(.+)$/.exec(line);
-        if ( matches === null || matches.length !== 3 ) { continue; }
+        if (matches === null || matches.length !== 3) { continue; }
         const name = matches[1];
-        if ( Object.hasOwn(out, name) === false ) { continue; }
-        if ( Object.hasOwn(this.hiddenSettingsAdmin, name) ) { continue; }
+        if (Object.hasOwn(out, name) === false) { continue; }
+        if (Object.hasOwn(this.hiddenSettingsAdmin, name)) { continue; }
         const value = this.hiddenSettingValueFromString(name, matches[2]);
-        if ( value !== undefined ) {
+        if (value !== undefined) {
             out[name] = value;
         }
     }
     return out;
 };
 
-µb.hiddenSettingValueFromString = function(name, value) {
-    if ( typeof name !== 'string' || typeof value !== 'string' ) { return; }
+µb.hiddenSettingValueFromString = function (name, value) {
+    if (typeof name !== 'string' || typeof value !== 'string') { return; }
     const hsDefault = this.hiddenSettingsDefault;
-    if ( Object.hasOwn(hsDefault, name) === false ) { return; }
+    if (Object.hasOwn(hsDefault, name) === false) { return; }
     let r;
-    switch ( typeof hsDefault[name] ) {
-    case 'boolean':
-        if ( value === 'true' ) {
-            r = true;
-        } else if ( value === 'false' ) {
-            r = false;
-        }
-        break;
-    case 'string':
-        r = value.trim();
-        break;
-    case 'number':
-        if ( value.startsWith('0b') ) {
-            r = parseInt(value.slice(2), 2);
-        } else if ( value.startsWith('0x') ) {
-            r = parseInt(value.slice(2), 16);
-        } else {
-            r = parseInt(value, 10);
-        }
-        if ( isNaN(r) ) { r = undefined; }
-        break;
-    default:
-        break;
+    switch (typeof hsDefault[name]) {
+        case 'boolean':
+            if (value === 'true') {
+                r = true;
+            } else if (value === 'false') {
+                r = false;
+            }
+            break;
+        case 'string':
+            r = value.trim();
+            break;
+        case 'number':
+            if (value.startsWith('0b')) {
+                r = parseInt(value.slice(2), 2);
+            } else if (value.startsWith('0x')) {
+                r = parseInt(value.slice(2), 16);
+            } else {
+                r = parseInt(value, 10);
+            }
+            if (isNaN(r)) { r = undefined; }
+            break;
+        default:
+            break;
     }
     return r;
 };
 
-µb.stringFromHiddenSettings = function() {
+µb.stringFromHiddenSettings = function () {
     const out = [];
-    for ( const key of Object.keys(this.hiddenSettings).sort() ) {
+    for (const key of Object.keys(this.hiddenSettings).sort()) {
         out.push(key + ' ' + this.hiddenSettings[key]);
     }
     return out.join('\n');
@@ -380,7 +380,7 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.savePermanentFirewallRules = function() {
+µb.savePermanentFirewallRules = function () {
     vAPI.storage.set({
         dynamicFilteringString: permanentFirewall.toString()
     });
@@ -388,7 +388,7 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.savePermanentURLFilteringRules = function() {
+µb.savePermanentURLFilteringRules = function () {
     vAPI.storage.set({
         urlFilteringString: permanentURLFiltering.toString()
     });
@@ -396,7 +396,7 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.saveHostnameSwitches = function() {
+µb.saveHostnameSwitches = function () {
     vAPI.storage.set({
         hostnameSwitchesString: permanentSwitches.toString()
     });
@@ -404,7 +404,7 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.saveWhitelist = function() {
+µb.saveWhitelist = function () {
     vAPI.storage.set({
         netWhitelist: this.arrayFromWhitelist(this.netWhitelist)
     });
@@ -413,64 +413,64 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.isTrustedList = function(assetKey) {
-    if ( assetKey === this.userFiltersPath ) {
-        if ( this.userSettings.userFiltersTrusted ) { return true; }
+µb.isTrustedList = function (assetKey) {
+    if (assetKey === this.userFiltersPath) {
+        if (this.userSettings.userFiltersTrusted) { return true; }
     }
-    if ( this.parsedTrustedListPrefixes.length === 0 ) {
+    if (this.parsedTrustedListPrefixes.length === 0) {
         this.parsedTrustedListPrefixes =
             µb.hiddenSettings.trustedListPrefixes.split(/ +/).map(prefix => {
-                if ( prefix === '' ) { return; }
-                if ( prefix.startsWith('http://') ) { return; }
-                if ( prefix.startsWith('file:///') ) { return prefix; }
-                if ( prefix.startsWith('https://') === false ) {
+                if (prefix === '') { return; }
+                if (prefix.startsWith('http://')) { return; }
+                if (prefix.startsWith('file:///')) { return prefix; }
+                if (prefix.startsWith('https://') === false) {
                     return prefix.includes('://') ? undefined : prefix;
                 }
                 try {
                     const url = new URL(prefix);
-                    if ( url.hostname.length > 0 ) { return url.href; }
+                    if (url.hostname.length > 0) { return url.href; }
                 } catch {
                 }
             }).filter(prefix => prefix !== undefined);
     }
     const match = /^[a-z-]+:\/\/[^/]+\//.exec(assetKey);
     const assetOrigin = match && match[0];
-    for ( const prefix of this.parsedTrustedListPrefixes ) {
-        if ( assetOrigin && prefix.length < assetOrigin.length ) { continue; }
-        if ( assetKey.startsWith(prefix) ) { return true; }
+    for (const prefix of this.parsedTrustedListPrefixes) {
+        if (assetOrigin && prefix.length < assetOrigin.length) { continue; }
+        if (assetKey.startsWith(prefix)) { return true; }
     }
     return false;
 };
 
 onBroadcast(msg => {
-    if ( msg.what !== 'hiddenSettingsChanged' ) { return; }
+    if (msg.what !== 'hiddenSettingsChanged') { return; }
     µb.parsedTrustedListPrefixes = [];
 });
 
 /******************************************************************************/
 
-µb.loadSelectedFilterLists = async function() {
+µb.loadSelectedFilterLists = async function () {
     const bin = await vAPI.storage.get('selectedFilterLists');
-    if ( bin instanceof Object && Array.isArray(bin.selectedFilterLists) ) {
+    if (bin instanceof Object && Array.isArray(bin.selectedFilterLists)) {
         this.selectedFilterLists = bin.selectedFilterLists;
         return;
     }
 
-    // https://github.com/gorhill/uBlock/issues/747
+    // https://github.com/Ablock/Ablock/issues/747
     //   Select default filter lists if first-time launch.
     const lists = await io.metadata();
     this.saveSelectedFilterLists(this.autoSelectRegionalFilterLists(lists));
 };
 
-µb.saveSelectedFilterLists = function(newKeys, append = false) {
+µb.saveSelectedFilterLists = function (newKeys, append = false) {
     const oldKeys = this.selectedFilterLists.slice();
-    if ( append ) {
+    if (append) {
         newKeys = newKeys.concat(oldKeys);
     }
     const newSet = new Set(newKeys);
     // Purge unused filter lists from cache.
-    for ( const oldKey of oldKeys ) {
-        if ( newSet.has(oldKey) === false ) {
+    for (const oldKey of oldKeys) {
+        if (newSet.has(oldKey) === false) {
             this.removeFilterList(oldKey);
         }
     }
@@ -481,14 +481,14 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.applyFilterListSelection = function(details) {
+µb.applyFilterListSelection = function (details) {
     let selectedListKeySet = new Set(this.selectedFilterLists);
     let importedLists = this.userSettings.importedLists.slice();
 
     // Filter lists to select
-    if ( Array.isArray(details.toSelect) ) {
-        if ( details.merge ) {
-            for ( let i = 0, n = details.toSelect.length; i < n; i++ ) {
+    if (Array.isArray(details.toSelect)) {
+        if (details.merge) {
+            for (let i = 0, n = details.toSelect.length; i < n; i++) {
                 selectedListKeySet.add(details.toSelect[i]);
             }
         } else {
@@ -497,12 +497,12 @@ onBroadcast(msg => {
     }
 
     // Imported filter lists to remove
-    if ( Array.isArray(details.toRemove) ) {
-        for ( let i = 0, n = details.toRemove.length; i < n; i++ ) {
+    if (Array.isArray(details.toRemove)) {
+        for (let i = 0, n = details.toRemove.length; i < n; i++) {
             const assetKey = details.toRemove[i];
             selectedListKeySet.delete(assetKey);
             const pos = importedLists.indexOf(assetKey);
-            if ( pos !== -1 ) {
+            if (pos !== -1) {
                 importedLists.splice(pos, 1);
             }
             this.removeFilterList(assetKey);
@@ -510,23 +510,23 @@ onBroadcast(msg => {
     }
 
     // Filter lists to import
-    if ( typeof details.toImport === 'string' ) {
-        // https://github.com/gorhill/uBlock/issues/1181
+    if (typeof details.toImport === 'string') {
+        // https://github.com/Ablock/Ablock/issues/1181
         //   Try mapping the URL of an imported filter list to the assetKey
         //   of an existing stock list.
         const assetKeyFromURL = url => {
             const needle = url.replace(/^https?:/, '');
             const assets = this.availableFilterLists;
-            for ( const assetKey in assets ) {
+            for (const assetKey in assets) {
                 const asset = assets[assetKey];
-                if ( asset.content !== 'filters' ) { continue; }
-                if ( typeof asset.contentURL === 'string' ) {
-                    if ( asset.contentURL.endsWith(needle) ) { return assetKey; }
+                if (asset.content !== 'filters') { continue; }
+                if (typeof asset.contentURL === 'string') {
+                    if (asset.contentURL.endsWith(needle)) { return assetKey; }
                     continue;
                 }
-                if ( Array.isArray(asset.contentURL) === false ) { continue; }
-                for ( let i = 0, n = asset.contentURL.length; i < n; i++ ) {
-                    if ( asset.contentURL[i].endsWith(needle) ) {
+                if (Array.isArray(asset.contentURL) === false) { continue; }
+                for (let i = 0, n = asset.contentURL.length; i < n; i++) {
+                    if (asset.contentURL[i].endsWith(needle)) {
                         return assetKey;
                     }
                 }
@@ -535,13 +535,13 @@ onBroadcast(msg => {
         };
         const importedSet = new Set(this.listKeysFromCustomFilterLists(importedLists));
         const toImportSet = new Set(this.listKeysFromCustomFilterLists(details.toImport));
-        for ( const urlKey of toImportSet ) {
-            if ( importedSet.has(urlKey) ) {
+        for (const urlKey of toImportSet) {
+            if (importedSet.has(urlKey)) {
                 selectedListKeySet.add(urlKey);
                 continue;
             }
             const assetKey = assetKeyFromURL(urlKey);
-            if ( assetKey === urlKey ) {
+            if (assetKey === urlKey) {
                 importedSet.add(urlKey);
             }
             selectedListKeySet.add(assetKey);
@@ -550,7 +550,7 @@ onBroadcast(msg => {
     }
 
     const result = Array.from(selectedListKeySet);
-    if ( importedLists.join() !== this.userSettings.importedLists.join() ) {
+    if (importedLists.join() !== this.userSettings.importedLists.join()) {
         this.userSettings.importedLists = importedLists;
         this.saveUserSettings();
     }
@@ -559,17 +559,17 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.listKeysFromCustomFilterLists = function(raw) {
+µb.listKeysFromCustomFilterLists = function (raw) {
     const urls = typeof raw === 'string'
         ? raw.trim().split(/[\n\r]+/)
         : raw;
     const out = new Set();
     const reIgnore = /^[!#]/;
     const reValid = /^[a-z-]+:\/\/\S+/;
-    for ( const url of urls ) {
-        if ( reIgnore.test(url) || !reValid.test(url) ) { continue; }
+    for (const url of urls) {
+        if (reIgnore.test(url) || !reValid.test(url)) { continue; }
         // Ignore really bad lists.
-        if ( this.badLists.get(url) === true ) { continue; }
+        if (this.badLists.get(url) === true) { continue; }
         out.add(url);
     }
     return Array.from(out);
@@ -577,21 +577,21 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.saveUserFilters = function(content) {
-    // https://github.com/gorhill/uBlock/issues/1022
+µb.saveUserFilters = function (content) {
+    // https://github.com/Ablock/Ablock/issues/1022
     //   Be sure to end with an empty line.
     content = content.trim();
     this.removeCompiledFilterList(this.userFiltersPath);
     return io.put(this.userFiltersPath, content);
 };
 
-µb.loadUserFilters = function() {
+µb.loadUserFilters = function () {
     return io.get(this.userFiltersPath);
 };
 
-µb.appendUserFilters = async function(filters, options) {
+µb.appendUserFilters = async function (filters, options) {
     filters = filters.trim();
-    if ( filters.length === 0 ) { return; }
+    if (filters.length === 0) { return; }
 
     // https://github.com/uBlockOrigin/uBlock-issues/issues/372
     //   Auto comment using user-defined template.
@@ -614,11 +614,11 @@ onBroadcast(msg => {
     }
 
     const details = await this.loadUserFilters();
-    if ( details.error ) { return; }
+    if (details.error) { return; }
 
     // The comment, if any, will be applied if and only if it is different
     // from the last comment found in the user filter list.
-    if ( comment !== '' ) {
+    if (comment !== '') {
         const beg = details.content.lastIndexOf(comment);
         const end = beg === -1 ? -1 : beg + comment.length;
         if (
@@ -666,33 +666,33 @@ onBroadcast(msg => {
     broadcast({ what: 'userFiltersUpdated' });
 };
 
-µb.createUserFilters = function(details) {
+µb.createUserFilters = function (details) {
     this.appendUserFilters(details.filters, details);
-    // https://github.com/gorhill/uBlock/issues/1786
-    if ( details.docURL === undefined ) { return; }
+    // https://github.com/Ablock/Ablock/issues/1786
+    if (details.docURL === undefined) { return; }
     cosmeticFilteringEngine.removeFromSelectorCache(
         hostnameFromURI(details.docURL)
     );
     staticFilteringReverseLookup.resetLists();
 };
 
-µb.userFiltersAreEnabled = function() {
+µb.userFiltersAreEnabled = function () {
     return this.selectedFilterLists.includes(this.userFiltersPath);
 };
 
 /******************************************************************************/
 
-µb.autoSelectRegionalFilterLists = function(lists) {
-    const selectedListKeys = [ this.userFiltersPath ];
-    for ( const key in lists ) {
-        if ( Object.hasOwn(lists, key) === false ) { continue; }
+µb.autoSelectRegionalFilterLists = function (lists) {
+    const selectedListKeys = [this.userFiltersPath];
+    for (const key in lists) {
+        if (Object.hasOwn(lists, key) === false) { continue; }
         const list = lists[key];
-        if ( list.content !== 'filters' ) { continue; }
-        if ( list.off !== true ) {
+        if (list.content !== 'filters') { continue; }
+        if (list.off !== true) {
             selectedListKeys.push(key);
             continue;
         }
-        if ( this.listMatchesEnvironment(list) ) {
+        if (this.listMatchesEnvironment(list)) {
             selectedListKeys.push(key);
             list.off = false;
         }
@@ -702,29 +702,29 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.hasInMemoryFilter = function(raw) {
+µb.hasInMemoryFilter = function (raw) {
     return this.inMemoryFilters.includes(raw);
 };
 
-µb.addInMemoryFilter = async function(raw) {
-    if ( this.inMemoryFilters.includes(raw) ){ return true; }
+µb.addInMemoryFilter = async function (raw) {
+    if (this.inMemoryFilters.includes(raw)) { return true; }
     this.inMemoryFilters.push(raw);
     this.inMemoryFiltersCompiled = '';
     await this.loadFilterLists();
     return true;
 };
 
-µb.removeInMemoryFilter = async function(raw) {
+µb.removeInMemoryFilter = async function (raw) {
     const pos = this.inMemoryFilters.indexOf(raw);
-    if ( pos === -1 ) { return false; }
+    if (pos === -1) { return false; }
     this.inMemoryFilters.splice(pos, 1);
     this.inMemoryFiltersCompiled = '';
     await this.loadFilterLists();
     return false;
 };
 
-µb.clearInMemoryFilters = async function() {
-    if ( this.inMemoryFilters.length === 0 ) { return; }
+µb.clearInMemoryFilters = async function () {
+    if (this.inMemoryFilters.length === 0) { return; }
     this.inMemoryFilters = [];
     this.inMemoryFiltersCompiled = '';
     await this.loadFilterLists();
@@ -732,7 +732,7 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.getAvailableLists = async function() {
+µb.getAvailableLists = async function () {
     const newAvailableLists = {};
 
     // User filter list
@@ -746,7 +746,7 @@ onBroadcast(msg => {
     const importedListKeys = new Set(
         this.listKeysFromCustomFilterLists(this.userSettings.importedLists)
     );
-    for ( const listKey of importedListKeys ) {
+    for (const listKey of importedListKeys) {
         const asset = {
             content: 'filters',
             contentURL: listKey,
@@ -761,7 +761,7 @@ onBroadcast(msg => {
 
     // Load previously saved available lists -- these contains data
     // computed at run-time, we will reuse this data if possible
-    const [ bin, registeredAssets, badlists ] = await Promise.all([
+    const [bin, registeredAssets, badlists] = await Promise.all([
         Object.keys(this.availableFilterLists).length !== 0
             ? { availableFilterLists: this.availableFilterLists }
             : vAPI.storage.get('availableFilterLists'),
@@ -769,9 +769,9 @@ onBroadcast(msg => {
         this.badLists.size === 0 ? io.get('ublock-badlists') : false,
     ]);
 
-    if ( badlists instanceof Object ) {
-        for ( const line of badlists.content.split(/\s*[\n\r]+\s*/) ) {
-            if ( line === '' || line.startsWith('#') ) { continue; }
+    if (badlists instanceof Object) {
+        for (const line of badlists.content.split(/\s*[\n\r]+\s*/)) {
+            if (line === '' || line.startsWith('#')) { continue; }
             const fields = line.split(/\s+/);
             const remove = fields.length === 2;
             this.badLists.set(fields[0], remove);
@@ -780,8 +780,8 @@ onBroadcast(msg => {
 
     const oldAvailableLists = bin && bin.availableFilterLists || {};
 
-    for ( const [ assetKey, asset ] of Object.entries(registeredAssets) ) {
-        if ( asset.content !== 'filters' ) { continue; }
+    for (const [assetKey, asset] of Object.entries(registeredAssets)) {
+        if (asset.content !== 'filters') { continue; }
         newAvailableLists[assetKey] = Object.assign({}, asset);
     }
 
@@ -789,21 +789,21 @@ onBroadcast(msg => {
     const selectedListset = new Set(this.selectedFilterLists);
 
     // Remove imported filter lists which are already present in stock lists
-    for ( const [ stockAssetKey, stockEntry ] of Object.entries(newAvailableLists) ) {
-        if ( stockEntry.content !== 'filters' ) { continue; }
-        if ( stockEntry.group === 'user' ) { continue; }
-        if ( stockEntry.submitter === 'user' ) { continue; }
-        if ( stockAssetKey.includes('://') ) { continue; }
+    for (const [stockAssetKey, stockEntry] of Object.entries(newAvailableLists)) {
+        if (stockEntry.content !== 'filters') { continue; }
+        if (stockEntry.group === 'user') { continue; }
+        if (stockEntry.submitter === 'user') { continue; }
+        if (stockAssetKey.includes('://')) { continue; }
         const contentURLs = Array.isArray(stockEntry.contentURL)
             ? stockEntry.contentURL
-            : [ stockEntry.contentURL ];
-        for ( const importedAssetKey of contentURLs ) {
+            : [stockEntry.contentURL];
+        for (const importedAssetKey of contentURLs) {
             const importedEntry = newAvailableLists[importedAssetKey];
-            if ( importedEntry === undefined ) { continue; }
+            if (importedEntry === undefined) { continue; }
             delete newAvailableLists[importedAssetKey];
             io.unregisterAssetSource(importedAssetKey);
             this.removeFilterList(importedAssetKey);
-            if ( selectedListset.has(importedAssetKey) ) {
+            if (selectedListset.has(importedAssetKey)) {
                 selectedListset.add(stockAssetKey);
                 selectedListset.delete(importedAssetKey);
             }
@@ -815,17 +815,17 @@ onBroadcast(msg => {
     // Unregister lists in old listset not present in new listset.
     // Convert a no longer existing stock list into an imported list, except
     // when the removed stock list is deemed a "bad list".
-    for ( const [ assetKey, oldEntry ] of Object.entries(oldAvailableLists) ) {
-        if ( newAvailableLists[assetKey] !== undefined ) { continue; }
+    for (const [assetKey, oldEntry] of Object.entries(oldAvailableLists)) {
+        if (newAvailableLists[assetKey] !== undefined) { continue; }
         const on = selectedListset.delete(assetKey);
         this.removeFilterList(assetKey);
         io.unregisterAssetSource(assetKey);
-        if ( assetKey.includes('://') ) { continue; }
-        if ( on === false ) { continue; }
+        if (assetKey.includes('://')) { continue; }
+        if (on === false) { continue; }
         const listURL = Array.isArray(oldEntry.contentURL)
             ? oldEntry.contentURL[0]
             : oldEntry.contentURL;
-        if ( this.badLists.has(listURL) ) { continue; }
+        if (this.badLists.has(listURL)) { continue; }
         const newEntry = {
             content: 'filters',
             contentURL: listURL,
@@ -841,9 +841,9 @@ onBroadcast(msg => {
     }
 
     // Remove unreferenced imported filter lists
-    for ( const [ assetKey, asset ] of Object.entries(newAvailableLists) ) {
-        if ( asset.submitter !== 'user' ) { continue; }
-        if ( importedListKeys.has(assetKey) ) { continue; }
+    for (const [assetKey, asset] of Object.entries(newAvailableLists)) {
+        if (asset.submitter !== 'user') { continue; }
+        if (importedListKeys.has(assetKey)) { continue; }
         selectedListset.delete(assetKey);
         delete newAvailableLists[assetKey];
         this.removeFilterList(assetKey);
@@ -851,18 +851,18 @@ onBroadcast(msg => {
     }
 
     // Mark lists as disabled/enabled according to selected listset
-    for ( const [ assetKey, asset ] of Object.entries(newAvailableLists) ) {
+    for (const [assetKey, asset] of Object.entries(newAvailableLists)) {
         asset.off = selectedListset.has(assetKey) === false;
     }
 
     // Reuse existing metadata
-    for ( const [ assetKey, oldEntry ] of Object.entries(oldAvailableLists) ) {
+    for (const [assetKey, oldEntry] of Object.entries(oldAvailableLists)) {
         const newEntry = newAvailableLists[assetKey];
-        if ( newEntry === undefined ) { continue; }
-        if ( oldEntry.entryCount !== undefined ) {
+        if (newEntry === undefined) { continue; }
+        if (oldEntry.entryCount !== undefined) {
             newEntry.entryCount = oldEntry.entryCount;
         }
-        if ( oldEntry.entryUsedCount !== undefined ) {
+        if (oldEntry.entryUsedCount !== undefined) {
             newEntry.entryUsedCount = oldEntry.entryUsedCount;
         }
         // This may happen if the list name was pulled from the list content
@@ -878,12 +878,12 @@ onBroadcast(msg => {
         }
     }
 
-    if ( Array.from(importedListKeys).join('\n') !== this.userSettings.importedLists.join('\n') ) {
+    if (Array.from(importedListKeys).join('\n') !== this.userSettings.importedLists.join('\n')) {
         this.userSettings.importedLists = Array.from(importedListKeys);
         this.saveUserSettings();
     }
 
-    if ( Array.from(selectedListset).join() !== this.selectedFilterLists.join() ) {
+    if (Array.from(selectedListset).join() !== this.selectedFilterLists.join()) {
         this.saveSelectedFilterLists(Array.from(selectedListset));
     }
 
@@ -897,9 +897,9 @@ onBroadcast(msg => {
     let loadingPromise;
     let t0 = 0;
 
-    const elapsed = ( ) => `${Date.now() - t0} ms`;
+    const elapsed = () => `${Date.now() - t0} ms`;
 
-    const onDone = ( ) => {
+    const onDone = () => {
         ubolog(`loadFilterLists() All filters in memory at ${elapsed()}`);
 
         staticNetFilteringEngine.freeze();
@@ -938,7 +938,7 @@ onBroadcast(msg => {
         let acceptedCount = snfe.acceptedCount + sxfe.acceptedCount;
         let discardedCount = snfe.discardedCount + sxfe.discardedCount;
         µb.applyCompiledFilters(compiled, assetKey === µb.userFiltersPath);
-        if ( Object.hasOwn(µb.availableFilterLists, assetKey) ) {
+        if (Object.hasOwn(µb.availableFilterLists, assetKey)) {
             const entry = µb.availableFilterLists[assetKey];
             entry.entryCount = snfe.acceptedCount + sxfe.acceptedCount -
                 acceptedCount;
@@ -957,7 +957,7 @@ onBroadcast(msg => {
 
         µb.availableFilterLists = lists;
 
-        if ( vAPI.Net.canSuspend() ) {
+        if (vAPI.Net.canSuspend()) {
             vAPI.net.suspend();
         }
         redirectEngine.reset();
@@ -973,9 +973,9 @@ onBroadcast(msg => {
         // This happens for assets which do not exist, or assets with no
         // content.
         const toLoad = [];
-        for ( const assetKey in lists ) {
-            if ( Object.hasOwn(lists, assetKey) === false ) { continue; }
-            if ( lists[assetKey].off ) { continue; }
+        for (const assetKey in lists) {
+            if (Object.hasOwn(lists, assetKey) === false) { continue; }
+            if (lists[assetKey].off) { continue; }
             toLoad.push(
                 µb.getCompiledFilterList(assetKey).then(details => {
                     applyCompiledFilters(details.assetKey, details.content);
@@ -983,15 +983,15 @@ onBroadcast(msg => {
             );
         }
 
-        if ( µb.inMemoryFilters.length !== 0 ) {
-            if ( µb.inMemoryFiltersCompiled === '' ) {
+        if (µb.inMemoryFilters.length !== 0) {
+            if (µb.inMemoryFiltersCompiled === '') {
                 µb.inMemoryFiltersCompiled =
                     µb.compileFilters(µb.inMemoryFilters.join('\n'), {
                         assetKey: 'in-memory',
                         trustedSource: true,
                     });
             }
-            if ( µb.inMemoryFiltersCompiled !== '' ) {
+            if (µb.inMemoryFiltersCompiled !== '') {
                 toLoad.push(
                     µb.applyCompiledFilters(µb.inMemoryFiltersCompiled, true)
                 );
@@ -1001,17 +1001,17 @@ onBroadcast(msg => {
         return Promise.all(toLoad);
     };
 
-    µb.loadFilterLists = function() {
-        if ( loadingPromise instanceof Promise ) { return loadingPromise; }
+    µb.loadFilterLists = function () {
+        if (loadingPromise instanceof Promise) { return loadingPromise; }
         ubolog('loadFilterLists() Start');
         t0 = Date.now();
         loadedListKeys.length = 0;
-        loadingPromise = this.loadRedirectResources().then(( ) => {
+        loadingPromise = this.loadRedirectResources().then(() => {
             ubolog(`loadFilterLists() Redirects/scriptlets ready at ${elapsed()}`);
             return this.getAvailableLists();
         }).then(lists => {
             return onFilterListsReady(lists)
-        }).then(( ) => {
+        }).then(() => {
             onDone();
         });
         return loadingPromise;
@@ -1020,7 +1020,7 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.getCompiledFilterList = async function(assetKey) {
+µb.getCompiledFilterList = async function (assetKey) {
     const compiledPath = `compiled/${assetKey}`;
 
     // https://github.com/uBlockOrigin/uBlock-issues/issues/1365
@@ -1032,13 +1032,13 @@ onBroadcast(msg => {
     ) {
         const content = await io.fromCache(compiledPath);
         const compilerVersion = `${this.systemSettings.compiledMagic}\n`;
-        if ( content.startsWith(compilerVersion) ) {
+        if (content.startsWith(compilerVersion)) {
             return { assetKey, content };
         }
     }
 
     // Skip downloading really bad lists.
-    if ( this.badLists.get(assetKey) ) {
+    if (this.badLists.get(assetKey)) {
         return { assetKey, content: '' };
     }
 
@@ -1047,7 +1047,7 @@ onBroadcast(msg => {
         silent: true,
     });
     // Compiling an empty string results in an empty string.
-    if ( rawDetails.content === '' ) {
+    if (rawDetails.content === '') {
         rawDetails.assetKey = assetKey;
         return rawDetails;
     }
@@ -1055,7 +1055,7 @@ onBroadcast(msg => {
     this.extractFilterListMetadata(assetKey, rawDetails.content);
 
     // Skip compiling bad lists.
-    if ( this.badLists.has(assetKey) ) {
+    if (this.badLists.has(assetKey)) {
         return { assetKey, content: '' };
     }
 
@@ -1070,19 +1070,19 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.extractFilterListMetadata = function(assetKey, raw) {
+µb.extractFilterListMetadata = function (assetKey, raw) {
     const listEntry = this.availableFilterLists[assetKey];
-    if ( listEntry === undefined ) { return; }
-    // https://github.com/gorhill/uBlock/issues/313
+    if (listEntry === undefined) { return; }
+    // https://github.com/Ablock/Ablock/issues/313
     // Always try to fetch the name if this is an external filter list.
-    if ( listEntry.group !== 'custom' ) { return; }
-    const data = io.extractMetadataFromList(raw, [ 'Title', 'Homepage' ]);
+    if (listEntry.group !== 'custom') { return; }
+    const data = io.extractMetadataFromList(raw, ['Title', 'Homepage']);
     const props = {};
-    if ( data.title && data.title !== listEntry.title ) {
+    if (data.title && data.title !== listEntry.title) {
         props.title = listEntry.title = orphanizeString(data.title);
     }
-    if ( data.homepage && /^https?:\/\/\S+/.test(data.homepage) ) {
-        if ( data.homepage !== listEntry.supportURL ) {
+    if (data.homepage && /^https?:\/\/\S+/.test(data.homepage)) {
+        if (data.homepage !== listEntry.supportURL) {
             props.supportURL = listEntry.supportURL = orphanizeString(data.homepage);
         }
     }
@@ -1091,24 +1091,24 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.removeCompiledFilterList = function(assetKey) {
+µb.removeCompiledFilterList = function (assetKey) {
     io.remove(`compiled/${assetKey}`);
 };
 
-µb.removeFilterList = function(assetKey) {
+µb.removeFilterList = function (assetKey) {
     this.removeCompiledFilterList(assetKey);
     io.remove(assetKey);
 };
 
 /******************************************************************************/
 
-µb.compileFilters = function(rawText, details = {}) {
+µb.compileFilters = function (rawText, details = {}) {
     const writer = new CompiledListWriter();
 
     // Populate the writer with information potentially useful to the
     // client compilers.
     const trustedSource = details.trustedSource === true;
-    if ( details.assetKey ) {
+    if (details.assetKey) {
         writer.properties.set('name', details.assetKey);
         writer.properties.set('trustedSource', trustedSource);
     }
@@ -1125,18 +1125,18 @@ onBroadcast(msg => {
 
     compiler.start(writer);
 
-    while ( lineIter.eot() === false ) {
+    while (lineIter.eot() === false) {
         let line = lineIter.next();
 
-        while ( line.endsWith(' \\') ) {
-            if ( lineIter.peek(4) !== '    ' ) { break; }
+        while (line.endsWith(' \\')) {
+            if (lineIter.peek(4) !== '    ') { break; }
             line = line.slice(0, -2).trim() + lineIter.next().trim();
         }
 
         parser.parse(line);
 
-        if ( parser.isFilter() === false ) { continue; }
-        if ( parser.hasError() ) {
+        if (parser.isFilter() === false) { continue; }
+        if (parser.hasError()) {
             logger.writeOne({
                 realm: 'message',
                 type: 'error',
@@ -1145,15 +1145,15 @@ onBroadcast(msg => {
             continue;
         }
 
-        if ( parser.isExtendedFilter() ) {
+        if (parser.isExtendedFilter()) {
             staticExtFilteringEngine.compile(parser, writer);
             continue;
         }
 
-        if ( parser.isNetworkFilter() === false ) { continue; }
+        if (parser.isNetworkFilter() === false) { continue; }
 
-        if ( compiler.compile(parser, writer) ) { continue; }
-        if ( compiler.error !== undefined ) {
+        if (compiler.compile(parser, writer)) { continue; }
+        if (compiler.error !== undefined) {
             logger.writeOne({
                 realm: 'message',
                 type: 'error',
@@ -1176,12 +1176,12 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/1395
+// https://github.com/Ablock/Ablock/issues/1395
 //   Added `firstparty` argument: to avoid discarding cosmetic filters when
 //   applying 1st-party filters.
 
-µb.applyCompiledFilters = function(rawText, firstparty) {
-    if ( rawText === '' ) { return; }
+µb.applyCompiledFilters = function (rawText, firstparty) {
+    if (rawText === '') { return; }
     const reader = new CompiledListReader(rawText);
     staticNetFilteringEngine.fromCompiled(reader);
     staticExtFilteringEngine.fromCompiledContent(reader, {
@@ -1192,16 +1192,16 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.loadRedirectResources = async function() {
+µb.loadRedirectResources = async function () {
     try {
         const success = await redirectEngine.resourcesFromSelfie(io);
-        if ( success === true ) {
+        if (success === true) {
             ubolog('Loaded redirect/scriptlets resources from selfie');
             return true;
         }
 
         const fetcher = (path, options = undefined) => {
-            if ( path.startsWith('/web_accessible_resources/') ) {
+            if (path.startsWith('/web_accessible_resources/')) {
                 path += `?secret=${vAPI.warSecret.short()}`;
                 return io.fetch(path, options);
             }
@@ -1213,28 +1213,28 @@ onBroadcast(msg => {
         ];
 
         const userResourcesLocation = this.hiddenSettings.userResourcesLocation;
-        if ( userResourcesLocation !== 'unset' ) {
-            for ( const url of userResourcesLocation.split(/\s+/) ) {
+        if (userResourcesLocation !== 'unset') {
+            for (const url of userResourcesLocation.split(/\s+/)) {
                 fetchPromises.push(io.fetchText(url));
             }
         }
 
         const results = await Promise.all(fetchPromises);
-        if ( Array.isArray(results) === false ) { return results; }
+        if (Array.isArray(results) === false) { return results; }
 
         const content = [];
-        for ( let i = 1; i < results.length; i++ ) {
+        for (let i = 1; i < results.length; i++) {
             const result = results[i];
-            if ( result instanceof Object === false ) { continue; }
-            if ( typeof result.content !== 'string' ) { continue; }
-            if ( result.content === '' ) { continue; }
+            if (result instanceof Object === false) { continue; }
+            if (typeof result.content !== 'string') { continue; }
+            if (result.content === '') { continue; }
             content.push(result.content);
         }
-        if ( content.length !== 0 ) {
+        if (content.length !== 0) {
             redirectEngine.resourcesFromString(content.join('\n\n'));
         }
         redirectEngine.selfieFromResources(io);
-    } catch(ex) {
+    } catch (ex) {
         ubolog(ex);
         return false;
     }
@@ -1243,13 +1243,13 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.loadPublicSuffixList = async function() {
+µb.loadPublicSuffixList = async function () {
     const psl = publicSuffixList;
 
     // WASM is nice but not critical
-    if ( vAPI.canWASM && this.hiddenSettings.disableWebAssembly !== true ) {
-        const wasmModuleFetcher = function(path) {
-            return fetch( `${path}.wasm`, {
+    if (vAPI.canWASM && this.hiddenSettings.disableWebAssembly !== true) {
+        const wasmModuleFetcher = function (path) {
+            return fetch(`${path}.wasm`, {
                 mode: 'same-origin'
             }).then(
                 WebAssembly.compileStreaming
@@ -1262,17 +1262,17 @@ onBroadcast(msg => {
             result = await psl.enableWASM(wasmModuleFetcher,
                 './lib/publicsuffixlist/wasm/'
             );
-        } catch(reason) {
+        } catch (reason) {
             ubolog(reason);
         }
-        if ( result ) {
-            ubolog(`WASM PSL ready ${Date.now()-vAPI.T0} ms after launch`);
+        if (result) {
+            ubolog(`WASM PSL ready ${Date.now() - vAPI.T0} ms after launch`);
         }
     }
 
     try {
         const selfie = await io.fromCache(`selfie/${this.pslAssetKey}`);
-        if ( psl.fromSelfie(selfie) ) {
+        if (psl.fromSelfie(selfie)) {
             ubolog('Loaded PSL from selfie');
             return;
         }
@@ -1281,12 +1281,12 @@ onBroadcast(msg => {
     }
 
     const result = await io.get(this.pslAssetKey);
-    if ( result.content !== '' ) {
+    if (result.content !== '') {
         this.compilePublicSuffixList(result.content);
     }
 };
 
-µb.compilePublicSuffixList = function(content) {
+µb.compilePublicSuffixList = function (content) {
     const psl = publicSuffixList;
     psl.parse(content, punycode.toASCII);
     ubolog(`Loaded PSL from ${this.pslAssetKey}`);
@@ -1304,11 +1304,11 @@ onBroadcast(msg => {
     //   JSON.stringify-ing ourselves results in a better baseline
     //   memory usage at selfie-load time. For some reasons.
 
-    const create = async function() {
+    const create = async function () {
         vAPI.alarms.clear('createSelfie');
         createTimer.off();
-        if ( µb.inMemoryFilters.length !== 0 ) { return; }
-        if ( Object.keys(µb.availableFilterLists).length === 0 ) { return; }
+        if (µb.inMemoryFilters.length !== 0) { return; }
+        if (Object.keys(µb.availableFilterLists).length === 0) { return; }
         await Promise.all([
             io.toCache('selfie/staticMain', {
                 magic: µb.systemSettings.selfieMagic,
@@ -1325,18 +1325,18 @@ onBroadcast(msg => {
         ubolog('Filtering engine selfie created');
     };
 
-    const loadMain = async function() {
+    const loadMain = async function () {
         const selfie = await io.fromCache('selfie/staticMain');
-        if ( selfie instanceof Object === false ) { return false; }
-        if ( selfie.magic !== µb.systemSettings.selfieMagic ) { return false; }
-        if ( selfie.availableFilterLists instanceof Object === false ) { return false; }
-        if ( Object.keys(selfie.availableFilterLists).length === 0 ) { return false; }
+        if (selfie instanceof Object === false) { return false; }
+        if (selfie.magic !== µb.systemSettings.selfieMagic) { return false; }
+        if (selfie.availableFilterLists instanceof Object === false) { return false; }
+        if (Object.keys(selfie.availableFilterLists).length === 0) { return false; }
         µb.availableFilterLists = selfie.availableFilterLists;
         return true;
     };
 
-    const load = async function() {
-        if ( µb.selfieIsInvalid ) { return false; }
+    const load = async function () {
+        if (µb.selfieIsInvalid) { return false; }
         try {
             const results = await Promise.all([
                 loadMain(),
@@ -1347,7 +1347,7 @@ onBroadcast(msg => {
                     staticNetFilteringEngine.fromSelfie(selfie)
                 ),
             ]);
-            if ( results.every(v => v) ) {
+            if (results.every(v => v)) {
                 return µb.loadRedirectResources();
             }
         }
@@ -1359,8 +1359,8 @@ onBroadcast(msg => {
         return false;
     };
 
-    const destroy = function(options = {}) {
-        if ( µb.selfieIsInvalid === false ) {
+    const destroy = function (options = {}) {
+        if (µb.selfieIsInvalid === false) {
             io.remove(/^selfie\/static/, options);
             µb.selfieIsInvalid = true;
             ubolog('Filtering engine selfie marked for invalidation');
@@ -1378,14 +1378,14 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/531
+// https://github.com/Ablock/Ablock/issues/531
 // Overwrite user settings with admin settings if present.
 //
 // Admin settings match layout of a uBlock backup. Not all data is
 // necessarily present, i.e. administrators may removed entries which
 // values are left to the user's choice.
 
-µb.restoreAdminSettings = async function() {
+µb.restoreAdminSettings = async function () {
     let toOverwrite = {};
     let data;
     try {
@@ -1393,20 +1393,20 @@ onBroadcast(msg => {
             'adminSettings',
             'toOverwrite',
         ]) || {};
-        if ( store.toOverwrite instanceof Object ) {
+        if (store.toOverwrite instanceof Object) {
             toOverwrite = store.toOverwrite;
         }
         const json = store.adminSettings;
-        if ( typeof json === 'string' && json !== '' ) {
+        if (typeof json === 'string' && json !== '') {
             data = JSON.parse(json);
-        } else if ( json instanceof Object ) {
+        } else if (json instanceof Object) {
             data = json;
         }
     } catch (ex) {
         console.error(ex);
     }
 
-    if ( data instanceof Object === false ) { data = {}; }
+    if (data instanceof Object === false) { data = {}; }
 
     const bin = {};
     let binNotEmpty = false;
@@ -1421,12 +1421,12 @@ onBroadcast(msg => {
         µb.assetsBootstrapLocation = data.assetsBootstrapLocation;
     }
 
-    if ( typeof data.userSettings === 'object' ) {
+    if (typeof data.userSettings === 'object') {
         const µbus = this.userSettings;
         const adminus = data.userSettings;
-        for ( const name in µbus ) {
-            if ( Object.hasOwn(µbus, name) === false ) { continue; }
-            if ( Object.hasOwn(adminus, name) === false ) { continue; }
+        for (const name in µbus) {
+            if (Object.hasOwn(µbus, name) === false) { continue; }
+            if (Object.hasOwn(adminus, name) === false) { continue; }
             bin[name] = adminus[name];
             binNotEmpty = true;
         }
@@ -1440,17 +1440,17 @@ onBroadcast(msg => {
         toOverwrite.filterLists.length !== 0
     ) {
         const importedLists = [];
-        for ( const list of toOverwrite.filterLists ) {
-            if ( /^[a-z-]+:\/\//.test(list) === false ) { continue; }
+        for (const list of toOverwrite.filterLists) {
+            if (/^[a-z-]+:\/\//.test(list) === false) { continue; }
             importedLists.push(list);
         }
-        if ( importedLists.length !== 0 ) {
+        if (importedLists.length !== 0) {
             bin.importedLists = importedLists;
             bin.externalLists = importedLists.join('\n');
         }
         bin.selectedFilterLists = toOverwrite.filterLists;
         binNotEmpty = true;
-    } else if ( Array.isArray(data.selectedFilterLists) ) {
+    } else if (Array.isArray(data.selectedFilterLists)) {
         bin.selectedFilterLists = data.selectedFilterLists;
         binNotEmpty = true;
     }
@@ -1462,43 +1462,43 @@ onBroadcast(msg => {
         µb.netWhitelistDefault = toOverwrite.trustedSiteDirectives.slice();
         bin.netWhitelist = toOverwrite.trustedSiteDirectives.slice();
         binNotEmpty = true;
-    } else if ( Array.isArray(data.whitelist) ) {
+    } else if (Array.isArray(data.whitelist)) {
         bin.netWhitelist = data.whitelist;
         binNotEmpty = true;
-    } else if ( typeof data.netWhitelist === 'string' ) {
+    } else if (typeof data.netWhitelist === 'string') {
         bin.netWhitelist = data.netWhitelist.split('\n');
         binNotEmpty = true;
     }
 
-    if ( typeof data.dynamicFilteringString === 'string' ) {
+    if (typeof data.dynamicFilteringString === 'string') {
         bin.dynamicFilteringString = data.dynamicFilteringString;
         binNotEmpty = true;
     }
 
-    if ( typeof data.urlFilteringString === 'string' ) {
+    if (typeof data.urlFilteringString === 'string') {
         bin.urlFilteringString = data.urlFilteringString;
         binNotEmpty = true;
     }
 
-    if ( typeof data.hostnameSwitchesString === 'string' ) {
+    if (typeof data.hostnameSwitchesString === 'string') {
         bin.hostnameSwitchesString = data.hostnameSwitchesString;
         binNotEmpty = true;
     }
 
-    if ( binNotEmpty ) {
+    if (binNotEmpty) {
         vAPI.storage.set(bin);
     }
 
     let userFiltersAfter;
-    if ( Array.isArray(toOverwrite.filters) ) {
+    if (Array.isArray(toOverwrite.filters)) {
         userFiltersAfter = toOverwrite.filters.join('\n').trim();
-    } else if ( typeof data.userFilters === 'string' ) {
+    } else if (typeof data.userFilters === 'string') {
         userFiltersAfter = data.userFilters.trim();
     }
-    if ( typeof userFiltersAfter === 'string' ) {
+    if (typeof userFiltersAfter === 'string') {
         const bin = await vAPI.storage.get(this.userFiltersPath);
         const userFiltersBefore = bin && bin[this.userFiltersPath] || '';
-        if ( userFiltersAfter !== userFiltersBefore ) {
+        if (userFiltersAfter !== userFiltersBefore) {
             await Promise.all([
                 this.saveUserFilters(userFiltersAfter),
                 this.selfieManager.destroy(),
@@ -1509,30 +1509,30 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-// https://github.com/gorhill/uBlock/issues/2344
+// https://github.com/Ablock/Ablock/issues/2344
 //   Support multiple locales per filter list.
-// https://github.com/gorhill/uBlock/issues/3210
+// https://github.com/Ablock/Ablock/issues/3210
 //   Support ability to auto-enable a filter list based on user agent.
-// https://github.com/gorhill/uBlock/pull/3860
+// https://github.com/Ablock/Ablock/pull/3860
 //   Get current language using extensions API (instead of `navigator.language`)
 
-µb.listMatchesEnvironment = function(details) {
+µb.listMatchesEnvironment = function (details) {
     // Matches language?
-    if ( typeof details.lang === 'string' ) {
+    if (typeof details.lang === 'string') {
         let re = this.listMatchesEnvironment.reLang;
-        if ( re === undefined ) {
+        if (re === undefined) {
             const match = /^[a-z]+/.exec(i18n.getUILanguage());
-            if ( match !== null ) {
+            if (match !== null) {
                 re = new RegExp('\\b' + match[0] + '\\b');
                 this.listMatchesEnvironment.reLang = re;
             }
         }
-        if ( re !== undefined && re.test(details.lang) ) { return true; }
+        if (re !== undefined && re.test(details.lang)) { return true; }
     }
     // Matches user agent?
-    if ( typeof details.ua === 'string' ) {
+    if (typeof details.ua === 'string') {
         let re = new RegExp('\\b' + this.escapeRegex(details.ua) + '\\b', 'i');
-        if ( re.test(self.navigator.userAgent) ) { return true; }
+        if (re.test(self.navigator.userAgent)) { return true; }
     }
     return false;
 };
@@ -1547,18 +1547,18 @@ onBroadcast(msg => {
         io.updateStart({ fetchDelay, auto: true });
     });
 
-    µb.scheduleAssetUpdater = async function(details = {}) {
+    µb.scheduleAssetUpdater = async function (details = {}) {
         launchTimer.off();
         vAPI.alarms.clear('assetUpdater');
 
-        if ( details.now ) {
+        if (details.now) {
             next = 0;
             io.updateStart(details);
             return;
         }
 
-        if ( µb.userSettings.autoUpdate === false ) {
-            if ( Boolean(details.updateDelay) === false ) {
+        if (µb.userSettings.autoUpdate === false) {
+            if (Boolean(details.updateDelay) === false) {
                 next = 0;
                 return;
             }
@@ -1571,7 +1571,7 @@ onBroadcast(msg => {
 
         // Use the new schedule if and only if it is earlier than the previous
         // one.
-        if ( next !== 0 ) {
+        if (next !== 0) {
             updateDelay = Math.min(updateDelay, Math.max(next - now, 1));
         }
 
@@ -1590,12 +1590,12 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-µb.assetObserver = function(topic, details) {
+µb.assetObserver = function (topic, details) {
     // Do not update filter list if not in use.
     // Also, ignore really bad lists, i.e. those which should not even be
     // fetched from a remote server.
-    if ( topic === 'before-asset-updated' ) {
-        if ( details.type === 'filters' ) {
+    if (topic === 'before-asset-updated') {
+        if (details.type === 'filters') {
             if (
                 Object.hasOwn(this.availableFilterLists, details.assetKey) === false ||
                 this.selectedFilterLists.indexOf(details.assetKey) === -1 ||
@@ -1608,18 +1608,18 @@ onBroadcast(msg => {
     }
 
     // Compile the list while we have the raw version in memory
-    if ( topic === 'after-asset-updated' ) {
+    if (topic === 'after-asset-updated') {
         // Skip selfie-related content.
-        if ( details.assetKey.startsWith('selfie/') ) { return; }
+        if (details.assetKey.startsWith('selfie/')) { return; }
         const cached = typeof details.content === 'string' && details.content !== '';
-        if ( Object.hasOwn(this.availableFilterLists, details.assetKey) ) {
-            if ( cached ) {
-                if ( this.selectedFilterLists.indexOf(details.assetKey) !== -1 ) {
+        if (Object.hasOwn(this.availableFilterLists, details.assetKey)) {
+            if (cached) {
+                if (this.selectedFilterLists.indexOf(details.assetKey) !== -1) {
                     this.extractFilterListMetadata(
                         details.assetKey,
                         details.content
                     );
-                    if ( this.badLists.has(details.assetKey) === false ) {
+                    if (this.badLists.has(details.assetKey) === false) {
                         io.toCache(`compiled/${details.assetKey}`,
                             this.compileFilters(details.content, {
                                 assetKey: details.assetKey,
@@ -1631,11 +1631,11 @@ onBroadcast(msg => {
             } else {
                 this.removeCompiledFilterList(details.assetKey);
             }
-        } else if ( details.assetKey === this.pslAssetKey ) {
-            if ( cached ) {
+        } else if (details.assetKey === this.pslAssetKey) {
+            if (cached) {
                 this.compilePublicSuffixList(details.content);
             }
-        } else if ( details.assetKey === 'ublock-badlists' ) {
+        } else if (details.assetKey === 'ublock-badlists') {
             this.badLists = new Map();
         }
         broadcast({
@@ -1643,7 +1643,7 @@ onBroadcast(msg => {
             key: details.assetKey,
             cached,
         });
-        // https://github.com/gorhill/uBlock/issues/2585
+        // https://github.com/Ablock/Ablock/issues/2585
         //   Whenever an asset is overwritten, the current selfie is quite
         //   likely no longer valid.
         this.selfieManager.destroy();
@@ -1651,7 +1651,7 @@ onBroadcast(msg => {
     }
 
     // Update failed.
-    if ( topic === 'asset-update-failed' ) {
+    if (topic === 'asset-update-failed') {
         broadcast({
             what: 'assetUpdated',
             key: details.assetKey,
@@ -1661,9 +1661,9 @@ onBroadcast(msg => {
     }
 
     // Reload all filter lists if needed.
-    if ( topic === 'after-assets-updated' ) {
-        if ( details.assetKeys.length !== 0 ) {
-            // https://github.com/gorhill/uBlock/pull/2314#issuecomment-278716960
+    if (topic === 'after-assets-updated') {
+        if (details.assetKeys.length !== 0) {
+            // https://github.com/Ablock/Ablock/pull/2314#issuecomment-278716960
             if (
                 this.hiddenSettings.userResourcesLocation !== 'unset' ||
                 vAPI.webextFlavor.soup.has('devbuild')
@@ -1682,26 +1682,26 @@ onBroadcast(msg => {
 
     // New asset source became available, if it's a filter list, should we
     // auto-select it?
-    if ( topic === 'builtin-asset-source-added' ) {
-        if ( details.entry.content === 'filters' ) {
+    if (topic === 'builtin-asset-source-added') {
+        if (details.entry.content === 'filters') {
             if (
                 details.entry.off === true &&
                 this.listMatchesEnvironment(details.entry)
             ) {
-                this.saveSelectedFilterLists([ details.assetKey ], true);
+                this.saveSelectedFilterLists([details.assetKey], true);
             }
         }
         return;
     }
 
-    if ( topic === 'assets.json-updated' ) {
+    if (topic === 'assets.json-updated') {
         const { newDict, oldDict } = details;
-        if ( newDict['assets.json'] === undefined ) { return; }
-        if ( oldDict['assets.json'] === undefined ) { return; }
+        if (newDict['assets.json'] === undefined) { return; }
+        if (oldDict['assets.json'] === undefined) { return; }
         const newDefaultListset = new Set(newDict['assets.json'].defaultListset || []);
         const oldDefaultListset = new Set(oldDict['assets.json'].defaultListset || []);
-        if ( newDefaultListset.size === 0 ) { return; }
-        if ( oldDefaultListset.size === 0 ) {
+        if (newDefaultListset.size === 0) { return; }
+        if (oldDefaultListset.size === 0) {
             Array.from(Object.entries(oldDict))
                 .filter(a =>
                     a[1].content === 'filters' &&
@@ -1710,21 +1710,21 @@ onBroadcast(msg => {
                 )
                 .map(a => a[0])
                 .forEach(a => oldDefaultListset.add(a));
-            if ( oldDefaultListset.size === 0 ) { return; }
+            if (oldDefaultListset.size === 0) { return; }
         }
         const selectedListset = new Set(this.selectedFilterLists);
         let selectedListModified = false;
-        for ( const assetKey of oldDefaultListset ) {
-            if ( newDefaultListset.has(assetKey) ) { continue; }
+        for (const assetKey of oldDefaultListset) {
+            if (newDefaultListset.has(assetKey)) { continue; }
             selectedListset.delete(assetKey);
             selectedListModified = true;
         }
-        for ( const assetKey of newDefaultListset ) {
-            if ( oldDefaultListset.has(assetKey) ) { continue; }
+        for (const assetKey of newDefaultListset) {
+            if (oldDefaultListset.has(assetKey)) { continue; }
             selectedListset.add(assetKey);
             selectedListModified = true;
         }
-        if ( selectedListModified ) {
+        if (selectedListModified) {
             this.saveSelectedFilterLists(Array.from(selectedListset));
         }
         return;

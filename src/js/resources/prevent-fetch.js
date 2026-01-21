@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -50,50 +50,50 @@ function preventFetchFn(
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 4);
     const propNeedles = parsePropertiesToMatchFn(propsToMatch, 'url');
     const validResponseProps = {
-        ok: [ false, true ],
-        statusText: [ '', 'Not Found' ],
-        type: [ 'basic', 'cors', 'default', 'error', 'opaque' ],
+        ok: [false, true],
+        statusText: ['', 'Not Found'],
+        type: ['basic', 'cors', 'default', 'error', 'opaque'],
     };
     const responseProps = {
         statusText: { value: 'OK' },
     };
     const responseHeaders = {};
-    if ( /^\{.*\}$/.test(responseType) ) {
+    if (/^\{.*\}$/.test(responseType)) {
         try {
-            Object.entries(JSON.parse(responseType)).forEach(([ p, v ]) => {
-                if ( p === 'headers' && trusted ) {
+            Object.entries(JSON.parse(responseType)).forEach(([p, v]) => {
+                if (p === 'headers' && trusted) {
                     Object.assign(responseHeaders, v);
                     return;
                 }
-                if ( validResponseProps[p] === undefined ) { return; }
-                if ( validResponseProps[p].includes(v) === false ) { return; }
+                if (validResponseProps[p] === undefined) { return; }
+                if (validResponseProps[p].includes(v) === false) { return; }
                 responseProps[p] = { value: v };
             });
         }
         catch { }
-    } else if ( responseType !== '' ) {
-        if ( validResponseProps.type.includes(responseType) ) {
+    } else if (responseType !== '') {
+        if (validResponseProps.type.includes(responseType)) {
             responseProps.type = { value: responseType };
         }
     }
     proxyApplyFn('fetch', function fetch(context) {
         const { callArgs } = context;
         const details = collateFetchArgumentsFn(...callArgs);
-        if ( safe.logLevel > 1 || propsToMatch === '' && responseBody === '' ) {
+        if (safe.logLevel > 1 || propsToMatch === '' && responseBody === '') {
             const out = Array.from(Object.entries(details)).map(a => `${a[0]}:${a[1]}`);
             safe.uboLog(logPrefix, `Called: ${out.join('\n')}`);
         }
-        if ( propsToMatch === '' && responseBody === '' ) {
+        if (propsToMatch === '' && responseBody === '') {
             return context.reflect();
         }
         const matched = matchObjectPropertiesFn(propNeedles, details);
-        if ( matched === undefined || matched.length === 0 ) {
+        if (matched === undefined || matched.length === 0) {
             return context.reflect();
         }
         return Promise.resolve(generateContentFn(trusted, responseBody)).then(text => {
             safe.uboLog(logPrefix, `Prevented with response "${text}"`);
             const headers = Object.assign({}, responseHeaders);
-            if ( headers['content-length'] === undefined ) {
+            if (headers['content-length'] === undefined) {
                 headers['content-length'] = text.length;
             }
             const response = new Response(text, { headers });
@@ -102,9 +102,9 @@ function preventFetchFn(
                 responseProps
             );
             safe.Object_defineProperties(response, props);
-            if ( extraArgs.throttle ) {
+            if (extraArgs.throttle) {
                 return new Promise(resolve => {
-                    setTimeout(( ) => { resolve(response); }, extraArgs.throttle);
+                    setTimeout(() => { resolve(response); }, extraArgs.throttle);
                 });
             }
             return response;

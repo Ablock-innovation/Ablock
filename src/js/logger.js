@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { broadcast, broadcastToAll } from './broadcast.js';
@@ -31,9 +31,9 @@ let writePtr = 0;
 // unused, and thus disabled.
 const logBufferObsoleteAfter = 30 * 1000;
 
-const janitorTimer = vAPI.defer.create(( ) => {
-    if ( buffer === null ) { return; }
-    if ( lastReadTime >= (Date.now() - logBufferObsoleteAfter) ) {
+const janitorTimer = vAPI.defer.create(() => {
+    if (buffer === null) { return; }
+    if (lastReadTime >= (Date.now() - logBufferObsoleteAfter)) {
         return janitorTimer.on(logBufferObsoleteAfter);
     }
     logger.enabled = false;
@@ -49,8 +49,8 @@ const boxEntry = details => {
 };
 
 const pushOne = box => {
-    if ( writePtr !== 0 && box === buffer[writePtr-1] ) { return; }
-    if ( writePtr === buffer.length ) {
+    if (writePtr !== 0 && box === buffer[writePtr - 1]) { return; }
+    if (writePtr === buffer.length) {
         buffer.push(box);
     } else {
         buffer[writePtr] = box;
@@ -62,12 +62,12 @@ const logger = {
     enabled: false,
     ownerId: undefined,
     writeOne(details) {
-        if ( buffer === null ) { return; }
+        if (buffer === null) { return; }
         pushOne(boxEntry(details));
     },
     readAll(ownerId) {
         this.ownerId = ownerId;
-        if ( buffer === null ) {
+        if (buffer === null) {
             this.enabled = true;
             buffer = [];
             janitorTimer.on(logBufferObsoleteAfter);

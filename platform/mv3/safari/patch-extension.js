@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import fs from 'fs/promises';
@@ -24,17 +24,17 @@ import process from 'process';
 
 /******************************************************************************/
 
-const commandLineArgs = (( ) => {
+const commandLineArgs = (() => {
     const args = Object.create(null);
     let name, value;
-    for ( const arg of process.argv.slice(2) ) {
+    for (const arg of process.argv.slice(2)) {
         const pos = arg.indexOf('=');
-        if ( pos === -1 ) {
+        if (pos === -1) {
             name = arg;
             value = '';
         } else {
             name = arg.slice(0, pos);
-            value = arg.slice(pos+1);
+            value = arg.slice(pos + 1);
         }
         args[name] = value;
     }
@@ -50,12 +50,12 @@ async function fixLongDescription(path) {
     let text = await fs.readFile(path, { encoding: 'utf8' });
     const messages = JSON.parse(text);
     let message = messages.extShortDesc.message;
-    if ( message.length <= 112 ) { return; }
+    if (message.length <= 112) { return; }
     const pos = message.indexOf('.');
-    if ( pos !== -1 ) {
-        message = message.slice(0, pos+1);
+    if (pos !== -1) {
+        message = message.slice(0, pos + 1);
     }
-    if ( message.length >= 112 ) {
+    if (message.length >= 112) {
         message = `${message.slice(0, 111)}…`;
     }
     messages.extShortDesc.message = message;
@@ -67,8 +67,8 @@ async function fixLongDescriptions() {
     const promises = [];
     const packageDir = commandLineArgs.packageDir;
     const entries = await fs.readdir(`${packageDir}/_locales/`, { withFileTypes: true });
-    for ( const entry of entries ) {
-        if ( entry.isDirectory() === false ) { continue; }
+    for (const entry of entries) {
+        if (entry.isDirectory() === false) { continue; }
         promises.push(fixLongDescription(`${packageDir}/_locales/${entry.name}/messages.json`));
     }
     return Promise.all(promises);
@@ -84,7 +84,7 @@ async function fixManifest() {
     let text = await fs.readFile(path, { encoding: 'utf8' });
     const manifest = JSON.parse(text);
     const match = /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/.exec(manifest.version);
-    if ( match === null ) { return; }
+    if (match === null) { return; }
     const month = parseInt(match[2], 10);
     const dayofmonth = parseInt(match[3], 10);
     const monthday /* sort of */ = month * 100 + dayofmonth;

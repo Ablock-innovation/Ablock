@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /*******************************************************************************
@@ -40,7 +40,7 @@
   just a matter of reading/comparing these integers, and further using them as
   indices in the array as a way to move around in the trie.
 
-  [1] To solve <https://github.com/gorhill/uBlock/issues/3193>
+  [1] To solve <https://github.com/Ablock/Ablock/issues/3193>
 
   Since this trie is specialized for matching hostnames, the stored
   strings are reversed internally, because of hostname comparison logic:
@@ -62,12 +62,12 @@
   ------------------------------------------------------------------------------
 
   1st iteration:
-    - https://github.com/gorhill/uBlock/blob/ff58107dac3a32607f8113e39ed5015584506813/src/js/hntrie.js
+    - https://github.com/Ablock/Ablock/blob/ff58107dac3a32607f8113e39ed5015584506813/src/js/hntrie.js
     - Suitable for small to medium set of hostnames
     - One buffer per trie
 
   2nd iteration: goal was to make matches() method wasm-able
-    - https://github.com/gorhill/uBlock/blob/c3b0fd31f64bd7ffecdd282fb1208fe07aac3eb0/src/js/hntrie.js
+    - https://github.com/Ablock/Ablock/blob/c3b0fd31f64bd7ffecdd282fb1208fe07aac3eb0/src/js/hntrie.js
     - Suitable for small to medium set of hostnames
     - Distinct tries all share same buffer:
       - Reduced memory footprint
@@ -110,21 +110,21 @@
 
 */
 
-const PAGE_SIZE   = 65536;
+const PAGE_SIZE = 65536;
 //                                             i32 /  i8
-const TRIE0_SLOT  = 256 >>> 2;              //  64 / 256
-const TRIE1_SLOT  = TRIE0_SLOT + 1;         //  65 / 260
-const CHAR0_SLOT  = TRIE0_SLOT + 2;         //  66 / 264
-const CHAR1_SLOT  = TRIE0_SLOT + 3;         //  67 / 268
+const TRIE0_SLOT = 256 >>> 2;              //  64 / 256
+const TRIE1_SLOT = TRIE0_SLOT + 1;         //  65 / 260
+const CHAR0_SLOT = TRIE0_SLOT + 2;         //  66 / 264
+const CHAR1_SLOT = TRIE0_SLOT + 3;         //  67 / 268
 const TRIE0_START = TRIE0_SLOT + 4 << 2;    //       272
 
-const roundToPageSize = v => (v + PAGE_SIZE-1) & ~(PAGE_SIZE-1);
+const roundToPageSize = v => (v + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 
 // http://www.cse.yorku.ca/~oz/hash.html#djb2
 const i32Checksum = (buf32) => {
     const n = buf32.length;
     let hash = 177573 ^ n;
-    for ( let i = 0; i < n; i++ ) {
+    for (let i = 0; i < n; i++) {
         hash = (hash << 5) + hash ^ buf32[i];
     }
     return hash;
@@ -157,7 +157,7 @@ class HNTrieContainer {
             typeof details.byteLength === 'number' &&
             typeof details.char0 === 'number'
         ) {
-            if ( details.byteLength > this.buf.byteLength ) {
+            if (details.byteLength > this.buf.byteLength) {
                 this.reallocateBuf(details.byteLength);
             }
             this.buf32[CHAR0_SLOT] = details.char0;
@@ -170,12 +170,12 @@ class HNTrieContainer {
     }
 
     setNeedle(needle) {
-        if ( needle !== this.needle ) {
+        if (needle !== this.needle) {
             const buf = this.buf;
             let i = needle.length;
-            if ( i > 255 ) { i = 255; }
+            if (i > 255) { i = 255; }
             buf[255] = i;
-            while ( i-- ) {
+            while (i--) {
                 buf[i] = needle.charCodeAt(i);
             }
             this.needle = needle;
@@ -188,64 +188,64 @@ class HNTrieContainer {
         const buf8 = this.buf;
         const char0 = buf32[CHAR0_SLOT];
         let ineedle = buf8[255];
-        let icell = buf32[iroot+0];
-        if ( icell === 0 ) { return -1; }
+        let icell = buf32[iroot + 0];
+        if (icell === 0) { return -1; }
         let c = 0, v = 0, i0 = 0, n = 0;
-        for (;;) {
-            if ( ineedle === 0 ) { return -1; }
+        for (; ;) {
+            if (ineedle === 0) { return -1; }
             ineedle -= 1;
             c = buf8[ineedle];
             // find first segment with a first-character match
-            for (;;) {
-                v = buf32[icell+2];
+            for (; ;) {
+                v = buf32[icell + 2];
                 i0 = char0 + (v >>> 8);
-                if ( buf8[i0] === c ) { break; }
-                icell = buf32[icell+0];
-                if ( icell === 0 ) { return -1; }
+                if (buf8[i0] === c) { break; }
+                icell = buf32[icell + 0];
+                if (icell === 0) { return -1; }
             }
             // all characters in segment must match
             n = v & 0x7F;
-            if ( n > 1 ) {
+            if (n > 1) {
                 n -= 1;
-                if ( n > ineedle ) { return -1; }
+                if (n > ineedle) { return -1; }
                 i0 += 1;
                 const i1 = i0 + n;
                 do {
                     ineedle -= 1;
-                    if ( buf8[i0] !== buf8[ineedle] ) { return -1; }
+                    if (buf8[i0] !== buf8[ineedle]) { return -1; }
                     i0 += 1;
-                } while ( i0 < i1 );
+                } while (i0 < i1);
             }
             // boundary at end of segment?
-            if ( (v & 0x80) !== 0 ) {
-                if ( ineedle === 0 || buf8[ineedle-1] === 0x2E /* '.' */ ) {
+            if ((v & 0x80) !== 0) {
+                if (ineedle === 0 || buf8[ineedle - 1] === 0x2E /* '.' */) {
                     return ineedle;
                 }
             }
             // next segment
-            icell = buf32[icell+1];
-            if ( icell === 0 ) { break; }
+            icell = buf32[icell + 1];
+            if (icell === 0) { break; }
         }
         return -1;
     }
 
     createTrie() {
         // grow buffer if needed
-        if ( (this.buf32[CHAR0_SLOT] - this.buf32[TRIE1_SLOT]) < 12 ) {
+        if ((this.buf32[CHAR0_SLOT] - this.buf32[TRIE1_SLOT]) < 12) {
             this.growBuf(12, 0);
         }
         const iroot = this.buf32[TRIE1_SLOT] >>> 2;
         this.buf32[TRIE1_SLOT] += 12;
-        this.buf32[iroot+0] = 0;
-        this.buf32[iroot+1] = 0;
-        this.buf32[iroot+2] = 0;
+        this.buf32[iroot + 0] = 0;
+        this.buf32[iroot + 1] = 0;
+        this.buf32[iroot + 2] = 0;
         return iroot;
     }
 
     createTrieFromIterable(hostnames) {
         const itrie = this.createTrie();
-        for ( const hn of hostnames ) {
-            if ( hn === '' ) { continue; }
+        for (const hn of hostnames) {
+            if (hn === '') { continue; }
             this.setNeedle(hn).add(itrie);
         }
         return itrie;
@@ -255,19 +255,19 @@ class HNTrieContainer {
         const itrie = this.createTrie();
         const jend = i + n;
         let j = i, offset = 0, k = 0, c = 0;
-        while ( j !== jend ) {
+        while (j !== jend) {
             offset = this.buf32[CHAR0_SLOT]; // Important
             k = 0;
-            for (;;) {
-                if ( j === jend ) { break; }
-                c = this.buf[offset+j];
+            for (; ;) {
+                if (j === jend) { break; }
+                c = this.buf[offset + j];
                 j += 1;
-                if ( c === 0x7C /* '|' */ ) { break; }
-                if ( k === 255 ) { continue; }
+                if (c === 0x7C /* '|' */) { break; }
+                if (k === 255) { continue; }
                 this.buf[k] = c;
                 k += 1;
             }
-            if ( k !== 0 ) {
+            if (k !== 0) {
                 this.buf[255] = k;
                 this.add(itrie);
             }
@@ -279,14 +279,14 @@ class HNTrieContainer {
 
     dumpTrie(iroot) {
         let hostnames = Array.from(this.trieIterator(iroot));
-        if ( String.prototype.padStart instanceof Function ) {
+        if (String.prototype.padStart instanceof Function) {
             const maxlen = Math.min(
                 hostnames.reduce((maxlen, hn) => Math.max(maxlen, hn.length), 0),
                 64
             );
             hostnames = hostnames.map(hn => hn.padStart(maxlen));
         }
-        for ( const hn of hostnames ) {
+        for (const hn of hostnames) {
             console.log(hn);
         }
     }
@@ -296,8 +296,8 @@ class HNTrieContainer {
             value: undefined,
             done: false,
             next() {
-                if ( this.icell === 0 ) {
-                    if ( this.forks.length === 0 ) {
+                if (this.icell === 0) {
+                    if (this.forks.length === 0) {
                         this.value = undefined;
                         this.done = true;
                         return this;
@@ -305,21 +305,21 @@ class HNTrieContainer {
                     this.charPtr = this.forks.pop();
                     this.icell = this.forks.pop();
                 }
-                for (;;) {
-                    const idown = this.container.buf32[this.icell+0];
-                    if ( idown !== 0 ) {
+                for (; ;) {
+                    const idown = this.container.buf32[this.icell + 0];
+                    if (idown !== 0) {
                         this.forks.push(idown, this.charPtr);
                     }
-                    const v = this.container.buf32[this.icell+2];
+                    const v = this.container.buf32[this.icell + 2];
                     let i0 = this.container.buf32[CHAR0_SLOT] + (v >>> 8);
                     const i1 = i0 + (v & 0x7F);
-                    while ( i0 < i1 ) {
+                    while (i0 < i1) {
                         this.charPtr -= 1;
                         this.charBuf[this.charPtr] = this.container.buf[i0];
                         i0 += 1;
                     }
-                    this.icell = this.container.buf32[this.icell+1];
-                    if ( (v & 0x80) !== 0 ) {
+                    this.icell = this.container.buf32[this.icell + 1];
+                    if ((v & 0x80) !== 0) {
                         return this.toHostname();
                     }
                 }
@@ -348,7 +348,7 @@ class HNTrieContainer {
     //   character buffer.
     addJS(iroot) {
         let lhnchar = this.buf[255];
-        if ( lhnchar === 0 ) { return 0; }
+        if (lhnchar === 0) { return 0; }
         // grow buffer if needed
         if (
             (this.buf32[CHAR0_SLOT] - this.buf32[TRIE1_SLOT]) < 24 ||
@@ -356,24 +356,24 @@ class HNTrieContainer {
         ) {
             this.growBuf(24, 256);
         }
-        let icell = this.buf32[iroot+0];
+        let icell = this.buf32[iroot + 0];
         // special case: first node in trie
-        if ( icell === 0 ) {
-            this.buf32[iroot+0] = this.addLeafCell(lhnchar);
+        if (icell === 0) {
+            this.buf32[iroot + 0] = this.addLeafCell(lhnchar);
             return 1;
         }
         //
         const char0 = this.buf32[CHAR0_SLOT];
         let isegchar, lsegchar, boundaryBit, inext;
         // find a matching cell: move down
-        for (;;) {
-            const v = this.buf32[icell+2];
+        for (; ;) {
+            const v = this.buf32[icell + 2];
             let isegchar0 = char0 + (v >>> 8);
             // if first character is no match, move to next descendant
-            if ( this.buf[isegchar0] !== this.buf[lhnchar-1] ) {
-                inext = this.buf32[icell+0];
-                if ( inext === 0 ) {
-                    this.buf32[icell+0] = this.addLeafCell(lhnchar);
+            if (this.buf[isegchar0] !== this.buf[lhnchar - 1]) {
+                inext = this.buf32[icell + 0];
+                if (inext === 0) {
+                    this.buf32[icell + 0] = this.addLeafCell(lhnchar);
                     return 1;
                 }
                 icell = inext;
@@ -384,59 +384,59 @@ class HNTrieContainer {
             lhnchar -= 1;
             // find 1st mismatch in rest of segment
             lsegchar = v & 0x7F;
-            if ( lsegchar !== 1 ) {
-                for (;;) {
-                    if ( isegchar === lsegchar ) { break; }
-                    if ( lhnchar === 0 ) { break; }
-                    if ( this.buf[isegchar0+isegchar] !== this.buf[lhnchar-1] ) { break; }
+            if (lsegchar !== 1) {
+                for (; ;) {
+                    if (isegchar === lsegchar) { break; }
+                    if (lhnchar === 0) { break; }
+                    if (this.buf[isegchar0 + isegchar] !== this.buf[lhnchar - 1]) { break; }
                     isegchar += 1;
                     lhnchar -= 1;
                 }
             }
             boundaryBit = v & 0x80;
             // all segment characters matched
-            if ( isegchar === lsegchar ) {
+            if (isegchar === lsegchar) {
                 // needle remainder: no
-                if ( lhnchar === 0 ) {
+                if (lhnchar === 0) {
                     // boundary: yes, already present
-                    if ( boundaryBit !== 0 ) { return 0; }
+                    if (boundaryBit !== 0) { return 0; }
                     // boundary: no, mark as boundary
-                    this.buf32[icell+2] = v | 0x80;
+                    this.buf32[icell + 2] = v | 0x80;
                 }
                 // needle remainder: yes
                 else {
                     // remainder is at label boundary? if yes, no need to add
                     // the rest since the shortest match is always reported
-                    if ( boundaryBit !== 0 ) {
-                        if ( this.buf[lhnchar-1] === 0x2E /* '.' */ ) { return -1; }
+                    if (boundaryBit !== 0) {
+                        if (this.buf[lhnchar - 1] === 0x2E /* '.' */) { return -1; }
                     }
-                    inext = this.buf32[icell+1];
-                    if ( inext !== 0 ) {
+                    inext = this.buf32[icell + 1];
+                    if (inext !== 0) {
                         icell = inext;
                         continue;
                     }
                     // add needle remainder
-                    this.buf32[icell+1] = this.addLeafCell(lhnchar);
+                    this.buf32[icell + 1] = this.addLeafCell(lhnchar);
                 }
             }
             // some segment characters matched
             else {
                 // split current cell
                 isegchar0 -= char0;
-                this.buf32[icell+2] = isegchar0 << 8 | isegchar;
+                this.buf32[icell + 2] = isegchar0 << 8 | isegchar;
                 inext = this.addCell(
                     0,
-                    this.buf32[icell+1],
+                    this.buf32[icell + 1],
                     isegchar0 + isegchar << 8 | boundaryBit | lsegchar - isegchar
                 );
-                this.buf32[icell+1] = inext;
+                this.buf32[icell + 1] = inext;
                 // needle remainder: yes, need new cell for remaining characters
-                if ( lhnchar !== 0 ) {
-                    this.buf32[inext+0] = this.addLeafCell(lhnchar);
+                if (lhnchar !== 0) {
+                    this.buf32[inext + 0] = this.addLeafCell(lhnchar);
                 }
                 // needle remainder: no, need boundary cell
                 else {
-                    this.buf32[icell+2] |= 0x80;
+                    this.buf32[icell + 2] |= 0x80;
                 }
             }
             return 1;
@@ -457,17 +457,17 @@ class HNTrieContainer {
     }
 
     fromSelfie(selfie) {
-        if ( typeof selfie !== 'object' || selfie === null ) { return false; }
-        if ( selfie.buf32 instanceof Uint32Array === false ) { return false; }
-        if ( selfie.checksum !== i32Checksum(selfie.buf32) ) { return false; }
+        if (typeof selfie !== 'object' || selfie === null) { return false; }
+        if (selfie.buf32 instanceof Uint32Array === false) { return false; }
+        if (selfie.checksum !== i32Checksum(selfie.buf32)) { return false; }
         this.needle = '';
         let byteLength = selfie.buf32.length << 2;
-        if ( byteLength === 0 ) { return false; }
+        if (byteLength === 0) { return false; }
         byteLength = roundToPageSize(byteLength);
-        if ( this.wasmMemory !== null ) {
+        if (this.wasmMemory !== null) {
             const pageCountBefore = this.buf.length >>> 16;
             const pageCountAfter = byteLength >>> 16;
-            if ( pageCountAfter > pageCountBefore ) {
+            if (pageCountAfter > pageCountBefore) {
                 this.wasmMemory.grow(pageCountAfter - pageCountBefore);
                 this.buf = new Uint8Array(this.wasmMemory.buffer);
                 this.buf32 = new Uint32Array(this.buf.buffer);
@@ -490,23 +490,23 @@ class HNTrieContainer {
 
     storeHostname(hn) {
         let n = hn.length;
-        if ( n > 255 ) {
+        if (n > 255) {
             hn = hn.slice(-255);
             n = 255;
         }
-        if ( n === this.lastStoredLen && hn === this.lastStored ) {
+        if (n === this.lastStoredLen && hn === this.lastStored) {
             return this.lastStoredIndex;
         }
         this.lastStored = hn;
         this.lastStoredLen = n;
-        if ( (this.buf.length - this.buf32[CHAR1_SLOT]) < n ) {
+        if ((this.buf.length - this.buf32[CHAR1_SLOT]) < n) {
             this.growBuf(0, n);
         }
         const offset = this.buf32[CHAR1_SLOT];
         this.buf32[CHAR1_SLOT] = offset + n;
         const buf8 = this.buf;
-        for ( let i = 0; i < n; i++ ) {
-            buf8[offset+i] = hn.charCodeAt(i);
+        for (let i = 0; i < n; i++) {
+            buf8[offset + i] = hn.charCodeAt(i);
         }
         return (this.lastStoredIndex = offset - this.buf32[CHAR0_SLOT]);
     }
@@ -519,19 +519,19 @@ class HNTrieContainer {
 
     storeDomainOpt(s) {
         let n = s.length;
-        if ( n === this.lastStoredLen && s === this.lastStored ) {
+        if (n === this.lastStoredLen && s === this.lastStored) {
             return this.lastStoredIndex;
         }
         this.lastStored = s;
         this.lastStoredLen = n;
-        if ( (this.buf.length - this.buf32[CHAR1_SLOT]) < n ) {
+        if ((this.buf.length - this.buf32[CHAR1_SLOT]) < n) {
             this.growBuf(0, n);
         }
         const offset = this.buf32[CHAR1_SLOT];
         this.buf32[CHAR1_SLOT] = offset + n;
         const buf8 = this.buf;
-        for ( let i = 0; i < n; i++ ) {
-            buf8[offset+i] = s.charCodeAt(i);
+        for (let i = 0; i < n; i++) {
+            buf8[offset + i] = s.charCodeAt(i);
         }
         return (this.lastStoredIndex = offset - this.buf32[CHAR0_SLOT]);
     }
@@ -546,20 +546,20 @@ class HNTrieContainer {
         this.setNeedle(hn);
         const buf8 = this.buf;
         const hr = buf8[255];
-        if ( n > hr ) { return false; }
+        if (n > hr) { return false; }
         const hl = hr - n;
         const nl = this.buf32[CHAR0_SLOT] + i;
-        for ( let j = 0; j < n; j++ ) {
-            if ( buf8[nl+j] !== buf8[hl+j] ) { return false; }
+        for (let j = 0; j < n; j++) {
+            if (buf8[nl + j] !== buf8[hl + j]) { return false; }
         }
-        return n === hr || hn.charCodeAt(hl-1) === 0x2E /* '.' */;
+        return n === hr || hn.charCodeAt(hl - 1) === 0x2E /* '.' */;
     }
 
     async enableWASM(wasmModuleFetcher, path) {
-        if ( typeof WebAssembly === 'undefined' ) { return false; }
-        if ( this.wasmMemory instanceof WebAssembly.Memory ) { return true; }
+        if (typeof WebAssembly === 'undefined') { return false; }
+        if (this.wasmMemory instanceof WebAssembly.Memory) { return true; }
         const module = await getWasmModule(wasmModuleFetcher, path);
-        if ( module instanceof WebAssembly.Module === false ) { return false; }
+        if (module instanceof WebAssembly.Module === false) { return false; }
         const memory = new WebAssembly.Memory({ initial: 2 });
         const instance = await WebAssembly.instantiate(module, {
             imports: {
@@ -567,11 +567,11 @@ class HNTrieContainer {
                 growBuf: this.growBuf.bind(this, 24, 256)
             }
         });
-        if ( instance instanceof WebAssembly.Instance === false ) { return false; }
+        if (instance instanceof WebAssembly.Instance === false) { return false; }
         this.wasmMemory = memory;
         const curPageCount = memory.buffer.byteLength >>> 16;
         const newPageCount = roundToPageSize(this.buf.byteLength) >>> 16;
-        if ( newPageCount > curPageCount ) {
+        if (newPageCount > curPageCount) {
             memory.grow(newPageCount - curPageCount);
         }
         const buf = new Uint8Array(memory.buffer);
@@ -599,37 +599,37 @@ class HNTrieContainer {
         let icell = this.buf32[TRIE1_SLOT];
         this.buf32[TRIE1_SLOT] = icell + 12;
         icell >>>= 2;
-        this.buf32[icell+0] = idown;
-        this.buf32[icell+1] = iright;
-        this.buf32[icell+2] = v;
+        this.buf32[icell + 0] = idown;
+        this.buf32[icell + 1] = iright;
+        this.buf32[icell + 2] = v;
         return icell;
     }
 
     addLeafCell(lsegchar) {
         const r = this.buf32[TRIE1_SLOT] >>> 2;
         let i = r;
-        while ( lsegchar > 127 ) {
-            this.buf32[i+0] = 0;
-            this.buf32[i+1] = i + 3;
-            this.buf32[i+2] = this.addSegment(lsegchar, lsegchar - 127);
+        while (lsegchar > 127) {
+            this.buf32[i + 0] = 0;
+            this.buf32[i + 1] = i + 3;
+            this.buf32[i + 2] = this.addSegment(lsegchar, lsegchar - 127);
             lsegchar -= 127;
             i += 3;
         }
-        this.buf32[i+0] = 0;
-        this.buf32[i+1] = 0;
-        this.buf32[i+2] = this.addSegment(lsegchar, 0) | 0x80;
+        this.buf32[i + 0] = 0;
+        this.buf32[i + 1] = 0;
+        this.buf32[i + 2] = this.addSegment(lsegchar, 0) | 0x80;
         this.buf32[TRIE1_SLOT] = i + 3 << 2;
         return r;
     }
 
     addSegment(lsegchar, lsegend) {
-        if ( lsegchar === 0 ) { return 0; }
+        if (lsegchar === 0) { return 0; }
         let char1 = this.buf32[CHAR1_SLOT];
         const isegchar = char1 - this.buf32[CHAR0_SLOT];
         let i = lsegchar;
         do {
             this.buf[char1++] = this.buf[--i];
-        } while ( i !== lsegend );
+        } while (i !== lsegend);
         this.buf32[CHAR1_SLOT] = char1;
         return isegchar << 8 | lsegchar - lsegend;
     }
@@ -649,7 +649,7 @@ class HNTrieContainer {
 
     shrinkBuf() {
         // Can't shrink WebAssembly.Memory
-        if ( this.wasmMemory !== null ) { return; }
+        if (this.wasmMemory !== null) { return; }
         const char0 = this.buf32[TRIE1_SLOT] + 24;
         const char1 = char0 + this.buf32[CHAR1_SLOT] - this.buf32[CHAR0_SLOT];
         const bufLen = char1 + 256;
@@ -658,18 +658,18 @@ class HNTrieContainer {
 
     resizeBuf(bufLen, char0) {
         bufLen = roundToPageSize(bufLen);
-        if ( bufLen === this.buf.length && char0 === this.buf32[CHAR0_SLOT] ) {
+        if (bufLen === this.buf.length && char0 === this.buf32[CHAR0_SLOT]) {
             return;
         }
         const charDataLen = this.buf32[CHAR1_SLOT] - this.buf32[CHAR0_SLOT];
-        if ( this.wasmMemory !== null ) {
+        if (this.wasmMemory !== null) {
             const pageCount = (bufLen >>> 16) - (this.buf.byteLength >>> 16);
-            if ( pageCount > 0 ) {
+            if (pageCount > 0) {
                 this.wasmMemory.grow(pageCount);
                 this.buf = new Uint8Array(this.wasmMemory.buffer);
                 this.buf32 = new Uint32Array(this.wasmMemory.buffer);
             }
-        } else if ( bufLen !== this.buf.length ) {
+        } else if (bufLen !== this.buf.length) {
             const newBuf = new Uint8Array(bufLen);
             newBuf.set(
                 new Uint8Array(
@@ -692,7 +692,7 @@ class HNTrieContainer {
             this.buf32[CHAR0_SLOT] = char0;
             this.buf32[CHAR1_SLOT] = char0 + charDataLen;
         }
-        if ( char0 !== this.buf32[CHAR0_SLOT] ) {
+        if (char0 !== this.buf32[CHAR0_SLOT]) {
             this.buf.set(
                 new Uint8Array(
                     this.buf.buffer,
@@ -708,8 +708,8 @@ class HNTrieContainer {
 
     reallocateBuf(newSize) {
         newSize = roundToPageSize(newSize);
-        if ( newSize === this.buf.length ) { return; }
-        if ( this.wasmMemory === null ) {
+        if (newSize === this.buf.length) { return; }
+        if (this.wasmMemory === null) {
             const newBuf = new Uint8Array(newSize);
             newBuf.set(
                 newBuf.length < this.buf.length
@@ -720,7 +720,7 @@ class HNTrieContainer {
         } else {
             const growBy =
                 ((newSize + 0xFFFF) >>> 16) - (this.buf.length >>> 16);
-            if ( growBy <= 0 ) { return; }
+            if (growBy <= 0) { return; }
             this.wasmMemory.grow(growBy);
             this.buf = new Uint8Array(this.wasmMemory.buffer);
         }
@@ -744,11 +744,11 @@ HNTrieContainer.prototype.addWASM = null;
 // The WASM module is entirely optional, the JS implementations will be
 // used should the WASM module be unavailable for whatever reason.
 
-const getWasmModule = (( ) => {
+const getWasmModule = (() => {
     let wasmModulePromise;
 
-    return async function(wasmModuleFetcher, path) {
-        if ( wasmModulePromise instanceof Promise ) {
+    return async function (wasmModuleFetcher, path) {
+        if (wasmModulePromise instanceof Promise) {
             return wasmModulePromise;
         }
 
@@ -757,7 +757,7 @@ const getWasmModule = (( ) => {
         const uint32s = new Uint32Array(1);
         const uint8s = new Uint8Array(uint32s.buffer);
         uint32s[0] = 1;
-        if ( uint8s[0] !== 1 ) { return; }
+        if (uint8s[0] !== 1) { return; }
 
         wasmModulePromise = wasmModuleFetcher(`${path}hntrie`).catch(reason => {
             console.info(reason);

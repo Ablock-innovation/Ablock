@@ -16,12 +16,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* global CodeMirror */
 
-CodeMirror.defineMode('ubo-dynamic-filtering', ( ) => {
+CodeMirror.defineMode('ubo-dynamic-filtering', () => {
 
     const validSwitches = new Set([
         'no-strict-blocking:',
@@ -63,7 +63,7 @@ CodeMirror.defineMode('ubo-dynamic-filtering', ( ) => {
     let psl;
 
     const isValidHostname = hnin => {
-        if ( hnin === '*' ) { return true; }
+        if (hnin === '*') { return true; }
         hnValidator.hostname = '_';
         try {
             hnValidator.hostname = hnin;
@@ -76,7 +76,7 @@ CodeMirror.defineMode('ubo-dynamic-filtering', ( ) => {
 
     const addSlice = (len, style = null) => {
         let i = sliceCount;
-        if ( i === slices.length ) {
+        if (i === slices.length) {
             slices[i] = { len: 0, style: null };
         }
         const entry = slices[i];
@@ -93,21 +93,21 @@ CodeMirror.defineMode('ubo-dynamic-filtering', ( ) => {
 
     const addMatchHnSlices = (match, style = null) => {
         const hn = match[0];
-        if ( hn === '*' ) {
+        if (hn === '*') {
             return addMatchSlice(match, style);
         }
         let dn = hostnameToDomainMap.get(hn) || '';
-        if ( dn === '' && psl !== undefined ) {
+        if (dn === '' && psl !== undefined) {
             dn = /(\d|\])$/.test(hn) ? hn : (psl.getDomain(hn) || hn);
         }
         const entityBeg = hn.length - dn.length;
-        if ( entityBeg !== 0 ) {
+        if (entityBeg !== 0) {
             addSlice(entityBeg, style);
         }
         let entityEnd = dn.indexOf('.');
-        if ( entityEnd === -1 ) { entityEnd = dn.length; }
+        if (entityEnd === -1) { entityEnd = dn.length; }
         addSlice(entityEnd, style !== null ? `${style} strong` : 'strong');
-        if ( entityEnd < dn.length ) {
+        if (entityEnd < dn.length) {
             addSlice(dn.length - entityEnd, style);
         }
         return match.input.slice(hn.length);
@@ -117,26 +117,26 @@ CodeMirror.defineMode('ubo-dynamic-filtering', ( ) => {
         sliceIndex = 0;
         sliceCount = 0;
         let { string } = stream;
-        if ( string === '...' ) { return; }
+        if (string === '...') { return; }
         const { sortType } = opts;
         const reNotToken = /^\s+/;
         const reToken = /^\S+/;
         const tokens = [];
         // leading whitespaces
         let match = reNotToken.exec(string);
-        if ( match !== null ) {
+        if (match !== null) {
             string = addMatchSlice(match);
         }
         // first token
         match = reToken.exec(string);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         tokens.push(match[0]);
         // hostname or switch
         const isSwitchRule = validSwitches.has(match[0]);
-        if ( isSwitchRule ) {
+        if (isSwitchRule) {
             string = addMatchSlice(match, sortType === 0 ? 'sortkey' : null);
-        } else if ( isValidHostname(match[0]) ) {
-            if ( sortType === 1 ) {
+        } else if (isValidHostname(match[0])) {
+            if (sortType === 1) {
                 string = addMatchHnSlices(match, 'sortkey');
             } else {
                 string = addMatchHnSlices(match, null);
@@ -146,41 +146,41 @@ CodeMirror.defineMode('ubo-dynamic-filtering', ( ) => {
         }
         // whitespaces before second token
         match = reNotToken.exec(string);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         string = addMatchSlice(match);
         // second token
         match = reToken.exec(string);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         tokens.push(match[0]);
         // hostname or url
         const isURLRule = isSwitchRule === false && match[0].indexOf('://') > 0;
-        if ( isURLRule ) {
+        if (isURLRule) {
             string = addMatchSlice(match, sortType === 2 ? 'sortkey' : null);
-        } else if ( isValidHostname(match[0]) === false ) {
+        } else if (isValidHostname(match[0]) === false) {
             string = addMatchSlice(match, 'error');
-        } else if ( sortType === 1 && isSwitchRule || sortType === 2 ) {
+        } else if (sortType === 1 && isSwitchRule || sortType === 2) {
             string = addMatchHnSlices(match, 'sortkey');
         } else {
             string = addMatchHnSlices(match, null);
         }
         // whitespaces before third token
         match = reNotToken.exec(string);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         string = addMatchSlice(match);
         // third token
         match = reToken.exec(string);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         tokens.push(match[0]);
         // rule type or switch state
-        if ( isSwitchRule ) {
+        if (isSwitchRule) {
             string = validSwitcheStates.has(match[0])
                 ? addMatchSlice(match, match[0] === 'true' ? 'blockrule' : 'allowrule')
                 : addMatchSlice(match, 'error');
-        } else if ( isURLRule ) {
+        } else if (isURLRule) {
             string = invalidURLRuleTypes.has(match[0])
                 ? addMatchSlice(match, 'error')
                 : addMatchSlice(match);
-        } else if ( tokens[1] === '*' ) {
+        } else if (tokens[1] === '*') {
             string = validHnRuleTypes.has(match[0])
                 ? addMatchSlice(match)
                 : addMatchSlice(match, 'error');
@@ -191,36 +191,36 @@ CodeMirror.defineMode('ubo-dynamic-filtering', ( ) => {
         }
         // whitespaces before fourth token
         match = reNotToken.exec(string);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         string = addMatchSlice(match);
         // fourth token
         match = reToken.exec(string);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         tokens.push(match[0]);
         string = isSwitchRule || validActions.has(match[0]) === false
             ? addMatchSlice(match, 'error')
             : addMatchSlice(match, `${match[0]}rule`);
         // whitespaces before end of line
         match = reNotToken.exec(string);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         string = addMatchSlice(match);
         // any token beyond fourth token is invalid
         match = reToken.exec(string);
-        if ( match !== null ) {
+        if (match !== null) {
             string = addMatchSlice(null, 'error');
         }
     };
 
-    const token = function(stream) {
-        if ( stream.sol() ) {
+    const token = function (stream) {
+        if (stream.sol()) {
             makeSlices(stream, this);
         }
-        if ( sliceIndex >= sliceCount ) {
+        if (sliceIndex >= sliceCount) {
             stream.skipToEnd(stream);
             return null;
         }
         const { len, style } = slices[sliceIndex++];
-        if ( len === 0 ) {
+        if (len === 0) {
             stream.skipToEnd();
         } else {
             stream.pos += len;

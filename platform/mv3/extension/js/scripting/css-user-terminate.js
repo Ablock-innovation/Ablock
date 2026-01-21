@@ -16,29 +16,29 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 (function uBOL_cssUserTerminate() {
 
-/******************************************************************************/
+    /******************************************************************************/
 
-const plainSelectors = self.customFilters?.plainSelectors;
-if ( plainSelectors ) {
-    chrome.runtime.sendMessage({
-        what: 'removeCSS',
-        css: `${plainSelectors.join(',\n')}{display:none!important;}`,
-    }).catch(( ) => {
-    });
-}
+    const plainSelectors = self.customFilters?.plainSelectors;
+    if (plainSelectors) {
+        chrome.runtime.sendMessage({
+            what: 'removeCSS',
+            css: `${plainSelectors.join(',\n')}{display:none!important;}`,
+        }).catch(() => {
+        });
+    }
 
-if ( self.customProceduralFiltererAPI instanceof Object ) {
-    self.customProceduralFiltererAPI.reset();
-}
+    if (self.customProceduralFiltererAPI instanceof Object) {
+        self.customProceduralFiltererAPI.reset();
+    }
 
-self.customFilters = undefined;
+    self.customFilters = undefined;
 
-/******************************************************************************/
+    /******************************************************************************/
 
 })();
 

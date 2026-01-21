@@ -352,7 +352,7 @@
     "description": ""
   },
   "settingsAdvancedUserPrompt": {
-    "message": "Јас сум напреден корисник (<a href='https://github.com/gorhill/uBlock/wiki/Advanced-user-features'>потребно читање</a>)",
+    "message": "Јас сум напреден корисник (<a href='https://github.com/Ablock/Ablock/wiki/Advanced-user-features'>потребно читање</a>)",
     "description": "Checkbox to let user access advanced, technical features"
   },
   "settingsPrefetchingDisabledPrompt": {
@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "Блокирајте CSP извештаи",
-    "description": "background information: https://github.com/gorhill/uBlock/issues/3150"
+    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Откријте канонски имиња",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Синтакса на правило: <code>извор дестинација тип акција</code> (<a href='https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-rule-syntax'>целосна документација</a>).",
+    "message": "Синтакса на правило: <code>извор дестинација тип акција</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>целосна документација</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

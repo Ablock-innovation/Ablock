@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import webext from './webext.js';
@@ -28,7 +28,7 @@ import webext from './webext.js';
 let broadcastChannel;
 
 export function broadcast(message) {
-    if ( broadcastChannel === undefined ) {
+    if (broadcastChannel === undefined) {
         broadcastChannel = new self.BroadcastChannel('uBO');
     }
     broadcastChannel.postMessage(message);
@@ -44,8 +44,8 @@ export async function broadcastToAll(message) {
         discarded: false,
     });
     const bcmessage = Object.assign({ broadcast: true }, message);
-    for ( const tab of tabs ) {
-        webext.tabs.sendMessage(tab.id, bcmessage).catch(( ) => { });
+    for (const tab of tabs) {
+        webext.tabs.sendMessage(tab.id, bcmessage).catch(() => { });
     }
 }
 
@@ -60,17 +60,17 @@ export function onBroadcast(listener) {
 /******************************************************************************/
 
 export function filteringBehaviorChanged(details = {}) {
-    if ( typeof details.direction !== 'number' || details.direction >= 0 ) {
+    if (typeof details.direction !== 'number' || details.direction >= 0) {
         filteringBehaviorChanged.throttle.offon(727);
     }
     broadcast(Object.assign({ what: 'filteringBehaviorChanged' }, details));
 }
 
-filteringBehaviorChanged.throttle = vAPI.defer.create(( ) => {
+filteringBehaviorChanged.throttle = vAPI.defer.create(() => {
     const { history, max } = filteringBehaviorChanged;
     const now = (Date.now() / 1000) | 0;
-    if ( history.length >= max ) {
-        if ( (now - history[0]) <= (10 * 60) ) { return; }
+    if (history.length >= max) {
+        if ((now - history[0]) <= (10 * 60)) { return; }
         history.shift();
     }
     history.push(now);

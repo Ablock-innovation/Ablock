@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import {
@@ -34,7 +34,7 @@ export async function hasBroadHostPermissions() {
     return browser.permissions.getAll().then(permissions =>
         permissions.origins.includes('<all_urls>') ||
         permissions.origins.includes('*://*/*')
-    ).catch(( ) => false);
+    ).catch(() => false);
 }
 
 /******************************************************************************/
@@ -46,7 +46,7 @@ export async function gotoURL(url, type) {
         windowType: type !== 'popup' ? 'normal' : 'popup'
     });
 
-    if ( Array.isArray(tabs) && tabs.length !== 0 ) {
+    if (Array.isArray(tabs) && tabs.length !== 0) {
         const { windowId, id } = tabs[0];
         return Promise.all([
             browser.windows.update(windowId, { focused: true }),
@@ -54,7 +54,7 @@ export async function gotoURL(url, type) {
         ]);
     }
 
-    if ( type === 'popup' ) {
+    if (type === 'popup') {
         return browser.windows.create({
             type: 'popup',
             url: pageURL.href,

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -29,13 +29,13 @@ import { safeSelf } from './safe-self.js';
 class RangeParser {
     constructor(s) {
         this.not = s.charAt(0) === '!';
-        if ( this.not ) { s = s.slice(1); }
-        if ( s === '' ) { return; }
+        if (this.not) { s = s.slice(1); }
+        if (s === '') { return; }
         const pos = s.indexOf('-');
-        if ( pos !== 0 ) {
+        if (pos !== 0) {
             this.min = this.max = parseInt(s, 10) || 0;
         }
-        if ( pos !== -1 ) {
+        if (pos !== -1) {
             this.max = parseInt(s.slice(pos + 1), 10) || Number.MAX_SAFE_INTEGER;
         }
     }
@@ -44,13 +44,13 @@ class RangeParser {
     }
     test(v) {
         const n = Math.min(Math.max(Number(v) || 0, 0), Number.MAX_SAFE_INTEGER);
-        if ( this.min === this.max ) {
+        if (this.min === this.max) {
             return (this.min === undefined || n === this.min) !== this.not;
         }
-        if ( this.min === undefined ) {
+        if (this.min === undefined) {
             return (n <= this.max) !== this.not;
         }
-        if ( this.max === undefined ) {
+        if (this.max === undefined) {
             return (n >= this.min) !== this.not;
         }
         return (n >= this.min && n <= this.max) !== this.not;
@@ -92,18 +92,18 @@ export function preventSetTimeout(
     const needleNot = needleRaw.charAt(0) === '!';
     const reNeedle = safe.patternToRegex(needleNot ? needleRaw.slice(1) : needleRaw);
     const range = new RangeParser(delayRaw);
-    proxyApplyFn('setTimeout', function(context) {
+    proxyApplyFn('setTimeout', function (context) {
         const { callArgs } = context;
         const a = callArgs[0] instanceof Function
             ? safe.String(safe.Function_toString(callArgs[0]))
             : safe.String(callArgs[0]);
         const b = callArgs[1];
-        if ( needleRaw === '' && range.unbound() ) {
+        if (needleRaw === '' && range.unbound()) {
             safe.uboLog(logPrefix, `Called:\n${a}\n${b}`);
             return context.reflect();
         }
-        if ( reNeedle.test(a) !== needleNot && range.test(b) ) {
-            callArgs[0] = function(){};
+        if (reNeedle.test(a) !== needleNot && range.test(b)) {
+            callArgs[0] = function () { };
             safe.uboLog(logPrefix, `Prevented:\n${a}\n${b}`);
         }
         return context.reflect();
@@ -156,18 +156,18 @@ export function preventSetInterval(
     const needleNot = needleRaw.charAt(0) === '!';
     const reNeedle = safe.patternToRegex(needleNot ? needleRaw.slice(1) : needleRaw);
     const range = new RangeParser(delayRaw);
-    proxyApplyFn('setInterval', function(context) {
+    proxyApplyFn('setInterval', function (context) {
         const { callArgs } = context;
         const a = callArgs[0] instanceof Function
             ? safe.String(safe.Function_toString(callArgs[0]))
             : safe.String(callArgs[0]);
         const b = callArgs[1];
-        if ( needleRaw === '' && range.unbound() ) {
+        if (needleRaw === '' && range.unbound()) {
             safe.uboLog(logPrefix, `Called:\n${a}\n${b}`);
             return context.reflect();
         }
-        if ( reNeedle.test(a) !== needleNot && range.test(b) ) {
-            callArgs[0] = function(){};
+        if (reNeedle.test(a) !== needleNot && range.test(b)) {
+            callArgs[0] = function () { };
             safe.uboLog(logPrefix, `Prevented:\n${a}\n${b}`);
         }
         return context.reflect();
@@ -209,15 +209,15 @@ export function preventRequestAnimationFrame(
     const logPrefix = safe.makeLogPrefix('prevent-requestAnimationFrame', needleRaw);
     const needleNot = needleRaw.charAt(0) === '!';
     const reNeedle = safe.patternToRegex(needleNot ? needleRaw.slice(1) : needleRaw);
-    proxyApplyFn('requestAnimationFrame', function(context) {
+    proxyApplyFn('requestAnimationFrame', function (context) {
         const { callArgs } = context;
         const a = callArgs[0] instanceof Function
             ? safe.String(safe.Function_toString(callArgs[0]))
             : safe.String(callArgs[0]);
-        if ( needleRaw === '' ) {
+        if (needleRaw === '') {
             safe.uboLog(logPrefix, `Called:\n${a}`);
-        } else if ( reNeedle.test(a) !== needleNot ) {
-            callArgs[0] = function(){};
+        } else if (reNeedle.test(a) !== needleNot) {
+            callArgs[0] = function () { };
             safe.uboLog(logPrefix, `Prevented:\n${a}`);
         }
         return context.reflect();

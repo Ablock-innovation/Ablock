@@ -246,7 +246,7 @@
     --popup-cell-cname-ink: #0054d7; /* h260 S:100 Luv:40 */;
     --popup-cell-label-mixed-surface: #c29100; /* TODO: fix */
     --popup-icon-x-ink: rgb(var(--red-60));
-    --popup-power-ink-rgb: var(--primary-50);
+    --popup-power-ink-rgb: var(--red-60);
 
     /* horizontal line separator */
     --hr-ink: var(--surface-2);
@@ -339,7 +339,7 @@
     --popup-cell-cname-ink: #93a6ff; /* h260 S:100 Luv:70 */;
     --popup-cell-label-mixed-surface: hsla(45, 100%, 38%, 1); /* TODO: fix */
     --popup-icon-x-ink: rgb(var(--red-50));
-    --popup-power-ink-rgb: var(--primary-60);
+    --popup-power-ink-rgb: var(--red-50);
 
     /* cloud widget */
     --cloud-total-used-surface: rgb(var(--violet-20) / 25%);

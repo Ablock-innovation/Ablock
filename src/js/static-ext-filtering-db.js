@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -29,17 +29,17 @@
 /******************************************************************************/
 
 const naivePathnameFromURL = url => {
-    if ( typeof url !== 'string' ) { return; }
+    if (typeof url !== 'string') { return; }
     const hnPos = url.indexOf('://');
-    if ( hnPos === -1 ) { return; }
-    const pathPos = url.indexOf('/', hnPos+3);
-    if ( pathPos === -1 ) { return; }
+    if (hnPos === -1) { return; }
+    const pathPos = url.indexOf('/', hnPos + 3);
+    if (pathPos === -1) { return; }
     return url.slice(pathPos);
 };
 
 const extractSubTargets = target => {
     const isRegex = target.charCodeAt(0) === 0x2F /* / */;
-    if ( isRegex === false ) {
+    if (isRegex === false) {
         const pathPos = target.indexOf('/');
         return {
             isRegex,
@@ -48,7 +48,7 @@ const extractSubTargets = target => {
         };
     }
     const pathPos = target.indexOf('\\/');
-    if ( pathPos !== -1 ) {
+    if (pathPos !== -1) {
         return {
             isRegex,
             hn: `${target.slice(1, pathPos)}$`,
@@ -69,27 +69,27 @@ export class StaticExtFilteringHostnameDB {
     #hostnameToStringListMap = new Map();
     #matcherMap = new Map();
     #hostnameToMatcherListMap = new Map();
-    #strSlots = [ '' ];     // Array of strings (selectors and pseudo-selectors)
-    #matcherSlots = [ null ];
-    #linkedLists = [ 0, 0 ];// Array of integer pairs
+    #strSlots = [''];     // Array of strings (selectors and pseudo-selectors)
+    #matcherSlots = [null];
+    #linkedLists = [0, 0];// Array of integer pairs
     #regexMap = new Map();
     #strToSlotMap = new Map();
-    #cleanupTimer = vAPI.defer.create(( ) => {
+    #cleanupTimer = vAPI.defer.create(() => {
         this.#strToSlotMap.clear();
     });
 
     store(target, s) {
         this.size += 1;
         let iStr = this.#strToSlotMap.get(s);
-        if ( iStr === undefined ) {
+        if (iStr === undefined) {
             iStr = this.#strSlots.length;
             this.#strSlots.push(s);
             this.#strToSlotMap.set(s, iStr);
-            if ( this.#cleanupTimer.ongoing() === false ) {
+            if (this.#cleanupTimer.ongoing() === false) {
                 this.collectGarbage(true);
             }
         }
-        if ( target.includes('/') ) {
+        if (target.includes('/')) {
             return this.#storeMatcher(target, iStr);
         }
         const iList = this.#hostnameToStringListMap.get(target) ?? 0;
@@ -100,11 +100,11 @@ export class StaticExtFilteringHostnameDB {
     #storeMatcher(target, iStr) {
         const iMatcher = this.#matcherMap.get(target) ||
             this.#matcherSlots.length;
-        if ( iMatcher === this.#matcherSlots.length ) {
+        if (iMatcher === this.#matcherSlots.length) {
             const { isRegex, hn, pn } = extractSubTargets(target);
             this.#matcherSlots.push({ isRegex, hn, pn, iList: 0 });
             this.#matcherMap.set(target, iMatcher);
-            if ( isRegex === false ) {
+            if (isRegex === false) {
                 const iMatcherList = this.#hostnameToMatcherListMap.get(hn) ?? 0;
                 this.#hostnameToMatcherListMap.set(hn, this.#linkedLists.length);
                 this.#linkedLists.push(iMatcher, iMatcherList);
@@ -124,16 +124,16 @@ export class StaticExtFilteringHostnameDB {
         this.#hostnameToStringListMap.clear();
         this.#matcherMap.clear();
         this.#hostnameToMatcherListMap.clear();
-        this.#strSlots = [ '' ];
-        this.#matcherSlots = [ null ];
-        this.#linkedLists = [ 0, 0 ];
+        this.#strSlots = [''];
+        this.#matcherSlots = [null];
+        this.#linkedLists = [0, 0];
         this.#regexMap.clear();
         this.#strToSlotMap.clear();
         this.size = 0;
     }
 
     collectGarbage(later = false) {
-        if ( later ) {
+        if (later) {
             return this.#cleanupTimer.onidle(5000, { timeout: 5000 });
         }
         this.#cleanupTimer.off();
@@ -142,34 +142,34 @@ export class StaticExtFilteringHostnameDB {
 
     retrieveSpecifics(out, hostname) {
         let hn = hostname;
-        if ( hn === '' ) { return; }
-        for (;;) {
+        if (hn === '') { return; }
+        for (; ;) {
             const iList = this.#hostnameToStringListMap.get(hn);
-            if ( iList !== undefined ) {
+            if (iList !== undefined) {
                 this.#retrieveFromSlot(out, iList);
             }
             const pos = hn.indexOf('.');
-            if ( pos === -1 ) { break; }
+            if (pos === -1) { break; }
             hn = hn.slice(pos + 1);
-            if ( hn === '*' ) { break; }
+            if (hn === '*') { break; }
         }
     }
 
     retrieveGenerics(out) {
         let iList = this.#hostnameToStringListMap.get('');
-        if ( iList ) { this.#retrieveFromSlot(out, iList); }
+        if (iList) { this.#retrieveFromSlot(out, iList); }
         iList = this.#hostnameToStringListMap.get('*');
-        if ( iList ) { this.#retrieveFromSlot(out, iList); }
+        if (iList) { this.#retrieveFromSlot(out, iList); }
     }
 
     retrieveSpecificsByRegex(out, hostname, url) {
         let hn = hostname;
-        if ( hn === '' ) { return; }
+        if (hn === '') { return; }
         const pathname = naivePathnameFromURL(url) ?? '';
-        for (;;) {
+        for (; ;) {
             this.#retrieveSpecificsByRegex(hn, out, hostname, pathname);
             const pos = hn.indexOf('.');
-            if ( pos === -1 ) { break; }
+            if (pos === -1) { break; }
             hn = hn.slice(pos + 1);
         }
         this.#retrieveSpecificsByRegex('', out, hostname, pathname);
@@ -177,40 +177,40 @@ export class StaticExtFilteringHostnameDB {
 
     #retrieveSpecificsByRegex(hn, out, hostname, pathname) {
         let iMatchList = this.#hostnameToMatcherListMap.get(hn) ?? 0;
-        while ( iMatchList !== 0 ) {
-            const iMatchSlot = this.#linkedLists[iMatchList+0];
+        while (iMatchList !== 0) {
+            const iMatchSlot = this.#linkedLists[iMatchList + 0];
             const matcher = this.#matcherSlots[iMatchSlot];
-            if ( this.#matcherTest(matcher, hostname, pathname) ) {
+            if (this.#matcherTest(matcher, hostname, pathname)) {
                 this.#retrieveFromSlot(out, matcher.iList);
             }
-            iMatchList = this.#linkedLists[iMatchList+1];
+            iMatchList = this.#linkedLists[iMatchList + 1];
         }
     }
 
     #matcherTest(matcher, hn, pn) {
-        if ( matcher.isRegex === false ) {
+        if (matcher.isRegex === false) {
             return pn.startsWith(matcher.pn);
         }
-        if ( this.#restrTest(matcher.hn, hn) === false ) { return false; }
-        if ( matcher.pn === undefined ) { return true; }
+        if (this.#restrTest(matcher.hn, hn) === false) { return false; }
+        if (matcher.pn === undefined) { return true; }
         return this.#restrTest(matcher.pn, pn);
     }
 
     #restrTest(restr, s) {
         let re = this.#regexMap.get(restr);
-        if ( re === undefined ) {
+        if (re === undefined) {
             this.#regexMap.set(restr, (re = new RegExp(restr)));
         }
         return re.test(s);
     }
 
     #retrieveFromSlot(out, iList) {
-        if ( iList === undefined ) { return; }
+        if (iList === undefined) { return; }
         do {
-            const iStr = this.#linkedLists[iList+0];
+            const iStr = this.#linkedLists[iList + 0];
             out.add(this.#strSlots[iStr]);
-            iList = this.#linkedLists[iList+1];
-        } while ( iList !== 0 );
+            iList = this.#linkedLists[iList + 1];
+        } while (iList !== 0);
     }
 
     toSelfie() {
@@ -227,8 +227,8 @@ export class StaticExtFilteringHostnameDB {
     }
 
     fromSelfie(selfie) {
-        if ( typeof selfie !== 'object' || selfie === null ) { return; }
-        if ( selfie.VERSION !== StaticExtFilteringHostnameDB.VERSION ) {
+        if (typeof selfie !== 'object' || selfie === null) { return; }
+        if (selfie.VERSION !== StaticExtFilteringHostnameDB.VERSION) {
             throw new TypeError('Bad selfie');
         }
         this.#hostnameToStringListMap = selfie.hostnameToStringListMap;

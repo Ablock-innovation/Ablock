@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dnr } from './ext-compat.js';
@@ -34,7 +34,7 @@ export class DNREditor {
         const { doc } = editor.view.state;
         const text = doc.sliceString(firstLine.from, lastLine.to);
         const { bad } = rulesFromText(text);
-        if ( Array.isArray(bad) && bad.length !== 0 ) {
+        if (Array.isArray(bad) && bad.length !== 0) {
             self.cm6.lineErrorAdd(editor.view, bad.map(i => i + firstLine.number));
         }
         const entries = self.cm6.findAll(
@@ -44,14 +44,14 @@ export class DNREditor {
             lastLine.to
         );
         const regexes = [];
-        for ( const entry of entries ) {
+        for (const entry of entries) {
             const regex = entry.match[1];
             const i = this.validatedRegexes.indexOf(regex);
-            if ( i !== -1 ) {
+            if (i !== -1) {
                 const reason = this.validatedRegexResults[i];
-                if ( reason === true ) { continue; }
-                self.cm6.spanErrorAdd(editor.view, entry.from+13, entry.to, reason);
-            } else { 
+                if (reason === true) { continue; }
+                self.cm6.spanErrorAdd(editor.view, entry.from + 13, entry.to, reason);
+            } else {
                 regexes.push(regex);
             }
         }
@@ -60,9 +60,9 @@ export class DNREditor {
 
     exportToFile(text, fname) {
         const { rules } = rulesFromText(text);
-        if ( Array.isArray(rules) === false ) { return; }
+        if (Array.isArray(rules) === false) { return; }
         let ruleId = 1;
-        for ( const rule of rules ) {
+        for (const rule of rules) {
             rule.id = ruleId++;
         }
         return {
@@ -73,18 +73,18 @@ export class DNREditor {
     }
 
     async validateRegexes(editor, regexes) {
-        if ( regexes.length === 0 ) { return; }
+        if (regexes.length === 0) { return; }
         const promises = regexes.map(regex => this.validateRegex(regex));
         await Promise.all(promises);
-        for ( const regex of regexes ) {
+        for (const regex of regexes) {
             const i = this.validatedRegexes.indexOf(regex);
-            if ( i === -1 ) { continue; }
+            if (i === -1) { continue; }
             const reason = this.validatedRegexResults[i];
-            if ( reason === true ) { continue; }
+            if (reason === true) { continue; }
             const entries = self.cm6.findAll(editor.view,
                 `(?<=\\bregexFilter: )${RegExp.escape(regex)}`
             );
-            for ( const entry of entries ) {
+            for (const entry of entries) {
                 self.cm6.spanErrorAdd(editor.view, entry.from, entry.to, reason);
             }
         }
@@ -93,7 +93,7 @@ export class DNREditor {
     async validateRegex(regex) {
         const details = await dnr.isRegexSupported({ regex });
         const result = details.isSupported || details.reason;
-        if ( this.validatedRegexes.length > 32 ) {
+        if (this.validatedRegexes.length > 32) {
             this.validatedRegexes.pop();
             this.validatedRegexResults.pop();
         }
@@ -112,23 +112,23 @@ export class DNREditor {
     foldService(state, from) {
         const { doc } = state;
         const lineFrom = doc.lineAt(from);
-        if ( this.reFoldable.test(lineFrom.text) === false ) { return null; }
-        if ( lineFrom.number <= 5 ) { return null ; }
+        if (this.reFoldable.test(lineFrom.text) === false) { return null; }
+        if (lineFrom.number <= 5) { return null; }
         const lineBlockStart = doc.line(lineFrom.number - 5);
-        if ( this.reFoldCandidates.test(lineBlockStart.text) === false ) { return null; }
-        for ( let i = lineFrom.number-4; i < lineFrom.number; i++ ) {
+        if (this.reFoldCandidates.test(lineBlockStart.text) === false) { return null; }
+        for (let i = lineFrom.number - 4; i < lineFrom.number; i++) {
             const line = doc.line(i);
-            if ( this.reFoldable.test(line.text) === false ) { return null; }
+            if (this.reFoldable.test(line.text) === false) { return null; }
         }
         let i = lineFrom.number + 1;
-        for ( ; i <= doc.lines; i++ ) {
+        for (; i <= doc.lines; i++) {
             const lineNext = doc.line(i);
-            if ( this.reFoldable.test(lineNext.text) === false ) { break; }
+            if (this.reFoldable.test(lineNext.text) === false) { break; }
         }
         i -= 1;
-        if ( i === lineFrom.number ) { return null; }
+        if (i === lineFrom.number) { return null; }
         const lineFoldEnd = doc.line(i);
-        return { from: lineFrom.from+6, to: lineFoldEnd.to };
+        return { from: lineFrom.from + 6, to: lineFoldEnd.to };
     }
     reFoldable = /^ {4}- \S/;
     reFoldCandidates = new RegExp(`^(?: {2})+${[

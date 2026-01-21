@@ -1,6 +1,6 @@
 En effektiv blocker: Forbruger kun lidt hukommelse og CPU, men kan alligevel indlæse og håndhæve tusindvis flere filtre end andre populære blockers.
 
-Illustreret oversigt over dens effektivitet: https://github.com/gorhill/uBlock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Illustreret oversigt over dens effektivitet: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Anvendelse: Den store slå til/fra knap i popup-vinduet benyttes til permanent at deaktivere/aktivere uBlock på det aktuelle websted. Dette gælder kun for det aktuelle websted, det er ikke en global til/fra-knap.
 
@@ -38,10 +38,10 @@ Gratis.
 Open source med offentlig licens (GPLv3)
 Til brugere, af brugere.
 
-Bidragsydere på Github: https://github.com/gorhill/uBlock/graphs/contributors
+Bidragsydere på Github: https://github.com/Ablock/Ablock/graphs/contributors
 Bidragsydere på Crowdin: https://crowdin.net/project/ublock
 
 ***
 
 Projektændringslog:
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases

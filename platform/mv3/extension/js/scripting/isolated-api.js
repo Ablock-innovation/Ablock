@@ -16,27 +16,27 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock/
+    Home: https://github.com/Ablock/Ablock/
 
 */
 
 /******************************************************************************/
 
 (api => {
-    if ( typeof api === 'object' ) { return; }
+    if (typeof api === 'object') { return; }
 
     const isolatedAPI = self.isolatedAPI = {};
 
-    const hostnameStack = (( ) => {
+    const hostnameStack = (() => {
         const docloc = document.location;
-        const origins = [ docloc.origin ];
-        if ( docloc.ancestorOrigins ) {
+        const origins = [docloc.origin];
+        if (docloc.ancestorOrigins) {
             origins.push(...docloc.ancestorOrigins);
         }
         return origins.map((origin, i) => {
             const beg = origin.lastIndexOf('://');
-            if ( beg === -1 ) { return; }
-            const hn1 = origin.slice(beg+3)
+            if (beg === -1) { return; }
+            const hn1 = origin.slice(beg + 3)
             const end = hn1.indexOf(':');
             const hn2 = end === -1 ? hn1 : hn1.slice(0, end);
             return { hnparts: hn2.split('.'), i };
@@ -48,31 +48,31 @@
     const forEachHostname = (entry, callback, details) => {
         const hnparts = entry.hnparts;
         const hnpartslen = hnparts.length;
-        if ( hnpartslen === 0 ) { return; }
-        for ( let i = 0; i < hnpartslen; i++ ) {
+        if (hnpartslen === 0) { return; }
+        for (let i = 0; i < hnpartslen; i++) {
             const r = callback(`${hnparts.slice(i).join('.')}`, details);
-            if ( r !== undefined ) { return r; }
+            if (r !== undefined) { return r; }
         }
-        if ( details?.hasEntities !== true ) { return; }
+        if (details?.hasEntities !== true) { return; }
         const n = hnpartslen - 1;
-        for ( let i = 0; i < n; i++ ) {
-            for ( let j = n; j > i; j-- ) {
-                const r = callback(`${hnparts.slice(i,j).join('.')}.*`, details);
-                if ( r !== undefined ) { return r; }
+        for (let i = 0; i < n; i++) {
+            for (let j = n; j > i; j--) {
+                const r = callback(`${hnparts.slice(i, j).join('.')}.*`, details);
+                if (r !== undefined) { return r; }
             }
         }
     };
 
     isolatedAPI.forEachHostname = (callback, details) => {
-        if ( hostnameStack.length === 0 ) { return; }
+        if (hostnameStack.length === 0) { return; }
         return forEachHostname(hostnameStack[0], callback, details);
     };
 
     isolatedAPI.forEachHostnameAncestors = (callback, details) => {
-        for ( const entry of hostnameStack ) {
-            if ( entry.i === 0 ) { continue; }
+        for (const entry of hostnameStack) {
+            if (entry.i === 0) { continue; }
             const r = forEachHostname(entry, callback, details);
-            if ( r !== undefined ) { return r; }
+            if (r !== undefined) { return r; }
         }
     };
 
@@ -80,14 +80,14 @@
 
 
 (api => {
-    if ( typeof api === 'object' ) { return; }
+    if (typeof api === 'object') { return; }
 
     const cosmeticAPI = self.cosmeticAPI = {};
     const { isolatedAPI } = self;
     const { topHostname } = isolatedAPI;
     const thisHostname = document.location.hostname || '';
 
-    const sessionRead = async function(key) {
+    const sessionRead = async function (key) {
         try {
             const bin = await chrome.storage.session.get(key);
             return bin?.[key] ?? undefined;
@@ -95,14 +95,14 @@
         }
     };
 
-    const sessionWrite = function(key, data) {
+    const sessionWrite = function (key, data) {
         try {
             chrome.storage.session.set({ [key]: data });
         } catch {
         }
     };
 
-    const localRead = async function(key) {
+    const localRead = async function (key) {
         try {
             const bin = await chrome.storage.local.get(key);
             return bin?.[key] ?? undefined;
@@ -114,15 +114,15 @@
         let l = 0, i = 0, d = 0;
         let r = sorted.length;
         let candidate;
-        while ( l < r ) {
+        while (l < r) {
             i = l + r >>> 1;
             candidate = sorted[i];
             d = target.length - candidate.length;
-            if ( d === 0 ) {
-                if ( target === candidate ) { return i; }
+            if (d === 0) {
+                if (target === candidate) { return i; }
                 d = target < candidate ? -1 : 1;
             }
-            if ( d < 0 ) {
+            if (d < 0) {
                 r = i;
             } else {
                 l = i + 1;
@@ -134,8 +134,8 @@
     const selectorsFromListIndex = (data, ilist) => {
         const list = JSON.parse(`[${data.selectorLists[ilist]}]`);
         const { result } = data;
-        for ( const iselector of list ) {
-            if ( iselector >= 0 ) {
+        for (const iselector of list) {
+            if (iselector >= 0) {
                 result.selectors.add(data.selectors[iselector]);
             } else {
                 result.exceptions.add(data.selectors[~iselector]);
@@ -145,44 +145,44 @@
 
     const lookupHostname = (hostname, data) => {
         const listref = binarySearch(data.hostnames, hostname);
-        if ( listref !== -1 ) {
+        if (listref !== -1) {
             selectorsFromListIndex(data, data.selectorListRefs[listref]);
         }
         const { fromRegexes } = data;
-        for ( let i = 0, n = fromRegexes.length; i < n; i += 3 ) {
-            if ( hostname.includes(fromRegexes[i+0]) === false ) { continue; }
-            if ( typeof fromRegexes[i+1] === 'string' ) {
-                fromRegexes[i+1] = new RegExp(fromRegexes[i+1]);
+        for (let i = 0, n = fromRegexes.length; i < n; i += 3) {
+            if (hostname.includes(fromRegexes[i + 0]) === false) { continue; }
+            if (typeof fromRegexes[i + 1] === 'string') {
+                fromRegexes[i + 1] = new RegExp(fromRegexes[i + 1]);
             }
-            if ( fromRegexes[i+1].test(hostname) === false ) { continue; }
-            selectorsFromListIndex(data, fromRegexes[i+2]);
+            if (fromRegexes[i + 1].test(hostname) === false) { continue; }
+            selectorsFromListIndex(data, fromRegexes[i + 2]);
         }
     };
 
     const selectorsFromRuleset = async (realm, rulesetId, result) => {
         const data = await localRead(`css.${realm}.${rulesetId}`);
-        if ( typeof data !== 'object' || data === null ) { return; }
+        if (typeof data !== 'object' || data === null) { return; }
         data.result = result;
         isolatedAPI.forEachHostname(lookupHostname, data);
     };
 
-    const fillCache = async function(realm, rulesetIds) {
+    const fillCache = async function (realm, rulesetIds) {
         const selectors = new Set();
         const exceptions = new Set();
         const result = { selectors, exceptions };
-        const [ filteringModeDetails ] = await Promise.all([
+        const [filteringModeDetails] = await Promise.all([
             localRead('filteringModeDetails'),
             ...rulesetIds.map(a => selectorsFromRuleset(realm, a, result)),
         ]);
         const skip = filteringModeDetails?.none.some(a => {
-            if ( topHostname.endsWith(a) === false ) { return false; }
+            if (topHostname.endsWith(a) === false) { return false; }
             const n = a.length;
-            return topHostname.length === n || topHostname.at(-n-1) === '.';
+            return topHostname.length === n || topHostname.at(-n - 1) === '.';
         });
-        for ( const selector of exceptions ) {
+        for (const selector of exceptions) {
             selectors.delete(selector);
         }
-        if ( skip ) {
+        if (skip) {
             selectors.clear();
         }
         cacheEntry[realm.charAt(0)] = Array.from(selectors).map(a =>
@@ -190,7 +190,7 @@
         );
     };
 
-    const readCache = async ( ) => {
+    const readCache = async () => {
         cacheEntry = await sessionRead(cacheKey) || {};
     };
 
@@ -199,31 +199,31 @@
     let clientCount = 0;
     let cacheEntry;
 
-    cosmeticAPI.getSelectors = async function(realm, rulesetIds) {
+    cosmeticAPI.getSelectors = async function (realm, rulesetIds) {
         clientCount += 1;
         const slot = realm.charAt(0);
-        if ( cacheEntry === undefined ) {
+        if (cacheEntry === undefined) {
             cacheEntry = readCache();
         }
-        if ( cacheEntry instanceof Promise ) {
+        if (cacheEntry instanceof Promise) {
             await cacheEntry;
         }
-        if ( cacheEntry[slot] === undefined ) {
+        if (cacheEntry[slot] === undefined) {
             cacheEntry[slot] = fillCache(realm, rulesetIds);
         }
-        if ( cacheEntry[slot] instanceof Promise ) {
+        if (cacheEntry[slot] instanceof Promise) {
             await cacheEntry[slot];
         }
         return cacheEntry[slot];
     };
 
-    cosmeticAPI.release = function() {
+    cosmeticAPI.release = function () {
         clientCount -= 1;
-        if ( clientCount !== 0 ) { return; }
+        if (clientCount !== 0) { return; }
         self.cosmeticAPI = undefined;
         const now = Math.round(Date.now() / 15000);
         const since = now - (cacheEntry.t || 0);
-        if ( since <= 1 ) { return; }
+        if (since <= 1) { return; }
         cacheEntry.t = now;
         sessionWrite(cacheKey, cacheEntry);
     };

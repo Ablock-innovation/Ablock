@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import {
@@ -38,7 +38,7 @@ import { ubolErr } from './debug.js';
 /******************************************************************************/
 
 async function flushWrites() {
-    while ( pendingWrites.length !== 0 ) {
+    while (pendingWrites.length !== 0) {
         const promises = pendingWrites;
         pendingWrites.length = 0;
         await Promise.all(promises);
@@ -70,17 +70,17 @@ const pendingWrites = [];
 export async function customFiltersFromHostname(hostname) {
     const promises = [];
     let hn = hostname;
-    while ( hn !== '' ) {
+    while (hn !== '') {
         promises.push(readFromStorage(`site.${hn}`));
         const pos = hn.indexOf('.');
-        if ( pos === -1 ) { break; }
+        if (pos === -1) { break; }
         hn = hn.slice(pos + 1);
     }
     const results = await Promise.all(promises);
     const out = [];
-    for ( let i = 0; i < promises.length; i++ ) {
+    for (let i = 0; i < promises.length; i++) {
         const selectors = results[i];
-        if ( selectors === undefined ) { continue; }
+        if (selectors === undefined) { continue; }
         selectors.forEach(selector => {
             out.push(selector.startsWith('0') ? selector.slice(1) : selector);
         });
@@ -107,7 +107,7 @@ async function getAllCustomFilterKeys() {
 export async function getAllCustomFilters() {
     const collect = async key => {
         const selectors = await readFromStorage(key);
-        return [ key.slice(5), selectors.map(a => a.startsWith('0') ? a.slice(1) : a) ];
+        return [key.slice(5), selectors.map(a => a.startsWith('0') ? a.slice(1) : a)];
     };
     const keys = await getAllCustomFilterKeys();
     const promises = keys.map(k => collect(k));
@@ -118,8 +118,8 @@ export async function getAllCustomFilters() {
 
 export function startCustomFilters(tabId, frameId) {
     return browser.scripting.executeScript({
-        files: [ '/js/scripting/css-user.js' ],
-        target: { tabId, frameIds: [ frameId ] },
+        files: ['/js/scripting/css-user.js'],
+        target: { tabId, frameIds: [frameId] },
         injectImmediately: true,
     }).catch(reason => {
         ubolErr(`startCustomFilters/${reason}`);
@@ -128,8 +128,8 @@ export function startCustomFilters(tabId, frameId) {
 
 export function terminateCustomFilters(tabId, frameId) {
     return browser.scripting.executeScript({
-        files: [ '/js/scripting/css-user-terminate.js' ],
-        target: { tabId, frameIds: [ frameId ] },
+        files: ['/js/scripting/css-user-terminate.js'],
+        target: { tabId, frameIds: [frameId] },
         injectImmediately: true,
     }).catch(reason => {
         ubolErr(`terminateCustomFilters/${reason}`);
@@ -140,26 +140,26 @@ export function terminateCustomFilters(tabId, frameId) {
 
 export async function injectCustomFilters(tabId, frameId, hostname) {
     const selectors = await customFiltersFromHostname(hostname);
-    if ( selectors.length === 0 ) { return; }
+    if (selectors.length === 0) { return; }
     const promises = [];
     const plainSelectors = selectors.filter(a => a.startsWith('{') === false);
-    if ( plainSelectors.length !== 0 ) {
+    if (plainSelectors.length !== 0) {
         promises.push(
             browser.scripting.insertCSS({
                 css: `${plainSelectors.join(',\n')}{display:none!important;}`,
                 origin: 'USER',
-                target: { tabId, frameIds: [ frameId ] },
+                target: { tabId, frameIds: [frameId] },
             }).catch(reason => {
                 ubolErr(`injectCustomFilters/insertCSS/${reason}`);
             })
         );
     }
     const proceduralSelectors = selectors.filter(a => a.startsWith('{'));
-    if ( proceduralSelectors.length !== 0 ) {
+    if (proceduralSelectors.length !== 0) {
         promises.push(
             browser.scripting.executeScript({
-                files: [ '/js/scripting/css-procedural-api.js' ],
-                target: { tabId, frameIds: [ frameId ] },
+                files: ['/js/scripting/css-procedural-api.js'],
+                target: { tabId, frameIds: [frameId] },
                 injectImmediately: true,
             }).catch(reason => {
                 ubolErr(`injectCustomFilters/executeScript/${reason}`);
@@ -174,23 +174,23 @@ export async function injectCustomFilters(tabId, frameId, hostname) {
 
 export async function registerCustomFilters(context) {
     const siteKeys = await getAllCustomFilterKeys();
-    if ( siteKeys.length === 0 ) { return; }
+    if (siteKeys.length === 0) { return; }
 
     const { none } = context.filteringModeDetails;
     let hostnames = siteKeys.map(a => a.slice(5));
-    if ( none.has('all-urls') ) {
+    if (none.has('all-urls')) {
         const { basic, optimal, complete } = context.filteringModeDetails;
         hostnames = intersectHostnameIters(hostnames, [
             ...basic, ...optimal, ...complete
         ]);
-    } else if ( none.size !== 0 ) {
-        hostnames = [ ...subtractHostnameIters(hostnames, none) ];
+    } else if (none.size !== 0) {
+        hostnames = [...subtractHostnameIters(hostnames, none)];
     }
-    if ( hostnames.length === 0 ) { return; }
+    if (hostnames.length === 0) { return; }
 
     const directive = {
         id: 'css-user',
-        js: [ '/js/scripting/css-user.js' ],
+        js: ['/js/scripting/css-user.js'],
         matches: matchesFromHostnames(hostnames),
         runAt: 'document_start',
     };
@@ -201,15 +201,15 @@ export async function registerCustomFilters(context) {
 /******************************************************************************/
 
 export async function addCustomFilters(hostname, toAdd) {
-    if ( hostname === '' ) { return false; }
+    if (hostname === '') { return false; }
     const key = `site.${hostname}`;
     const selectors = await readFromStorage(key) || [];
     const countBefore = selectors.length;
-    for ( const selector of toAdd ) {
-        if ( selectors.includes(selector) ) { continue; }
+    for (const selector of toAdd) {
+        if (selectors.includes(selector)) { continue; }
         selectors.push(selector);
     }
-    if ( selectors.length === countBefore ) { return false; }
+    if (selectors.length === countBefore) { return false; }
     selectors.sort();
     writeToStorage(key, selectors);
     return true;
@@ -218,10 +218,10 @@ export async function addCustomFilters(hostname, toAdd) {
 /******************************************************************************/
 
 export async function removeAllCustomFilters(hostname) {
-    if ( hostname === '*' ) {
+    if (hostname === '*') {
         const keys = await getAllCustomFilterKeys();
-        if ( keys.length === 0 ) { return false; }
-        for ( const key of keys ) {
+        if (keys.length === 0) { return false; }
+        for (const key of keys) {
             removeFromStorage(key);
         }
         return true;
@@ -235,10 +235,10 @@ export async function removeAllCustomFilters(hostname) {
 export async function removeCustomFilters(hostname, selectors) {
     const promises = [];
     let hn = hostname;
-    while ( hn !== '' ) {
+    while (hn !== '') {
         promises.push(removeCustomFiltersByKey(`site.${hn}`, selectors));
         const pos = hn.indexOf('.');
-        if ( pos === -1 ) { break; }
+        if (pos === -1) { break; }
         hn = hn.slice(pos + 1);
     }
     const results = await Promise.all(promises);
@@ -247,19 +247,19 @@ export async function removeCustomFilters(hostname, selectors) {
 
 async function removeCustomFiltersByKey(key, toRemove) {
     const selectors = await readFromStorage(key);
-    if ( selectors === undefined ) { return false; }
+    if (selectors === undefined) { return false; }
     const beforeCount = selectors.length;
-    for ( const selector of toRemove ) {
+    for (const selector of toRemove) {
         let i = selectors.indexOf(selector);
-        if ( i === -1 ) {
+        if (i === -1) {
             i = selectors.indexOf(`0${selector}`);
-            if ( i === -1 ) { continue; }
+            if (i === -1) { continue; }
         }
         selectors.splice(i, 1);
     }
     const afterCount = selectors.length;
-    if ( afterCount === beforeCount ) { return false; }
-    if ( afterCount !== 0 ) {
+    if (afterCount === beforeCount) { return false; }
+    if (afterCount !== 0) {
         writeToStorage(key, selectors);
     } else {
         removeFromStorage(key);

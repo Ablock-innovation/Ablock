@@ -16,121 +16,121 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
-(async ( ) => {
+(async () => {
 
-/******************************************************************************/
+    /******************************************************************************/
 
-const ubolOverlay = self.ubolOverlay;
-if ( ubolOverlay === undefined ) { return; }
-if ( ubolOverlay.file === '/zapper-ui.html' ) { return; }
+    const ubolOverlay = self.ubolOverlay;
+    if (ubolOverlay === undefined) { return; }
+    if (ubolOverlay.file === '/zapper-ui.html') { return; }
 
-/******************************************************************************/
+    /******************************************************************************/
 
-// https://www.reddit.com/r/uBlockOrigin/comments/bktxtb/scrolling_doesnt_work/emn901o
-//   Override 'fixed' position property on body element if present.
+    // https://www.reddit.com/r/uBlockOrigin/comments/bktxtb/scrolling_doesnt_work/emn901o
+    //   Override 'fixed' position property on body element if present.
 
-// With touch-driven devices, first highlight the element and remove only
-// when tapping again the highlighted area.
+    // With touch-driven devices, first highlight the element and remove only
+    // when tapping again the highlighted area.
 
-function zapElementAtPoint(mx, my, options) {
-    if ( options.highlight ) {
-        const elem = ubolOverlay.elementFromPoint(mx, my);
-        if ( elem ) {
-            ubolOverlay.highlightElements([ elem ]);
+    function zapElementAtPoint(mx, my, options) {
+        if (options.highlight) {
+            const elem = ubolOverlay.elementFromPoint(mx, my);
+            if (elem) {
+                ubolOverlay.highlightElements([elem]);
+            }
+            return;
         }
-        return;
+
+        let elemToRemove = ubolOverlay.highlightedElements?.[0] ?? null;
+        if (elemToRemove === null && mx !== undefined) {
+            elemToRemove = ubolOverlay.elementFromPoint(mx, my);
+        }
+
+        if (elemToRemove instanceof Element === false) { return; }
+
+        const getStyleValue = (elem, prop) => {
+            const style = window.getComputedStyle(elem);
+            return style ? style[prop] : '';
+        };
+
+        // Heuristic to detect scroll-locking: remove such lock when detected.
+        let maybeScrollLocked = elemToRemove.shadowRoot instanceof DocumentFragment;
+        if (maybeScrollLocked === false) {
+            let elem = elemToRemove;
+            do {
+                maybeScrollLocked =
+                    parseInt(getStyleValue(elem, 'zIndex'), 10) >= 1000 ||
+                    getStyleValue(elem, 'position') === 'fixed';
+                elem = elem.parentElement;
+            } while (elem !== null && maybeScrollLocked === false);
+        }
+        if (maybeScrollLocked) {
+            const doc = document;
+            if (getStyleValue(doc.body, 'overflowY') === 'hidden') {
+                doc.body.style.setProperty('overflow', 'auto', 'important');
+            }
+            if (getStyleValue(doc.body, 'position') === 'fixed') {
+                doc.body.style.setProperty('position', 'initial', 'important');
+            }
+            if (getStyleValue(doc.documentElement, 'position') === 'fixed') {
+                doc.documentElement.style.setProperty('position', 'initial', 'important');
+            }
+            if (getStyleValue(doc.documentElement, 'overflowY') === 'hidden') {
+                doc.documentElement.style.setProperty('overflow', 'auto', 'important');
+            }
+        }
+        elemToRemove.remove();
+        ubolOverlay.highlightElementAtPoint(mx, my);
     }
 
-    let elemToRemove = ubolOverlay.highlightedElements?.[0] ?? null;
-    if ( elemToRemove === null && mx !== undefined ) {
-        elemToRemove = ubolOverlay.elementFromPoint(mx, my);
+    /******************************************************************************/
+
+    function onKeyPressed(ev) {
+        if (ev.key !== 'Delete' && ev.key !== 'Backspace') { return; }
+        ev.stopPropagation();
+        ev.preventDefault();
+        zapElementAtPoint();
     }
 
-    if ( elemToRemove instanceof Element === false ) { return; }
+    /******************************************************************************/
 
-    const getStyleValue = (elem, prop) => {
-        const style = window.getComputedStyle(elem);
-        return style ? style[prop] : '';
-    };
-
-    // Heuristic to detect scroll-locking: remove such lock when detected.
-    let maybeScrollLocked = elemToRemove.shadowRoot instanceof DocumentFragment;
-    if ( maybeScrollLocked === false ) {
-        let elem = elemToRemove;
-        do {
-            maybeScrollLocked =
-                parseInt(getStyleValue(elem, 'zIndex'), 10) >= 1000 ||
-                getStyleValue(elem, 'position') === 'fixed';
-            elem = elem.parentElement;
-        } while ( elem !== null && maybeScrollLocked === false );
+    function startZapper() {
+        self.addEventListener('keydown', onKeyPressed, true);
     }
-    if ( maybeScrollLocked ) {
-        const doc = document;
-        if ( getStyleValue(doc.body, 'overflowY') === 'hidden' ) {
-            doc.body.style.setProperty('overflow', 'auto', 'important');
-        }
-        if ( getStyleValue(doc.body, 'position') === 'fixed' ) {
-            doc.body.style.setProperty('position', 'initial', 'important');
-        }
-        if ( getStyleValue(doc.documentElement, 'position') === 'fixed' ) {
-            doc.documentElement.style.setProperty('position', 'initial', 'important');
-        }
-        if ( getStyleValue(doc.documentElement, 'overflowY') === 'hidden' ) {
-            doc.documentElement.style.setProperty('overflow', 'auto', 'important');
+
+    function quitZapper() {
+        self.removeEventListener('keydown', onKeyPressed, true);
+    }
+
+    /******************************************************************************/
+
+    function onMessage(msg) {
+        switch (msg.what) {
+            case 'startTool':
+                startZapper();
+                break;
+            case 'quitTool':
+                quitZapper();
+                break;
+            case 'zapElementAtPoint':
+                zapElementAtPoint(msg.mx, msg.my, msg.options);
+                if (msg.options.highlight !== true && msg.options.stay !== true) {
+                    quitZapper();
+                }
+                break;
+            default:
+                break;
         }
     }
-    elemToRemove.remove();
-    ubolOverlay.highlightElementAtPoint(mx, my);
-}
 
-/******************************************************************************/
+    /******************************************************************************/
 
-function onKeyPressed(ev) {
-    if ( ev.key !== 'Delete' && ev.key !== 'Backspace' ) { return; }
-    ev.stopPropagation();
-    ev.preventDefault();
-    zapElementAtPoint();
-}
+    await ubolOverlay.install('/zapper-ui.html', onMessage);
 
-/******************************************************************************/
-
-function startZapper() {
-    self.addEventListener('keydown', onKeyPressed, true);
-}
-
-function quitZapper() {
-    self.removeEventListener('keydown', onKeyPressed, true);
-}
-
-/******************************************************************************/
-
-function onMessage(msg) {
-    switch ( msg.what ) {
-    case 'startTool':
-        startZapper();
-        break;
-    case 'quitTool':
-        quitZapper();
-        break;
-    case 'zapElementAtPoint':
-        zapElementAtPoint(msg.mx, msg.my, msg.options);
-        if ( msg.options.highlight !== true && msg.options.stay !== true ) {
-            quitZapper();
-        }
-        break;
-    default:
-        break;
-    }
-}
-
-/******************************************************************************/
-
-await ubolOverlay.install('/zapper-ui.html', onMessage);
-
-/******************************************************************************/
+    /******************************************************************************/
 
 })();
 

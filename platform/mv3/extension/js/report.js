@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$ } from './dom.js';
@@ -25,24 +25,24 @@ import { sendMessage } from './ext.js';
 
 /******************************************************************************/
 
-const reportedPage = (( ) => {
+const reportedPage = (() => {
     const url = new URL(window.location.href);
     try {
         const pageURL = url.searchParams.get('url');
-        if ( pageURL === null ) { return null; }
+        if (pageURL === null) { return null; }
         const parsedURL = new URL(pageURL);
         parsedURL.username = '';
         parsedURL.password = '';
         parsedURL.hash = '';
         const select = qs$('select[name="url"]');
         dom.text(select.options[0], parsedURL.href);
-        if ( parsedURL.search !== '' ) {
+        if (parsedURL.search !== '') {
             const option = dom.create('option');
             parsedURL.search = '';
             dom.text(option, parsedURL.href);
             select.append(option);
         }
-        if ( parsedURL.pathname !== '/' ) {
+        if (parsedURL.pathname !== '/') {
             const option = dom.create('option');
             parsedURL.pathname = '';
             dom.text(option, parsedURL.href);
@@ -71,7 +71,7 @@ async function reportSpecificFilterIssue() {
     );
     const issueType = reportSpecificFilterType();
     let title = `${reportedPage.hostname}: ${issueType}`;
-    if ( qs$('#isNSFW').checked ) {
+    if (qs$('#isNSFW').checked) {
         title = `[nsfw] ${title}`;
     }
     githubURL.searchParams.set('title', title);
@@ -99,12 +99,12 @@ getTroubleshootingInfo(reportedPage.mode).then(config => {
     dom.on('[data-url]', 'click', ev => {
         const elem = ev.target.closest('[data-url]');
         const url = dom.attr(elem, 'data-url');
-        if ( typeof url !== 'string' || url === '' ) { return; }
+        if (typeof url !== 'string' || url === '') { return; }
         sendMessage({ what: 'gotoURL', url });
         ev.preventDefault();
     });
 
-    if ( reportedPage !== null ) {
+    if (reportedPage !== null) {
         dom.on('[data-i18n="supportReportSpecificButton"]', 'click', ev => {
             reportSpecificFilterIssue();
             ev.preventDefault();

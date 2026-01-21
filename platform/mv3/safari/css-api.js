@@ -16,11 +16,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 (api => {
-    if ( typeof api === 'object' ) { return; }
+    if (typeof api === 'object') { return; }
 
     const inserted = new Set();
 
@@ -29,17 +29,17 @@
             chrome.runtime.sendMessage({
                 what: 'insertCSS',
                 css,
-            }).catch(( ) => {
+            }).catch(() => {
             });
             inserted.add(css);
         },
     };
 
-    self.addEventListener('pageshow', ( ) => {
+    self.addEventListener('pageshow', () => {
         chrome.runtime.sendMessage({
             what: 'insertCSS',
             css: Array.from(inserted).join('\n'),
-        }).catch(( ) => {
+        }).catch(() => {
         });
     });
 

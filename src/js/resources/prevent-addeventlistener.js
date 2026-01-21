@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -64,27 +64,27 @@ function preventAddEventListener(
     const rePattern = safe.patternToRegex(pattern);
     const targetSelector = extraArgs.elements || undefined;
     const elementMatches = elem => {
-        if ( targetSelector === 'window' ) { return elem === window; }
-        if ( targetSelector === 'document' ) { return elem === document; }
-        if ( elem && elem.matches && elem.matches(targetSelector) ) { return true; }
+        if (targetSelector === 'window') { return elem === window; }
+        if (targetSelector === 'document') { return elem === document; }
+        if (elem && elem.matches && elem.matches(targetSelector)) { return true; }
         const elems = Array.from(document.querySelectorAll(targetSelector));
         return elems.includes(elem);
     };
     const elementDetails = elem => {
-        if ( elem instanceof Window ) { return 'window'; }
-        if ( elem instanceof Document ) { return 'document'; }
-        if ( elem instanceof Element === false ) { return '?'; }
+        if (elem instanceof Window) { return 'window'; }
+        if (elem instanceof Document) { return 'document'; }
+        if (elem instanceof Element === false) { return '?'; }
         const parts = [];
         // https://github.com/uBlockOrigin/uAssets/discussions/17907#discussioncomment-9871079
         const id = String(elem.id);
-        if ( id !== '' ) { parts.push(`#${CSS.escape(id)}`); }
-        for ( let i = 0; i < elem.classList.length; i++ ) {
+        if (id !== '') { parts.push(`#${CSS.escape(id)}`); }
+        for (let i = 0; i < elem.classList.length; i++) {
             parts.push(`.${CSS.escape(elem.classList.item(i))}`);
         }
-        for ( let i = 0; i < elem.attributes.length; i++ ) {
+        for (let i = 0; i < elem.attributes.length; i++) {
             const attr = elem.attributes.item(i);
-            if ( attr.name === 'id' ) { continue; }
-            if ( attr.name === 'class' ) { continue; }
+            if (attr.name === 'id') { continue; }
+            if (attr.name === 'class') { continue; }
             parts.push(`[${CSS.escape(attr.name)}="${attr.value}"]`);
         }
         return parts.join('');
@@ -94,23 +94,23 @@ function preventAddEventListener(
         const matchesHandler = safe.RegExp_test.call(rePattern, handler);
         const matchesEither = matchesType || matchesHandler;
         const matchesBoth = matchesType && matchesHandler;
-        if ( safe.logLevel > 1 && matchesEither ) {
+        if (safe.logLevel > 1 && matchesEither) {
             debugger; // eslint-disable-line no-debugger
         }
-        if ( matchesBoth && targetSelector !== undefined ) {
-            if ( elementMatches(thisArg) === false ) { return false; }
+        if (matchesBoth && targetSelector !== undefined) {
+            if (elementMatches(thisArg) === false) { return false; }
         }
         return matchesBoth;
     };
-    const proxyFn = function(context) {
+    const proxyFn = function (context) {
         const { callArgs, thisArg } = context;
         let t, h;
         try {
             t = String(callArgs[0]);
-            if ( typeof callArgs[1] === 'function' ) {
+            if (typeof callArgs[1] === 'function') {
                 h = String(safe.Function_toString(callArgs[1]));
-            } else if ( typeof callArgs[1] === 'object' && callArgs[1] !== null ) {
-                if ( typeof callArgs[1].handleEvent === 'function' ) {
+            } else if (typeof callArgs[1] === 'object' && callArgs[1] !== null) {
+                if (typeof callArgs[1].handleEvent === 'function') {
                     h = String(safe.Function_toString(callArgs[1].handleEvent));
                 }
             } else {
@@ -118,16 +118,16 @@ function preventAddEventListener(
             }
         } catch {
         }
-        if ( type === '' && pattern === '' ) {
+        if (type === '' && pattern === '') {
             safe.uboLog(logPrefix, `Called: ${t}\n${h}\n${elementDetails(thisArg)}`);
-        } else if ( shouldPrevent(thisArg, t, h) ) {
+        } else if (shouldPrevent(thisArg, t, h)) {
             return safe.uboLog(logPrefix, `Prevented: ${t}\n${h}\n${elementDetails(thisArg)}`);
         }
         return context.reflect();
     };
-    runAt(( ) => {
+    runAt(() => {
         proxyApplyFn('EventTarget.prototype.addEventListener', proxyFn);
-        if ( extraArgs.protect ) {
+        if (extraArgs.protect) {
             const { addEventListener } = EventTarget.prototype;
             Object.defineProperty(EventTarget.prototype, 'addEventListener', {
                 set() { },
@@ -135,7 +135,7 @@ function preventAddEventListener(
             });
         }
         proxyApplyFn('document.addEventListener', proxyFn);
-        if ( extraArgs.protect ) {
+        if (extraArgs.protect) {
             const { addEventListener } = document;
             Object.defineProperty(document, 'addEventListener', {
                 set() { },
@@ -144,7 +144,7 @@ function preventAddEventListener(
         }
     }, extraArgs.runAt);
 }
-registerScriptlet(preventAddEventListener , {
+registerScriptlet(preventAddEventListener, {
     name: 'prevent-addEventListener.js',
     aliases: [
         'addEventListener-defuser.js',

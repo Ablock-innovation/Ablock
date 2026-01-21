@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import * as makeScriptlet from './make-scriptlets.js';
@@ -41,17 +41,17 @@ import { safeReplace } from './safe-replace.js';
 
 /******************************************************************************/
 
-const commandLineArgs = (( ) => {
+const commandLineArgs = (() => {
     const args = new Map();
     let name, value;
-    for ( const arg of process.argv.slice(2) ) {
+    for (const arg of process.argv.slice(2)) {
         const pos = arg.indexOf('=');
-        if ( pos === -1 ) {
+        if (pos === -1) {
             name = arg;
             value = '';
         } else {
             name = arg.slice(0, pos);
-            value = arg.slice(pos+1);
+            value = arg.slice(pos + 1);
         }
         args.set(name, value);
     }
@@ -63,7 +63,7 @@ const outputDir = commandLineArgs.get('output') || '.';
 const cacheDir = `${outputDir}/../mv3-data`;
 const rulesetDir = `${outputDir}/rulesets`;
 const scriptletDir = `${rulesetDir}/scripting`;
-const envExtra = (( ) => {
+const envExtra = (() => {
     const env = commandLineArgs.get('env');
     return env ? env.split('|') : [];
 })();
@@ -77,15 +77,15 @@ const env = [
     ...envExtra,
 ];
 
-if ( platform === 'edge' ) {
+if (platform === 'edge') {
     env.push('chromium');
 }
 
 /******************************************************************************/
 
 const jsonSetMapReplacer = (k, v) => {
-    if ( v instanceof Set || v instanceof Map ) {
-        if ( v.size === 0 ) { return; }
+    if (v instanceof Set || v instanceof Map) {
+        if (v.size === 0) { return; }
         return Array.from(v);
     }
     return v;
@@ -99,7 +99,7 @@ const stdOutput = [];
 const log = (text, silent = true) => {
     silent = silent && text.startsWith('!!!') === false;
     stdOutput.push(text);
-    if ( silent === false ) {
+    if (silent === false) {
         consoleLog(text);
     }
 };
@@ -120,28 +120,28 @@ async function fetchText(url, cacheDir) {
     logProgress(`Reading locally cached ${path.basename(url)}`);
     const fname = url
         .replace(/^https?:\/\//, '')
-        .replace(/\//g, '_');(url);
+        .replace(/\//g, '_'); (url);
     const content = await fs.readFile(
         `${cacheDir}/${fname}`,
         { encoding: 'utf8' }
-    ).catch(( ) => { });
-    if ( content !== undefined ) {
+    ).catch(() => { });
+    if (content !== undefined) {
         log(`\tFetched local ${url}`);
         return { url, content };
     }
     logProgress(`Fetching remote ${path.basename(url)}`);
     log(`\tFetching remote ${url}`);
-    const response = await fetch(url).catch(( ) => { });
-    if ( response === undefined ) {
+    const response = await fetch(url).catch(() => { });
+    if (response === undefined) {
         return { url, error: `Fetching failed: ${url}` };
     }
     let text;
-    if ( response.ok ) {
-        text = await response.text().catch(( ) => { });
+    if (response.ok) {
+        text = await response.text().catch(() => { });
     } else {
-        text = await fallbackFetchText(url).catch(( ) => { });
+        text = await fallbackFetchText(url).catch(() => { });
     }
-    if ( text === undefined ) {
+    if (text === undefined) {
         return { url, error: `Fetching text content failed: ${url}` };
     }
     writeFile(`${cacheDir}/${fname}`, text);
@@ -150,7 +150,7 @@ async function fetchText(url, cacheDir) {
 
 async function fallbackFetchText(url) {
     const match = /^https:\/\/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/master\/([^?]+)/.exec(url);
-    if ( match === null ) { return; }
+    if (match === null) { return; }
     logProgress(`\tGitHub CLI-fetching remote ${path.basename(url)}`);
     // https://docs.github.com/en/rest/repos/contents
     const content = execSync(`gh api \
@@ -191,7 +191,7 @@ const requiredRedirectResources = new Set();
 let networkBad = new Set();
 
 // This will be used to sign our inserted `!#trusted on` directives
-const secret = createHash('sha256').update(randomBytes(16)).digest('hex').slice(0,16);
+const secret = createHash('sha256').update(randomBytes(16)).digest('hex').slice(0, 16);
 log(`Secret: ${secret}`, false);
 
 /******************************************************************************/
@@ -200,31 +200,31 @@ const restrSeparator = '(?:[^%.0-9a-z_-]|$)';
 
 const rePatternFromUrlFilter = s => {
     let anchor = 0b000;
-    if ( s.startsWith('||') ) {
+    if (s.startsWith('||')) {
         anchor = 0b100;
         s = s.slice(2);
-    } else if ( s.startsWith('|') ) {
+    } else if (s.startsWith('|')) {
         anchor = 0b010;
         s = s.slice(1);
     }
-    if ( s.endsWith('|') ) {
+    if (s.endsWith('|')) {
         anchor |= 0b001;
         s = s.slice(0, -1);
     }
     let reStr = s.replace(rePatternFromUrlFilter.rePlainChars, '\\$&')
-                 .replace(rePatternFromUrlFilter.reSeparators, restrSeparator)
-                 .replace(rePatternFromUrlFilter.reDanglingAsterisks, '')
-                 .replace(rePatternFromUrlFilter.reAsterisks, '\\S*?');
-    if ( anchor & 0b100 ) {
+        .replace(rePatternFromUrlFilter.reSeparators, restrSeparator)
+        .replace(rePatternFromUrlFilter.reDanglingAsterisks, '')
+        .replace(rePatternFromUrlFilter.reAsterisks, '\\S*?');
+    if (anchor & 0b100) {
         reStr = (
             reStr.startsWith('\\.') ?
                 rePatternFromUrlFilter.restrHostnameAnchor2 :
                 rePatternFromUrlFilter.restrHostnameAnchor1
         ) + reStr;
-    } else if ( anchor & 0b010 ) {
+    } else if (anchor & 0b010) {
         reStr = '^' + reStr;
     }
-    if ( anchor & 0b001 ) {
+    if (anchor & 0b001) {
         reStr += '$';
     }
     return reStr;
@@ -244,14 +244,14 @@ async function fetchList(assetDetails) {
 
     // Fetch list and expand `!#include` directives
     let parts = assetDetails.urls.map(url => ({ url }));
-    while (  parts.every(v => typeof v === 'string') === false ) {
+    while (parts.every(v => typeof v === 'string') === false) {
         const newParts = [];
-        for ( const part of parts ) {
-            if ( typeof part === 'string' ) {
+        for (const part of parts) {
+            if (typeof part === 'string') {
                 newParts.push(part);
                 continue;
             }
-            if ( fetchedURLs.has(part.url) ) {
+            if (fetchedURLs.has(part.url)) {
                 newParts.push('');
                 continue;
             }
@@ -265,9 +265,9 @@ async function fetchList(assetDetails) {
             newParts.push(
                 fetchText(part.url, cacheDir).then(details => {
                     const { url, error } = details;
-                    if ( error !== undefined ) { return details; }
+                    if (error !== undefined) { return details; }
                     const content = details.content.trim();
-                    if ( /* content === '' || */ /^<.*>$/.test(content) ) {
+                    if ( /* content === '' || */ /^<.*>$/.test(content)) {
                         return { url, error: `Bad content: ${url}` };
                     }
                     return { url, content };
@@ -275,13 +275,13 @@ async function fetchList(assetDetails) {
             );
             newParts.push(`!#trusted off ${secret}`);
         }
-        if ( parts.some(v => typeof v === 'object' && v.error) ) { return; }
+        if (parts.some(v => typeof v === 'object' && v.error)) { return; }
         parts = await Promise.all(newParts);
         parts = sfp.utils.preparser.expandIncludes(parts, env);
     }
     const text = parts.join('\n');
 
-    if ( text === '' ) {
+    if (text === '') {
         log('No filterset found', false);
     }
     return text;
@@ -310,7 +310,7 @@ const isURLSkip = rule =>
 async function patchRuleset(ruleset) {
     return import(`./${platform}/patch-ruleset.js`).then(module => {
         return module.patchRuleset(ruleset)
-    }).catch(( ) => {
+    }).catch(() => {
         return ruleset;
     });
 }
@@ -327,32 +327,32 @@ async function patchRuleset(ruleset) {
 
 function pruneHostnameArray(hostnames) {
     const rootMap = new Map();
-    for ( const hostname of hostnames ) {
+    for (const hostname of hostnames) {
         const labels = hostname.split('.');
         let currentMap = rootMap;
         let i = labels.length;
-        while ( i-- ) {
+        while (i--) {
             const label = labels[i];
             let nextMap = currentMap.get(label);
-            if ( nextMap === null ) { break; }
-            if ( nextMap === undefined ) {
-                if ( i === 0 ) {
+            if (nextMap === null) { break; }
+            if (nextMap === undefined) {
+                if (i === 0) {
                     currentMap.set(label, (nextMap = null));
                 } else {
                     currentMap.set(label, (nextMap = new Map()));
                 }
-            } else if ( i === 0 ) {
+            } else if (i === 0) {
                 currentMap.set(label, null);
             }
             currentMap = nextMap;
         }
     }
     const assemble = (currentMap, currentHostname, out) => {
-        for ( const [ label, nextMap ] of currentMap ) {
+        for (const [label, nextMap] of currentMap) {
             const nextHostname = currentHostname === ''
                 ? label
                 : `${label}.${currentHostname}`;
-            if ( nextMap === null ) {
+            if (nextMap === null) {
                 out.push(nextHostname);
             } else {
                 assemble(nextMap, nextHostname, out);
@@ -372,31 +372,31 @@ function pruneHostnameArray(hostnames) {
  * */
 
 function toJSONRuleset(ruleset) {
-    const nodupProps = [ 'domains', 'excludedDomains', 'requestDomains', 'excludedRequestDomains', 'initiatorDomains', 'excludedInitiatorDomains' ];
-    for ( const { condition } of ruleset ) {
-        if ( condition === undefined ) { continue; }
-        for ( const prop of nodupProps ) {
-            if ( condition[prop] === undefined ) { continue; }
+    const nodupProps = ['domains', 'excludedDomains', 'requestDomains', 'excludedRequestDomains', 'initiatorDomains', 'excludedInitiatorDomains'];
+    for (const { condition } of ruleset) {
+        if (condition === undefined) { continue; }
+        for (const prop of nodupProps) {
+            if (condition[prop] === undefined) { continue; }
             condition[prop] = Array.from(new Set(condition[prop]));
         }
     }
-    const sortProps = [ 'requestDomains', 'initiatorDomains', 'domains' ];
+    const sortProps = ['requestDomains', 'initiatorDomains', 'domains'];
     ruleset.sort((a, b) => {
         let aLen = 0, bLen = 0;
-        for ( const prop of sortProps ) {
+        for (const prop of sortProps) {
             aLen += a.condition[prop]?.length ?? 0;
             bLen += b.condition[prop]?.length ?? 0;
         }
         return bLen - aLen;
     });
     const replacer = (k, v) => {
-        if ( k.startsWith('_') ) { return; }
-        if ( Array.isArray(v) ) {
+        if (k.startsWith('_')) { return; }
+        if (Array.isArray(v)) {
             return v.sort();
         }
-        if ( v instanceof Object ) {
+        if (v instanceof Object) {
             const sorted = {};
-            for ( const kk of Object.keys(v).sort() ) {
+            for (const kk of Object.keys(v).sort()) {
                 sorted[kk] = v[kk];
             }
             return sorted;
@@ -406,7 +406,7 @@ function toJSONRuleset(ruleset) {
     const indent = ruleset.length > 10 ? undefined : 1;
     const out = [];
     let id = 1;
-    for ( const rule of ruleset ) {
+    for (const rule of ruleset) {
         rule.id = id++;
         out.push(JSON.stringify(rule, replacer, indent));
     }
@@ -416,32 +416,32 @@ function toJSONRuleset(ruleset) {
 /******************************************************************************/
 
 function toStrictBlockRule(rule, out) {
-    if ( rule.action.type !== 'block' ) { return; }
+    if (rule.action.type !== 'block') { return; }
     const { condition } = rule;
-    if ( condition === undefined ) { return; }
-    if ( condition.domainType ) { return; }
-    if ( condition.excludedResourceTypes ) { return; }
-    if ( condition.requestMethods ) { return; }
-    if ( condition.excludedRequestMethods ) { return; }
-    if ( condition.responseHeaders ) { return; }
-    if ( condition.excludedResponseHeaders ) { return; }
-    if ( condition.initiatorDomains ) { return; }
-    if ( condition.excludedInitiatorDomains ) { return; }
+    if (condition === undefined) { return; }
+    if (condition.domainType) { return; }
+    if (condition.excludedResourceTypes) { return; }
+    if (condition.requestMethods) { return; }
+    if (condition.excludedRequestMethods) { return; }
+    if (condition.responseHeaders) { return; }
+    if (condition.excludedResponseHeaders) { return; }
+    if (condition.initiatorDomains) { return; }
+    if (condition.excludedInitiatorDomains) { return; }
     const { resourceTypes } = condition;
-    if ( resourceTypes === undefined ) {
-        if ( condition.requestDomains === undefined ) { return; }
-    } else if ( resourceTypes.includes('main_frame') === false ) {
+    if (resourceTypes === undefined) {
+        if (condition.requestDomains === undefined) { return; }
+    } else if (resourceTypes.includes('main_frame') === false) {
         return;
     }
     let regexFilter;
-    if ( condition.urlFilter ) {
+    if (condition.urlFilter) {
         regexFilter = rePatternFromUrlFilter(condition.urlFilter);
-    } else if ( condition.regexFilter ) {
+    } else if (condition.regexFilter) {
         regexFilter = condition.regexFilter;
     } else {
         regexFilter = '^https?://.*';
     }
-    if ( regexFilter.startsWith('^') === false ) {
+    if (regexFilter.startsWith('^') === false) {
         regexFilter = `^.*${regexFilter}`;
     }
     if (
@@ -460,11 +460,11 @@ function toStrictBlockRule(rule, out) {
         },
         condition: {
             regexFilter,
-            resourceTypes: [ 'main_frame' ],
+            resourceTypes: ['main_frame'],
         },
         priority: 29,
     };
-    if ( condition.requestDomains ) {
+    if (condition.requestDomains) {
         strictBlockRule.condition.requestDomains ??= [];
         strictBlockRule.condition.requestDomains = Array.from(
             new Set([
@@ -473,7 +473,7 @@ function toStrictBlockRule(rule, out) {
             ])
         );
     }
-    if ( condition.excludedRequestDomains ) {
+    if (condition.excludedRequestDomains) {
         strictBlockRule.condition.excludedRequestDomains ??= [];
         strictBlockRule.condition.excludedRequestDomains = Array.from(
             new Set([
@@ -496,23 +496,23 @@ async function processNetworkFilters(assetDetails, network) {
     log(`Output rule count: ${rules.length}`);
 
     // Minimize requestDomains arrays
-    for ( const rule of rules ) {
+    for (const rule of rules) {
         const condition = rule.condition;
-        if ( condition === undefined ) { continue; }
+        if (condition === undefined) { continue; }
         const requestDomains = condition.requestDomains;
-        if ( requestDomains === undefined ) { continue; }
+        if (requestDomains === undefined) { continue; }
         const beforeCount = requestDomains.length;
         condition.requestDomains = pruneHostnameArray(requestDomains);
         const afterCount = condition.requestDomains.length;
-        if ( afterCount !== beforeCount ) {
+        if (afterCount !== beforeCount) {
             log(`\tPruning requestDomains: from ${beforeCount} to ${afterCount}`);
         }
     }
 
     // Add native DNR ruleset if present
-    if ( assetDetails.dnrURL ) {
+    if (assetDetails.dnrURL) {
         const result = await fetchText(assetDetails.dnrURL, cacheDir);
-        for ( const rule of JSON.parse(result.content) ) {
+        for (const rule of JSON.parse(result.content)) {
             rules.push(rule);
         }
     }
@@ -533,33 +533,33 @@ async function processNetworkFilters(assetDetails, network) {
     log(`\tMaybe good (regexes): ${regexRules.length}`);
 
     staticRules.forEach(rule => {
-        if ( rule.action.redirect?.extensionPath === undefined ) { return; }
+        if (rule.action.redirect?.extensionPath === undefined) { return; }
         requiredRedirectResources.add(
             rule.action.redirect.extensionPath.replace(/^\/+/, '')
         );
     });
 
     const urlskips = new Map();
-    for ( const rule of rules ) {
-        if ( isURLSkip(rule) === false ) { continue; }
-        if ( rule.__modifierAction !== 0 ) { continue; }
+    for (const rule of rules) {
+        if (isURLSkip(rule) === false) { continue; }
+        if (rule.__modifierAction !== 0) { continue; }
         const { condition } = rule;
-        if ( condition.resourceTypes ) {
-            if ( condition.resourceTypes.includes('main_frame') === false ) {
+        if (condition.resourceTypes) {
+            if (condition.resourceTypes.includes('main_frame') === false) {
                 continue;
             }
         }
         const { urlFilter, regexFilter, requestDomains } = condition;
         let re;
-        if ( urlFilter !== undefined ) {
+        if (urlFilter !== undefined) {
             re = rePatternFromUrlFilter(urlFilter);
-        } else if ( regexFilter !== undefined ) {
+        } else if (regexFilter !== undefined) {
             re = regexFilter;
         } else {
             re = '^';
         }
         const rawSteps = rule.__modifierValue;
-        const steps = rawSteps.includes(' ') && rawSteps.split(/ +/) || [ rawSteps ];
+        const steps = rawSteps.includes(' ') && rawSteps.split(/ +/) || [rawSteps];
         const keyEntry = {
             re,
             c: condition.isUrlFilterCaseSensitive,
@@ -567,12 +567,12 @@ async function processNetworkFilters(assetDetails, network) {
         }
         const key = JSON.stringify(keyEntry);
         let actualEntry = urlskips.get(key);
-        if ( actualEntry === undefined ) {
+        if (actualEntry === undefined) {
             urlskips.set(key, keyEntry);
             actualEntry = keyEntry;
         }
-        if ( requestDomains !== undefined ) {
-            if ( actualEntry.hostnames === undefined ) {
+        if (requestDomains !== undefined) {
+            if (actualEntry.hostnames === undefined) {
                 actualEntry.hostnames = [];
             }
             actualEntry.hostnames.push(...requestDomains);
@@ -590,24 +590,24 @@ async function processNetworkFilters(assetDetails, network) {
         toJSONRuleset(staticRules)
     );
 
-    if ( regexRules.length !== 0 ) {
+    if (regexRules.length !== 0) {
         writeFile(`${rulesetDir}/regex/${assetDetails.id}.json`,
             toJSONRuleset(regexRules)
         );
     }
 
     const strictBlocked = new Map();
-    for ( const rule of staticRules ) {
+    for (const rule of staticRules) {
         toStrictBlockRule(rule, strictBlocked);
     }
-    if ( strictBlocked.size !== 0 ) {
+    if (strictBlocked.size !== 0) {
         mergeRules(strictBlocked, 'requestDomains');
         writeFile(`${rulesetDir}/strictblock/${assetDetails.id}.json`,
             toJSONRuleset(Array.from(strictBlocked.values()))
         );
     }
 
-    if ( urlskips.size !== 0 ) {
+    if (urlskips.size !== 0) {
         writeFile(`${rulesetDir}/urlskip/${assetDetails.id}.json`,
             JSON.stringify(Array.from(urlskips.values()), null, 1)
         );
@@ -634,24 +634,24 @@ async function processNetworkFilters(assetDetails, network) {
 let scriptletsMapPromise;
 
 function loadAllSourceScriptlets() {
-    if ( scriptletsMapPromise !== undefined ) {
+    if (scriptletsMapPromise !== undefined) {
         return scriptletsMapPromise;
     }
 
     scriptletsMapPromise = fs.readdir('./scriptlets').then(files => {
         const readTemplateFile = file =>
             fs.readFile(`./scriptlets/${file}`, { encoding: 'utf8' })
-              .then(text => ({ file, text }));
+                .then(text => ({ file, text }));
         const readPromises = [];
-        for ( const file of files ) {
+        for (const file of files) {
             readPromises.push(readTemplateFile(file));
         }
         return Promise.all(readPromises).then(results => {
             const originalScriptletMap = new Map();
-            for ( const details of results ) {
+            for (const details of results) {
                 originalScriptletMap.set(
                     details.file.replace('.template.js', '')
-                                .replace('.template.css', ''),
+                        .replace('.template.css', ''),
                     details.text
                 );
             }
@@ -679,14 +679,14 @@ async function processGenericCosmeticFilters(
     );
 
     const genericSelectorMap = new Map();
-    if ( selectorList ) {
-        for ( const { key, selector } of selectorList ) {
-            if ( key === undefined ) { continue; }
-            if ( exceptionSet.has(selector) ) { continue; }
+    if (selectorList) {
+        for (const { key, selector } of selectorList) {
+            if (key === undefined) { continue; }
+            if (exceptionSet.has(selector)) { continue; }
             const type = key.charCodeAt(0);
             const hash = hashFromStr(type, key.slice(1));
             const selectors = genericSelectorMap.get(hash);
-            if ( selectors === undefined ) {
+            if (selectors === undefined) {
                 genericSelectorMap.set(hash, selector)
             } else {
                 genericSelectorMap.set(hash, `${selectors},\n${selector}`)
@@ -697,18 +697,18 @@ async function processGenericCosmeticFilters(
     // Specific exceptions
     const genericExceptionSieve = new Set();
     const genericExceptionMap = new Map();
-    if ( declarativeMap ) {
-        for ( const [ exception, details ] of declarativeMap ) {
-            if ( details.rejected ) { continue; }
-            if ( details.key === undefined ) { continue; }
-            if ( details.matches !== undefined ) { continue; }
-            if ( details.excludeMatches === undefined ) { continue; }
+    if (declarativeMap) {
+        for (const [exception, details] of declarativeMap) {
+            if (details.rejected) { continue; }
+            if (details.key === undefined) { continue; }
+            if (details.matches !== undefined) { continue; }
+            if (details.excludeMatches === undefined) { continue; }
             const type = details.key.charCodeAt(0);
             const hash = hashFromStr(type, details.key.slice(1));
             genericExceptionSieve.add(hash);
-            for ( const hn of details.excludeMatches ) {
+            for (const hn of details.excludeMatches) {
                 const exceptions = genericExceptionMap.get(hn);
-                if ( exceptions === undefined ) {
+                if (exceptions === undefined) {
                     genericExceptionMap.set(hn, exception);
                 } else {
                     genericExceptionMap.set(hn, `${exceptions}\n${exception}`);
@@ -717,8 +717,8 @@ async function processGenericCosmeticFilters(
         }
     }
 
-    if ( genericSelectorMap.size === 0 ) {
-        if ( genericExceptionMap.size === 0 ) { return 0; }
+    if (genericSelectorMap.size === 0) {
+        if (genericExceptionMap.size === 0) { return 0; }
     }
 
     const originalScriptletMap = await loadAllSourceScriptlets();
@@ -753,7 +753,7 @@ const hashFromStr = (type, s) => {
     const len = s.length;
     const step = len + 7 >>> 3;
     let hash = (type << 5) + type ^ len;
-    for ( let i = 0; i < len; i += step ) {
+    for (let i = 0; i < len; i += step) {
         hash = (hash << 5) + hash ^ s.charCodeAt(i);
     }
     return hash & 0xFFF;
@@ -766,25 +766,25 @@ async function processGenericHighCosmeticFilters(
     genericSelectorList,
     genericExceptionList
 ) {
-    if ( genericSelectorList === undefined ) { return 0; }
+    if (genericSelectorList === undefined) { return 0; }
     const genericSelectorSet = new Set(
         genericSelectorList
             .filter(a => a.key === undefined)
             .map(a => a.selector)
     );
     // https://github.com/uBlockOrigin/uBOL-home/issues/365
-    if ( genericExceptionList ) {
-        for ( const entry of genericExceptionList ) {
-            if ( entry.key !== undefined ) { continue; }
+    if (genericExceptionList) {
+        for (const entry of genericExceptionList) {
+            if (entry.key !== undefined) { continue; }
             globalHighlyGenericExceptionSet.add(entry.selector);
         }
     }
-    for ( const selector of globalHighlyGenericExceptionSet ) {
-        if ( genericSelectorSet.has(selector) === false ) { continue; }
+    for (const selector of globalHighlyGenericExceptionSet) {
+        if (genericSelectorSet.has(selector) === false) { continue; }
         genericSelectorSet.delete(selector);
         log(`\tRemoving excepted highly generic filter ##${selector}`);
     }
-    if ( genericSelectorSet.size === 0 ) { return 0; }
+    if (genericSelectorSet.size === 0) { return 0; }
     const selectorLists = Array.from(genericSelectorSet).sort().join(',\n');
     const originalScriptletMap = await loadAllSourceScriptlets();
 
@@ -811,12 +811,12 @@ const globalHighlyGenericExceptionSet = new Set();
 /******************************************************************************/
 
 const scriptletJsonReplacer = (k, v) => {
-    if ( k === 'n' ) {
-        if ( v === undefined || v.size === 0 ) { return; }
+    if (k === 'n') {
+        if (v === undefined || v.size === 0) { return; }
         return Array.from(v);
     }
-    if ( v instanceof Set || v instanceof Map ) {
-        if ( v.size === 0 ) { return; }
+    if (v instanceof Set || v instanceof Map) {
+        if (v.size === 0) { return; }
         return Array.from(v);
     }
     return v;
@@ -825,8 +825,8 @@ const scriptletJsonReplacer = (k, v) => {
 /******************************************************************************/
 
 async function processCosmeticFilters(assetDetails, realm, mapin) {
-    if ( mapin === undefined ) { return 0; }
-    if ( mapin.size === 0 ) { return 0; }
+    if (mapin === undefined) { return 0; }
+    if (mapin.size === 0) { return 0; }
 
     // Collate all distinct selectors
     const allSelectors = new Map();
@@ -835,13 +835,13 @@ async function processCosmeticFilters(assetDetails, realm, mapin) {
     let hasEntities = false;
 
     const storeHostnameSelectorPair = (hn, iSelector) => {
-        if ( isHnRegexOrPath(hn) ) {
-            if ( allRegexesOrPaths.has(hn) === false ) {
+        if (isHnRegexOrPath(hn)) {
+            if (allRegexesOrPaths.has(hn) === false) {
                 allRegexesOrPaths.set(hn, new Set());
             }
             allRegexesOrPaths.get(hn).add(iSelector);
         } else {
-            if ( allHostnames.has(hn) === false ) {
+            if (allHostnames.has(hn) === false) {
                 allHostnames.set(hn, new Set());
             }
             allHostnames.get(hn).add(iSelector);
@@ -849,19 +849,19 @@ async function processCosmeticFilters(assetDetails, realm, mapin) {
         }
     };
 
-    for ( const [ selector, details ] of mapin ) {
-        if ( details.rejected ) { continue; }
-        if ( allSelectors.has(selector) === false ) {
+    for (const [selector, details] of mapin) {
+        if (details.rejected) { continue; }
+        if (allSelectors.has(selector) === false) {
             allSelectors.set(selector, allSelectors.size);
         }
         const iSelector = allSelectors.get(selector);
-        if ( details.matches ) {
-            for ( const hn of details.matches ) {
+        if (details.matches) {
+            for (const hn of details.matches) {
                 storeHostnameSelectorPair(hn, iSelector);
             }
         }
-        if ( details.excludeMatches ) {
-            for ( const hn of details.excludeMatches ) {
+        if (details.excludeMatches) {
+            for (const hn of details.excludeMatches) {
                 storeHostnameSelectorPair(hn, ~iSelector);
             }
         }
@@ -870,22 +870,22 @@ async function processCosmeticFilters(assetDetails, realm, mapin) {
 
     const ilistFromSelectorSet = selectorSet => {
         const list = JSON.stringify(Array.from(selectorSet).sort()).slice(1, -1);
-        if ( allSelectorLists.has(list) === false ) {
+        if (allSelectorLists.has(list) === false) {
             allSelectorLists.set(list, allSelectorLists.size);
         }
         return allSelectorLists.get(list);
     };
 
-    for ( const [ hn, selectorSet ] of allHostnames ) {
+    for (const [hn, selectorSet] of allHostnames) {
         allHostnames.set(hn, ilistFromSelectorSet(selectorSet));
     }
-    for ( const [ regexOrPath, selectorSet ] of allRegexesOrPaths ) {
+    for (const [regexOrPath, selectorSet] of allRegexesOrPaths) {
         allRegexesOrPaths.set(regexOrPath, ilistFromSelectorSet(selectorSet));
     }
 
     const sortedHostnames = Array.from(allHostnames.keys()).toSorted((a, b) => {
         const d = a.length - b.length;
-        if ( d !== 0 ) { return d; }
+        if (d !== 0) { return d; }
         return a < b ? -1 : 1;
     });
 
@@ -898,8 +898,8 @@ async function processCosmeticFilters(assetDetails, realm, mapin) {
         fromRegexes: Array.from(allRegexesOrPaths)
             .filter(a => a[0].startsWith('/') && a[0].endsWith('/'))
             .map(a => {
-                const restr = a[0].slice(1,-1);
-                return [ literalStrFromRegex(restr).slice(0,8), restr, a[1] ]
+                const restr = a[0].slice(1, -1);
+                return [literalStrFromRegex(restr).slice(0, 8), restr, a[1]]
             }).flat(),
     };
     writeFile(`${scriptletDir}/${realm}/${assetDetails.id}.json`, JSON.stringify(data));
@@ -922,10 +922,10 @@ async function processCosmeticFilters(assetDetails, realm, mapin) {
 /******************************************************************************/
 
 async function processScriptletFilters(assetDetails, mapin) {
-    if ( mapin === undefined ) { return 0; }
-    if ( mapin.size === 0 ) { return 0; }
+    if (mapin === undefined) { return 0; }
+    if (mapin.size === 0) { return 0; }
 
-    for ( const details of mapin.values() ) {
+    for (const details of mapin.values()) {
         makeScriptlet.compile(assetDetails, details);
     }
     const stats = await makeScriptlet.commit(
@@ -933,7 +933,7 @@ async function processScriptletFilters(assetDetails, mapin) {
         `${scriptletDir}/scriptlet`,
         writeFile
     );
-    if ( stats.length !== 0 ) {
+    if (stats.length !== 0) {
         scriptletStats.set(assetDetails.id, stats);
     }
     makeScriptlet.reset();
@@ -946,9 +946,9 @@ async function rulesetFromURLs(assetDetails) {
     log('============================');
     log(`Listset for '${assetDetails.id}':`);
 
-    if ( assetDetails.text === undefined && assetDetails.urls.length !== 0 ) {
+    if (assetDetails.text === undefined && assetDetails.urls.length !== 0) {
         const text = await fetchList(assetDetails);
-        if ( text === undefined ) {
+        if (text === undefined) {
             process.exit(1);
         }
         assetDetails.text = text;
@@ -956,7 +956,7 @@ async function rulesetFromURLs(assetDetails) {
         assetDetails.text = '';
     }
 
-    if ( Array.isArray(assetDetails.filters) && assetDetails.filters.length ) {
+    if (Array.isArray(assetDetails.filters) && assetDetails.filters.length) {
         const extra = [
             `!#trusted on ${secret}`,
             ...assetDetails.filters,
@@ -966,25 +966,25 @@ async function rulesetFromURLs(assetDetails) {
         assetDetails.text = extra.join('\n').trim();
     }
 
-    if ( assetDetails.text === '' ) { return; }
+    if (assetDetails.text === '') { return; }
 
     const extensionPaths = [];
-    for ( const [ fname, details ] of redirectResourcesMap ) {
+    for (const [fname, details] of redirectResourcesMap) {
         const path = `/web_accessible_resources/${fname}`;
-        extensionPaths.push([ fname, path ]);
-        if ( details.alias === undefined ) { continue; }
-        if ( typeof details.alias === 'string' ) {
-            extensionPaths.push([ details.alias, path ]);
+        extensionPaths.push([fname, path]);
+        if (details.alias === undefined) { continue; }
+        if (typeof details.alias === 'string') {
+            extensionPaths.push([details.alias, path]);
             continue;
         }
-        if ( Array.isArray(details.alias) === false ) { continue; }
-        for ( const alias of details.alias ) {
-            extensionPaths.push([ alias, path ]);
+        if (Array.isArray(details.alias) === false) { continue; }
+        for (const alias of details.alias) {
+            extensionPaths.push([alias, path]);
         }
     }
 
     const results = await dnrRulesetFromRawLists(
-        [ { name: assetDetails.id, text: assetDetails.text } ],
+        [{ name: assetDetails.id, text: assetDetails.text }],
         { env, extensionPaths, secret, networkBad }
     );
     networkBad = results.networkBad;
@@ -1001,13 +1001,13 @@ async function rulesetFromURLs(assetDetails) {
     const declarativeCosmetic = new Map();
     const proceduralCosmetic = new Map();
     const rejectedCosmetic = [];
-    if ( results.specificCosmetic ) {
-        for ( const [ selector, details ] of results.specificCosmetic ) {
-            if ( details.rejected ) {
+    if (results.specificCosmetic) {
+        for (const [selector, details] of results.specificCosmetic) {
+            if (details.rejected) {
                 rejectedCosmetic.push(selector);
                 continue;
             }
-            if ( selector.startsWith('{') === false ) {
+            if (selector.startsWith('{') === false) {
                 declarativeCosmetic.set(selector, details);
                 continue;
             }
@@ -1016,7 +1016,7 @@ async function rulesetFromURLs(assetDetails) {
             proceduralCosmetic.set(JSON.stringify(parsed), details);
         }
     }
-    if ( rejectedCosmetic.length !== 0 ) {
+    if (rejectedCosmetic.length !== 0) {
         log(`Rejected cosmetic filters: ${rejectedCosmetic.length}`);
         log(rejectedCosmetic.map(line => `\t${line}`).join('\n'), true);
     }
@@ -1038,7 +1038,7 @@ async function rulesetFromURLs(assetDetails) {
             .filter(hn => hn.endsWith('.*') === false)
             .sort();
     }
-    if ( genericDetailsForRuleset.unhide || genericDetailsForRuleset.hide ) {
+    if (genericDetailsForRuleset.unhide || genericDetailsForRuleset.hide) {
         genericDetails.set(assetDetails.id, genericDetailsForRuleset);
     }
 
@@ -1123,7 +1123,7 @@ async function main() {
         const dayPart = now.getUTCDate();
         const hourPart = Math.floor(now.getUTCHours());
         const minutePart = Math.floor(now.getUTCMinutes());
-        version = `${yearPart}.${monthPart*100+dayPart}.${hourPart*100+minutePart}`;
+        version = `${yearPart}.${monthPart * 100 + dayPart}.${hourPart * 100 + minutePart}`;
     }
     log(`Version: ${version}`, false);
 
@@ -1134,8 +1134,8 @@ async function main() {
         JSON.parse(text)
     );
 
-    for ( const ruleset of rulesets ) {
-        if ( ruleset.excludedPlatforms?.includes(platform) ) { continue; }
+    for (const ruleset of rulesets) {
+        if (ruleset.excludedPlatforms?.includes(platform)) { continue; }
         await rulesetFromURLs(ruleset);
     }
 
@@ -1154,7 +1154,7 @@ async function main() {
     );
 
     // Copy required redirect resources
-    for ( const path of requiredRedirectResources ) {
+    for (const path of requiredRedirectResources) {
         copyFile(`./${path}`, `${outputDir}/${path}`);
     }
 
@@ -1174,9 +1174,9 @@ async function main() {
     manifest.web_accessible_resources = manifest.web_accessible_resources || [];
     const web_accessible_resources = {
         resources: Array.from(requiredRedirectResources).map(path => `${path}`),
-        matches: [ '<all_urls>' ],
+        matches: ['<all_urls>'],
     };
-    if ( env.includes('chromium') && env.includes('safari') === false ) {
+    if (env.includes('chromium') && env.includes('safari') === false) {
         web_accessible_resources.use_dynamic_url = true;
     }
     manifest.web_accessible_resources.push(web_accessible_resources);

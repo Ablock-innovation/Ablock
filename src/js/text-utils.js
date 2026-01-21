@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
@@ -39,13 +39,13 @@ class LineIterator {
         this.offset = offset || 0;
     }
     next(offset) {
-        if ( offset !== undefined ) {
+        if (offset !== undefined) {
             this.offset += offset;
         }
         let lineEnd = this.text.indexOf('\n', this.offset);
-        if ( lineEnd === -1 ) {
+        if (lineEnd === -1) {
             lineEnd = this.text.indexOf('\r', this.offset);
-            if ( lineEnd === -1 ) {
+            if (lineEnd === -1) {
                 lineEnd = this.textLen;
             }
         }
@@ -84,7 +84,7 @@ class FieldIterator {
     }
     next() {
         let end = this.text.indexOf(this.sep, this.offset);
-        if ( end === -1 ) {
+        if (end === -1) {
             end = this.text.length;
         }
         const field = this.text.slice(this.offset, end);

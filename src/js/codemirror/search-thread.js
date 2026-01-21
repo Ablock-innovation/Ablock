@@ -16,183 +16,183 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /******************************************************************************/
 
-(( ) => {
-// >>>>> start of local scope
+(() => {
+    // >>>>> start of local scope
 
-/******************************************************************************/
+    /******************************************************************************/
 
-// Worker context
+    // Worker context
 
-if (
-    self.WorkerGlobalScope instanceof Object &&
-    self instanceof self.WorkerGlobalScope
-) {
-    let content = '';
+    if (
+        self.WorkerGlobalScope instanceof Object &&
+        self instanceof self.WorkerGlobalScope
+    ) {
+        let content = '';
 
-    const doSearch = function(details) {
-        const reEOLs = /\n\r|\r\n|\n|\r/g;
-        const t1 = Date.now() + 750;
+        const doSearch = function (details) {
+            const reEOLs = /\n\r|\r\n|\n|\r/g;
+            const t1 = Date.now() + 750;
 
-        let reSearch;
-        try {
-            reSearch = new RegExp(details.pattern, details.flags);
-        } catch {
-            return;
-        }
-
-        const response = [];
-        const maxOffset = content.length;
-        let iLine = 0;
-        let iOffset = 0;
-        let size = 0;
-        while ( iOffset < maxOffset ) {
-            // Find next match
-            const match = reSearch.exec(content);
-            if ( match === null ) { break; }
-            // Find number of line breaks between last and current match.
-            reEOLs.lastIndex = 0;
-            const eols = content.slice(iOffset, match.index).match(reEOLs);
-            if ( Array.isArray(eols) ) {
-                iLine += eols.length;
+            let reSearch;
+            try {
+                reSearch = new RegExp(details.pattern, details.flags);
+            } catch {
+                return;
             }
-            // Store line
-            response.push(iLine);
-            size += 1;
-            // Find next line break.
-            reEOLs.lastIndex = reSearch.lastIndex;
-            const eol = reEOLs.exec(content);
-            iOffset = eol !== null
-                ? reEOLs.lastIndex
-                : content.length;
-            reSearch.lastIndex = iOffset;
-            iLine += 1;
-            // Quit if this takes too long
-            if ( (size & 0x3FF) === 0 && Date.now() >= t1 ) { break; }
-        }
 
-        return response;
-    };
+            const response = [];
+            const maxOffset = content.length;
+            let iLine = 0;
+            let iOffset = 0;
+            let size = 0;
+            while (iOffset < maxOffset) {
+                // Find next match
+                const match = reSearch.exec(content);
+                if (match === null) { break; }
+                // Find number of line breaks between last and current match.
+                reEOLs.lastIndex = 0;
+                const eols = content.slice(iOffset, match.index).match(reEOLs);
+                if (Array.isArray(eols)) {
+                    iLine += eols.length;
+                }
+                // Store line
+                response.push(iLine);
+                size += 1;
+                // Find next line break.
+                reEOLs.lastIndex = reSearch.lastIndex;
+                const eol = reEOLs.exec(content);
+                iOffset = eol !== null
+                    ? reEOLs.lastIndex
+                    : content.length;
+                reSearch.lastIndex = iOffset;
+                iLine += 1;
+                // Quit if this takes too long
+                if ((size & 0x3FF) === 0 && Date.now() >= t1) { break; }
+            }
 
-    self.onmessage = function(e) {
-        const msg = e.data;
+            return response;
+        };
 
-        switch ( msg.what ) {
-        case 'setHaystack':
-            content = msg.content;
-            break;
+        self.onmessage = function (e) {
+            const msg = e.data;
 
-        case 'doSearch': {
-            const response = doSearch(msg);
-            self.postMessage({ id: msg.id, response });
-            break;
-        }
-        default:
-            break;
-        }
-    };
+            switch (msg.what) {
+                case 'setHaystack':
+                    content = msg.content;
+                    break;
 
-    return;
-}
+                case 'doSearch': {
+                    const response = doSearch(msg);
+                    self.postMessage({ id: msg.id, response });
+                    break;
+                }
+                default:
+                    break;
+            }
+        };
 
-/******************************************************************************/
+        return;
+    }
 
-// Main context
+    /******************************************************************************/
 
-{
-    const workerTTL = { min: 5 };
-    const pendingResponses = new Map();
-    const workerTTLTimer = vAPI.defer.create(( ) => {
-        shutdown();
-    });
+    // Main context
 
-    let worker;
-    let messageId = 1;
+    {
+        const workerTTL = { min: 5 };
+        const pendingResponses = new Map();
+        const workerTTLTimer = vAPI.defer.create(() => {
+            shutdown();
+        });
 
-    const onWorkerMessage = function(e) {
-        const msg = e.data;
-        const resolver = pendingResponses.get(msg.id);
-        if ( resolver === undefined ) { return; }
-        pendingResponses.delete(msg.id);
-        resolver(msg.response);
-    };
+        let worker;
+        let messageId = 1;
 
-    const cancelPendingTasks = function() {
-        for ( const resolver of pendingResponses.values() ) {
-            resolver();
-        }
-        pendingResponses.clear();
-    };
+        const onWorkerMessage = function (e) {
+            const msg = e.data;
+            const resolver = pendingResponses.get(msg.id);
+            if (resolver === undefined) { return; }
+            pendingResponses.delete(msg.id);
+            resolver(msg.response);
+        };
 
-    const destroy = function() {
-        shutdown();
-        self.searchThread = undefined;
-    };
+        const cancelPendingTasks = function () {
+            for (const resolver of pendingResponses.values()) {
+                resolver();
+            }
+            pendingResponses.clear();
+        };
 
-    const shutdown = function() {
-        if ( worker === undefined ) { return; }
-        workerTTLTimer.off();
-        worker.terminate();
-        worker.onmessage = undefined;
-        worker = undefined;
-        cancelPendingTasks();
-    };
+        const destroy = function () {
+            shutdown();
+            self.searchThread = undefined;
+        };
 
-    const init = function() {
-        if ( self.searchThread instanceof Object === false ) { return; }
-        if ( worker === undefined ) {
-            worker = new Worker('js/codemirror/search-thread.js');
-            worker.onmessage = onWorkerMessage;
-        }
-        workerTTLTimer.offon(workerTTL);
-    };
-
-    const needHaystack = function() {
-        return worker instanceof Object === false;
-    };
-
-    const setHaystack = function(content) {
-        init();
-        worker.postMessage({ what: 'setHaystack', content });
-    };
-
-    const search = function(query, overwrite = true) {
-        init();
-        if ( worker instanceof Object === false ) {
-            return Promise.resolve();
-        }
-        if ( overwrite ) {
+        const shutdown = function () {
+            if (worker === undefined) { return; }
+            workerTTLTimer.off();
+            worker.terminate();
+            worker.onmessage = undefined;
+            worker = undefined;
             cancelPendingTasks();
-        }
-        const id = messageId++;
-        worker.postMessage({
-            what: 'doSearch',
-            id,
-            pattern: query.source,
-            flags: query.flags,
-            isRE: query instanceof RegExp
-        });
-        return new Promise(resolve => {
-            pendingResponses.set(id, resolve);
-        });
-    };
+        };
 
-    self.addEventListener(
-        'beforeunload',
-        ( ) => { destroy(); },
-        { once: true }
-    );
+        const init = function () {
+            if (self.searchThread instanceof Object === false) { return; }
+            if (worker === undefined) {
+                worker = new Worker('js/codemirror/search-thread.js');
+                worker.onmessage = onWorkerMessage;
+            }
+            workerTTLTimer.offon(workerTTL);
+        };
 
-    self.searchThread = { needHaystack, setHaystack, search, shutdown };
-}
+        const needHaystack = function () {
+            return worker instanceof Object === false;
+        };
 
-/******************************************************************************/
+        const setHaystack = function (content) {
+            init();
+            worker.postMessage({ what: 'setHaystack', content });
+        };
 
-// <<<<< end of local scope
+        const search = function (query, overwrite = true) {
+            init();
+            if (worker instanceof Object === false) {
+                return Promise.resolve();
+            }
+            if (overwrite) {
+                cancelPendingTasks();
+            }
+            const id = messageId++;
+            worker.postMessage({
+                what: 'doSearch',
+                id,
+                pattern: query.source,
+                flags: query.flags,
+                isRE: query instanceof RegExp
+            });
+            return new Promise(resolve => {
+                pendingResponses.set(id, resolve);
+            });
+        };
+
+        self.addEventListener(
+            'beforeunload',
+            () => { destroy(); },
+            { once: true }
+        );
+
+        self.searchThread = { needHaystack, setHaystack, search, shutdown };
+    }
+
+    /******************************************************************************/
+
+    // <<<<< end of local scope
 })();
 
 /******************************************************************************/

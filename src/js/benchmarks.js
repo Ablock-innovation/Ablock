@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import {
@@ -63,22 +63,22 @@ import µb from './background.js';
 // Rename ./tmp/requests.json.gz to something else if you no longer want
 // ./assets/requests.json in the build.
 
-const loadBenchmarkDataset = (( ) => {
+const loadBenchmarkDataset = (() => {
     let datasetPromise;
 
-    const ttlTimer = vAPI.defer.create(( ) => {
+    const ttlTimer = vAPI.defer.create(() => {
         datasetPromise = undefined;
     });
 
-    return async function() {
+    return async function () {
         ttlTimer.offon({ min: 2 });
 
-        if ( datasetPromise !== undefined ) {
+        if (datasetPromise !== undefined) {
             return datasetPromise;
         }
 
         const datasetURL = µb.hiddenSettings.benchmarkDatasetURL;
-        if ( datasetURL === 'unset' ) {
+        if (datasetURL === 'unset') {
             console.info(`No benchmark dataset available.`);
             return;
         }
@@ -86,7 +86,7 @@ const loadBenchmarkDataset = (( ) => {
         datasetPromise = io.fetchText(datasetURL).then(details => {
             console.info(`Parsing benchmark dataset...`);
             let requests = [];
-            if ( details.content.startsWith('[') ) {
+            if (details.content.startsWith('[')) {
                 try {
                     requests = JSON.parse(details.content);
                 } catch {
@@ -94,9 +94,9 @@ const loadBenchmarkDataset = (( ) => {
             } else {
                 const lineIter = new LineIterator(details.content);
                 const parsed = [];
-                while ( lineIter.eot() === false ) {
+                while (lineIter.eot() === false) {
                     const line = lineIter.next().trim();
-                    if ( line === '' ) { continue; }
+                    if (line === '') { continue; }
                     try {
                         parsed.push(JSON.parse(line));
                     } catch {
@@ -106,14 +106,14 @@ const loadBenchmarkDataset = (( ) => {
                 }
                 requests = parsed;
             }
-            if ( requests.length === 0 ) { return; }
+            if (requests.length === 0) { return; }
             const out = [];
-            for ( const request of requests ) {
-                if ( request instanceof Object === false ) { continue; }
-                if ( !request.frameUrl || !request.url ) { continue; }
-                if ( request.cpt === 'document' ) {
+            for (const request of requests) {
+                if (request instanceof Object === false) { continue; }
+                if (!request.frameUrl || !request.url) { continue; }
+                if (request.cpt === 'document') {
                     request.cpt = 'main_frame';
-                } else if ( request.cpt === 'xhr' ) {
+                } else if (request.cpt === 'xhr') {
                     request.cpt = 'xmlhttprequest';
                 }
                 out.push(request);
@@ -134,7 +134,7 @@ export async function benchmarkStaticNetFiltering(options = {}) {
     const { target, redirectEngine } = options;
 
     const requests = await loadBenchmarkDataset();
-    if ( Array.isArray(requests) === false || requests.length === 0 ) {
+    if (Array.isArray(requests) === false || requests.length === 0) {
         const text = 'No dataset found to benchmark';
         console.info(text);
         return text;
@@ -144,7 +144,7 @@ export async function benchmarkStaticNetFiltering(options = {}) {
 
     const fctxt = new FilteringContext();
 
-    if ( typeof target === 'number' ) {
+    if (typeof target === 'number') {
         const request = requests[target];
         fctxt.setURL(request.url);
         fctxt.setDocOriginFromURL(request.frameUrl);
@@ -154,7 +154,7 @@ export async function benchmarkStaticNetFiltering(options = {}) {
         console.info(`\ttype=${fctxt.type}`);
         console.info(`\turl=${fctxt.url}`);
         console.info(`\tdocOrigin=${fctxt.getDocOrigin()}`);
-        if ( r !== 0 ) {
+        if (r !== 0) {
             console.info(sfne.toLogData());
         }
         return;
@@ -170,9 +170,9 @@ export async function benchmarkStaticNetFiltering(options = {}) {
     let cspCount = 0;
     let permissionsCount = 0;
     let replaceCount = 0;
-    for ( const request of requests ) {
+    for (const request of requests) {
         fctxt.setURL(request.url);
-        if ( fctxt.getIPAddress() === '' ) {
+        if (fctxt.getIPAddress() === '') {
             fctxt.setIPAddress('93.184.215.14\n2606:2800:21f:cb07:6820:80da:af6b:8b2c');
         }
         fctxt.setDocOriginFromURL(request.frameUrl);
@@ -180,37 +180,37 @@ export async function benchmarkStaticNetFiltering(options = {}) {
         sfne.redirectURL = undefined;
         const r = sfne.matchRequest(fctxt);
         matchCount += 1;
-        if ( r === 1 ) { blockCount += 1; }
-        else if ( r === 2 ) { allowCount += 1; }
-        if ( r !== 1 ) {
-            if ( sfne.transformURL(fctxt) ) {
+        if (r === 1) { blockCount += 1; }
+        else if (r === 2) { allowCount += 1; }
+        if (r !== 1) {
+            if (sfne.transformURL(fctxt)) {
                 redirectCount += 1;
             }
-            if ( sfne.hasQuery(fctxt) ) {
-                if ( sfne.filterQuery(fctxt) ) {
+            if (sfne.hasQuery(fctxt)) {
+                if (sfne.filterQuery(fctxt)) {
                     removeparamCount += 1;
                 }
             }
-            if ( sfne.urlSkip(fctxt, false) ) {
+            if (sfne.urlSkip(fctxt, false)) {
                 urlskipCount += 1;
             }
-            if ( fctxt.isDocument() ) {
-                if ( sfne.matchAndFetchModifiers(fctxt, 'csp') ) {
+            if (fctxt.isDocument()) {
+                if (sfne.matchAndFetchModifiers(fctxt, 'csp')) {
                     cspCount += 1;
                 }
-                if ( sfne.matchAndFetchModifiers(fctxt, 'permissions') ) {
+                if (sfne.matchAndFetchModifiers(fctxt, 'permissions')) {
                     permissionsCount += 1;
                 }
             }
             sfne.matchHeaders(fctxt, []);
-            if ( sfne.matchAndFetchModifiers(fctxt, 'replace') ) {
+            if (sfne.matchAndFetchModifiers(fctxt, 'replace')) {
                 replaceCount += 1;
             }
-        } else if ( redirectEngine !== undefined ) {
-            if ( sfne.redirectRequest(redirectEngine, fctxt) ) {
+        } else if (redirectEngine !== undefined) {
+            if (sfne.redirectRequest(redirectEngine, fctxt)) {
                 redirectCount += 1;
             }
-            if ( fctxt.isRootDocument() && sfne.urlSkip(fctxt, true) ) {
+            if (fctxt.isRootDocument() && sfne.urlSkip(fctxt, true)) {
                 urlskipCount += 1;
             }
         }
@@ -241,7 +241,7 @@ export async function benchmarkStaticNetFiltering(options = {}) {
 
 export async function tokenHistogramsfunction() {
     const requests = await loadBenchmarkDataset();
-    if ( Array.isArray(requests) === false || requests.length === 0 ) {
+    if (Array.isArray(requests) === false || requests.length === 0) {
         console.info('No requests found to benchmark');
         return;
     }
@@ -253,24 +253,24 @@ export async function tokenHistogramsfunction() {
     const hitTokenMap = new Map();
     const reTokens = /[0-9a-z%]{2,}/g;
 
-    for ( let i = 0; i < requests.length; i++ ) {
+    for (let i = 0; i < requests.length; i++) {
         const request = requests[i];
         fctxt.setURL(request.url);
         fctxt.setDocOriginFromURL(request.frameUrl);
         fctxt.setType(request.cpt);
         const r = sfne.matchRequest(fctxt);
-        for ( let [ keyword ] of request.url.toLowerCase().matchAll(reTokens) ) {
+        for (let [keyword] of request.url.toLowerCase().matchAll(reTokens)) {
             const token = keyword.slice(0, 7);
-            if ( r === 0 ) {
+            if (r === 0) {
                 missTokenMap.set(token, (missTokenMap.get(token) || 0) + 1);
-            } else if ( r === 1 ) {
+            } else if (r === 1) {
                 hitTokenMap.set(token, (hitTokenMap.get(token) || 0) + 1);
             }
         }
     }
     const customSort = (a, b) => b[1] - a[1];
     const topmisses = Array.from(missTokenMap).sort(customSort).slice(0, 100);
-    for ( const [ token ] of topmisses ) {
+    for (const [token] of topmisses) {
         hitTokenMap.delete(token);
     }
     const tophits = Array.from(hitTokenMap).sort(customSort).slice(0, 100);
@@ -282,14 +282,14 @@ export async function tokenHistogramsfunction() {
 
 export async function benchmarkDynamicNetFiltering() {
     const requests = await loadBenchmarkDataset();
-    if ( Array.isArray(requests) === false || requests.length === 0 ) {
+    if (Array.isArray(requests) === false || requests.length === 0) {
         console.info('No requests found to benchmark');
         return;
     }
     console.info(`Benchmarking sessionFirewall.evaluateCellZY()...`);
     const fctxt = new FilteringContext();
     const t0 = performance.now();
-    for ( const request of requests ) {
+    for (const request of requests) {
         fctxt.setURL(request.url);
         fctxt.setTabOriginFromURL(request.frameUrl);
         fctxt.setType(request.cpt);
@@ -309,7 +309,7 @@ export async function benchmarkDynamicNetFiltering() {
 
 export async function benchmarkCosmeticFiltering() {
     const requests = await loadBenchmarkDataset();
-    if ( Array.isArray(requests) === false || requests.length === 0 ) {
+    if (Array.isArray(requests) === false || requests.length === 0) {
         console.info('No requests found to benchmark');
         return;
     }
@@ -329,9 +329,9 @@ export async function benchmarkCosmeticFiltering() {
     };
     let count = 0;
     const t0 = performance.now();
-    for ( let i = 0; i < requests.length; i++ ) {
+    for (let i = 0; i < requests.length; i++) {
         const request = requests[i];
-        if ( request.cpt !== 'main_frame' ) { continue; }
+        if (request.cpt !== 'main_frame') { continue; }
         count += 1;
         details.hostname = hostnameFromURI(request.url);
         details.domain = domainFromHostname(details.hostname);
@@ -353,7 +353,7 @@ export async function benchmarkCosmeticFiltering() {
 
 export async function benchmarkScriptletFiltering() {
     const requests = await loadBenchmarkDataset();
-    if ( Array.isArray(requests) === false || requests.length === 0 ) {
+    if (Array.isArray(requests) === false || requests.length === 0) {
         console.info('No requests found to benchmark');
         return;
     }
@@ -370,9 +370,9 @@ export async function benchmarkScriptletFiltering() {
     };
     let count = 0;
     const t0 = performance.now();
-    for ( let i = 0; i < requests.length; i++ ) {
+    for (let i = 0; i < requests.length; i++) {
         const request = requests[i];
-        if ( request.cpt !== 'main_frame' ) { continue; }
+        if (request.cpt !== 'main_frame') { continue; }
         count += 1;
         details.url = request.url;
         details.hostname = hostnameFromURI(request.url);
@@ -395,13 +395,13 @@ export async function benchmarkScriptletFiltering() {
 
 export async function benchmarkOnBeforeRequest() {
     const requests = await loadBenchmarkDataset();
-    if ( Array.isArray(requests) === false || requests.length === 0 ) {
+    if (Array.isArray(requests) === false || requests.length === 0) {
         console.info('No requests found to benchmark');
         return;
     }
     const mappedTypes = new Map([
-        [ 'document', 'main_frame' ],
-        [ 'subdocument', 'sub_frame' ],
+        ['document', 'main_frame'],
+        ['subdocument', 'sub_frame'],
     ]);
     console.info('webRequest.onBeforeRequest()...');
     const t0 = self.performance.now();
@@ -414,20 +414,20 @@ export async function benchmarkOnBeforeRequest() {
         type: '',
         url: '',
     };
-    for ( const request of requests ) {
+    for (const request of requests) {
         details.documentUrl = request.frameUrl;
         details.tabId = -1;
         details.parentFrameId = -1;
         details.frameId = 0;
         details.type = mappedTypes.get(request.cpt) || request.cpt;
         details.url = request.url;
-        if ( details.type === 'main_frame' ) { continue; }
+        if (details.type === 'main_frame') { continue; }
         promises.push(webRequest.onBeforeRequest(details));
     }
     return Promise.all(promises).then(results => {
         let blockCount = 0;
-        for ( const r of results ) {
-            if ( r !== undefined ) { blockCount += 1; }
+        for (const r of results) {
+            if (r !== undefined) { blockCount += 1; }
         }
         const t1 = self.performance.now();
         const dur = t1 - t0;

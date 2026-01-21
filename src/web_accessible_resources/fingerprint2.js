@@ -16,13 +16,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 // Reference:
 // https://github.com/fingerprintjs/fingerprintjs/tree/v2
 
-(function() {
+(function () {
     'use strict';
     const hex32 = len => {
         return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
@@ -31,24 +31,24 @@
             .padStart(len, '0');
     };
     const browserId = `${hex32(8)}${hex32(8)}${hex32(8)}${hex32(8)}`;
-    const fp2 = function(){};
-    fp2.get = function(opts, cb) {
-        if ( !cb  ) { cb = opts; }
-        setTimeout(( ) => { cb([]); }, 1);
+    const fp2 = function () { };
+    fp2.get = function (opts, cb) {
+        if (!cb) { cb = opts; }
+        setTimeout(() => { cb([]); }, 1);
     };
-    fp2.getPromise = function() {
+    fp2.getPromise = function () {
         return Promise.resolve([]);
     };
-    fp2.getV18 = function() {
+    fp2.getV18 = function () {
         return browserId;
     };
-    fp2.x64hash128 = function() {
+    fp2.x64hash128 = function () {
         return browserId;
     };
     fp2.prototype = {
-        get: function(opts, cb) {
-            if ( !cb  ) { cb = opts; }
-            setTimeout(( ) => { cb(browserId, []); }, 1);
+        get: function (opts, cb) {
+            if (!cb) { cb = opts; }
+            setTimeout(() => { cb(browserId, []); }, 1);
         },
     };
     self.Fingerprint2 = self.Fingerprint = fp2;

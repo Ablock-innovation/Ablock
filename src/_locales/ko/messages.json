@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "CSP 보고서 차단",
-    "description": "background information: https://github.com/gorhill/uBlock/issues/3150"
+    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "표준 이름 잠금 해제",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "규칙 문법: <code>소스 페이지, 필터링 대상, 필터링할 타입, 적용할 조치</code> (<a href='https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-rule-syntax'>전체 설명서</a>).",
+    "message": "규칙 문법: <code>소스 페이지, 필터링 대상, 필터링할 타입, 적용할 조치</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>전체 설명서</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

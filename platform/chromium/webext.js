@@ -16,22 +16,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 // `webext` is a promisified api of `chrome`. Entries are added as
 // the promisification of uBO progress.
 
-const promisifyNoFail = function(thisArg, fnName, outFn = r => r) {
+const promisifyNoFail = function (thisArg, fnName, outFn = r => r) {
     const fn = thisArg[fnName];
-    return function(...args) {
+    return function (...args) {
         return new Promise(resolve => {
             try {
-                fn.call(thisArg, ...args, function(...args) {
+                fn.call(thisArg, ...args, function (...args) {
                     void chrome.runtime.lastError;
                     resolve(outFn(...args));
                 });
-            } catch(ex) {
+            } catch (ex) {
                 console.error(ex);
                 resolve(outFn());
             }
@@ -39,19 +39,19 @@ const promisifyNoFail = function(thisArg, fnName, outFn = r => r) {
     };
 };
 
-const promisify = function(thisArg, fnName) {
+const promisify = function (thisArg, fnName) {
     const fn = thisArg[fnName];
-    return function(...args) {
+    return function (...args) {
         return new Promise((resolve, reject) => {
             try {
-                fn.call(thisArg, ...args, function(...args) {
+                fn.call(thisArg, ...args, function (...args) {
                     const lastError = chrome.runtime.lastError;
-                    if ( lastError instanceof Object ) {
+                    if (lastError instanceof Object) {
                         return reject(lastError.message);
                     }
                     resolve(...args);
                 });
-            } catch(ex) {
+            } catch (ex) {
                 console.error(ex);
                 resolve();
             }
@@ -78,8 +78,8 @@ const webext = {
     },
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/menus
     menus: {
-        create: function() {
-            return chrome.contextMenus.create(...arguments, ( ) => {
+        create: function () {
+            return chrome.contextMenus.create(...arguments, () => {
                 void chrome.runtime.lastError;
             });
         },
@@ -130,14 +130,14 @@ const webext = {
 {
     const settings = [
         // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/privacy/network
-        [ 'network', 'networkPredictionEnabled' ],
-        [ 'network', 'webRTCIPHandlingPolicy' ],
+        ['network', 'networkPredictionEnabled'],
+        ['network', 'webRTCIPHandlingPolicy'],
         // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/privacy/websites
-        [ 'websites', 'hyperlinkAuditingEnabled' ],
+        ['websites', 'hyperlinkAuditingEnabled'],
     ];
-    for ( const [ category, setting ] of settings ) {
+    for (const [category, setting] of settings) {
         let categoryEntry = webext.privacy[category];
-        if ( categoryEntry instanceof Object === false ) {
+        if (categoryEntry instanceof Object === false) {
             categoryEntry = webext.privacy[category] = {};
         }
         const settingEntry = categoryEntry[setting] = {};
@@ -149,14 +149,14 @@ const webext = {
 }
 
 // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed
-if ( chrome.storage.managed instanceof Object ) {
+if (chrome.storage.managed instanceof Object) {
     webext.storage.managed = {
         get: promisify(chrome.storage.managed, 'get'),
     };
 }
 
 // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/sync
-if ( chrome.storage.sync instanceof Object ) {
+if (chrome.storage.sync instanceof Object) {
     webext.storage.sync = {
         QUOTA_BYTES: chrome.storage.sync.QUOTA_BYTES,
         QUOTA_BYTES_PER_ITEM: chrome.storage.sync.QUOTA_BYTES_PER_ITEM,
@@ -173,7 +173,7 @@ if ( chrome.storage.sync instanceof Object ) {
 }
 
 // https://bugs.chromium.org/p/chromium/issues/detail?id=608854
-if ( chrome.tabs.removeCSS instanceof Function ) {
+if (chrome.tabs.removeCSS instanceof Function) {
     webext.tabs.removeCSS = promisifyNoFail(chrome.tabs, 'removeCSS');
 }
 

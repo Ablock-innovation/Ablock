@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 /* global CodeMirror, uBlockDashboard */
@@ -33,22 +33,22 @@ const reFoldable = /^ *(?=\+ \S)/;
 CodeMirror.registerGlobalHelper(
     'fold',
     'ubo-dump',
-    ( ) => true,
+    () => true,
     (cm, start) => {
         const startLineNo = start.line;
         const startLine = cm.getLine(startLineNo);
         let endLineNo = startLineNo;
         let endLine = startLine;
         const match = reFoldable.exec(startLine);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         const foldCandidate = '  ' + match[0];
         const lastLineNo = cm.lastLine();
         let nextLineNo = startLineNo + 1;
-        while ( nextLineNo < lastLineNo ) {
+        while (nextLineNo < lastLineNo) {
             const nextLine = cm.getLine(nextLineNo);
             // TODO: use regex to find folding end
-            if ( nextLine.startsWith(foldCandidate) === false && nextLine !== ']' ) {
-                if ( startLineNo >= endLineNo ) { return; }
+            if (nextLine.startsWith(foldCandidate) === false && nextLine !== ']') {
+                if (startLineNo >= endLineNo) { return; }
                 return {
                     from: CodeMirror.Pos(startLineNo, startLine.length),
                     to: CodeMirror.Pos(endLineNo, endLine.length)
@@ -64,7 +64,7 @@ CodeMirror.registerGlobalHelper(
 const cmEditor = new CodeMirror(qs$('#console'), {
     autofocus: true,
     foldGutter: true,
-    gutters: [ 'CodeMirror-linenumbers', 'CodeMirror-foldgutter' ],
+    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     lineNumbers: true,
     lineWrapping: true,
     mode: 'ubo-dump',
@@ -84,16 +84,16 @@ function log(text) {
 
 function toDNRText(raw) {
     const result = s14e.deserialize(raw);
-    if ( typeof result === 'string' ) { return result; }
+    if (typeof result === 'string') { return result; }
     const { network } = result;
     const replacer = (k, v) => {
-        if ( k.startsWith('__') ) { return; }
-        if ( Array.isArray(v) ) {
+        if (k.startsWith('__')) { return; }
+        if (Array.isArray(v)) {
             return v.sort();
         }
-        if ( v instanceof Object ) {
+        if (v instanceof Object) {
             const sorted = {};
-            for ( const kk of Object.keys(v).sort() ) {
+            for (const kk of Object.keys(v).sort()) {
                 sorted[kk] = v[kk];
             }
             return sorted;
@@ -162,9 +162,9 @@ function toDNRText(raw) {
     out.push(`+ 'removeparam=' filters (${removeparams.length}): ${JSON.stringify(removeparams, replacer, 2)}`);
     out.push(`+ Unsupported filters (${unsupported.length}): ${JSON.stringify(unsupported, replacer, 2)}`);
     out.push(`+ generichide exclusions (${network.generichideExclusions.length}): ${JSON.stringify(network.generichideExclusions, replacer, 2)}`);
-    if ( result.specificCosmetic ) {
+    if (result.specificCosmetic) {
         out.push(`+ Cosmetic filters: ${result.specificCosmetic.size}`);
-        for ( const details of result.specificCosmetic ) {
+        for (const details of result.specificCosmetic) {
             out.push(`    ${JSON.stringify(details)}`);
         }
     } else {
@@ -176,49 +176,49 @@ function toDNRText(raw) {
 
 /******************************************************************************/
 
-dom.on('#console-clear', 'click', ( ) => {
+dom.on('#console-clear', 'click', () => {
     cmEditor.setValue('');
 });
 
-dom.on('#console-fold', 'click', ( ) => {
+dom.on('#console-fold', 'click', () => {
     const unfolded = [];
     let maxUnfolded = -1;
     cmEditor.eachLine(handle => {
         const match = reFoldable.exec(handle.text);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         const depth = match[0].length;
         const line = handle.lineNo();
         const isFolded = cmEditor.isFolded({ line, ch: handle.text.length });
-        if ( isFolded === true ) { return; }
+        if (isFolded === true) { return; }
         unfolded.push({ line, depth });
         maxUnfolded = Math.max(maxUnfolded, depth);
     });
-    if ( maxUnfolded === -1 ) { return; }
+    if (maxUnfolded === -1) { return; }
     cmEditor.startOperation();
-    for ( const details of unfolded ) {
-        if ( details.depth !== maxUnfolded ) { continue; }
+    for (const details of unfolded) {
+        if (details.depth !== maxUnfolded) { continue; }
         cmEditor.foldCode(details.line, null, 'fold');
     }
     cmEditor.endOperation();
 });
 
-dom.on('#console-unfold', 'click', ( ) => {
+dom.on('#console-unfold', 'click', () => {
     const folded = [];
     let minFolded = Number.MAX_SAFE_INTEGER;
     cmEditor.eachLine(handle => {
         const match = reFoldable.exec(handle.text);
-        if ( match === null ) { return; }
+        if (match === null) { return; }
         const depth = match[0].length;
         const line = handle.lineNo();
         const isFolded = cmEditor.isFolded({ line, ch: handle.text.length });
-        if ( isFolded !== true ) { return; }
+        if (isFolded !== true) { return; }
         folded.push({ line, depth });
         minFolded = Math.min(minFolded, depth);
     });
-    if ( minFolded === Number.MAX_SAFE_INTEGER ) { return; }
+    if (minFolded === Number.MAX_SAFE_INTEGER) { return; }
     cmEditor.startOperation();
-    for ( const details of folded ) {
-        if ( details.depth !== minFolded ) { continue; }
+    for (const details of folded) {
+        if (details.depth !== minFolded) { continue; }
         cmEditor.foldCode(details.line, null, 'unfold');
     }
     cmEditor.endOperation();
@@ -257,7 +257,7 @@ dom.on('#cfe-dump', 'click', ev => {
     });
 });
 
-dom.on('#purge-all-caches', 'click', ( ) => {
+dom.on('#purge-all-caches', 'click', () => {
     vAPI.messaging.send('devTools', {
         what: 'purgeAllCaches'
     }).then(result => {
@@ -268,7 +268,7 @@ dom.on('#purge-all-caches', 'click', ( ) => {
 vAPI.messaging.send('dashboard', {
     what: 'getAppData',
 }).then(appData => {
-    if ( appData.canBenchmark !== true ) { return; }
+    if (appData.canBenchmark !== true) { return; }
     dom.attr('#snfe-benchmark', 'disabled', null);
     dom.on('#snfe-benchmark', 'click', ev => {
         const button = ev.target;
@@ -313,7 +313,7 @@ async function snfeQuery(lineNo, query) {
         what: 'snfeQuery',
         query
     });
-    if ( typeof result !== 'string' ) { return; }
+    if (typeof result !== 'string') { return; }
     cmEditor.startOperation();
     const nextLineNo = doc.getLineNumber(lineHandle) + 1;
     doc.replaceRange(`${result}\n`, { line: nextLineNo, ch: 0 });
@@ -321,28 +321,28 @@ async function snfeQuery(lineNo, query) {
 }
 
 cmEditor.on('beforeChange', (cm, details) => {
-    if ( details.origin !== '+input' ) { return; }
-    if ( details.text.length !== 2 ) { return; }
-    if ( details.text[1] !== '' ) { return; }
+    if (details.origin !== '+input') { return; }
+    if (details.text.length !== 2) { return; }
+    if (details.text[1] !== '') { return; }
     const lineNo = details.from.line;
     const line = cm.getLine(lineNo);
-    if ( details.from.ch !== line.length ) { return; }
-    if ( line.startsWith('snfe?') === false ) { return; }
+    if (details.from.ch !== line.length) { return; }
+    if (line.startsWith('snfe?') === false) { return; }
     const fields = line.slice(5).split(/\s+/);
     const query = {};
-    for ( const field of fields ) {
-        if ( field === '' ) { continue; }
-        if ( /[/.]/.test(field) ) {
-            if ( query.url === undefined ) {
+    for (const field of fields) {
+        if (field === '') { continue; }
+        if (/[/.]/.test(field)) {
+            if (query.url === undefined) {
                 query.url = field;
-            } else if ( query.from === undefined ) {
+            } else if (query.from === undefined) {
                 query.from = field;
             }
-        } else if ( query.type === undefined ) {
+        } else if (query.type === undefined) {
             query.type = field;
         }
     }
-    if ( query.url === undefined ) { return; }
+    if (query.url === undefined) { return; }
     snfeQuery(lineNo, query);
 });
 

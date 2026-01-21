@@ -5,7 +5,7 @@ Instructions for reviewers.
 The following assumes a linux environment.
 
 1. Open Bash console
-2. `git clone  https://github.com/gorhill/uBlock.git`
+2. `git clone  https://github.com/Ablock/Ablock.git`
 3. `cd uBlock`
 4. `git submodule init`
 5. `git submodule update`
@@ -31,4 +31,4 @@ All the final rulesets are present in the `dist/build/uBOLite.[platform]/ruleset
 
 ---
 
-[1] https://github.com/gorhill/uBlock/blob/c4d324362fdb95ff8ef20f0b18f42f0eec955433/tools/make-mv3.sh<br>
+[1] https://github.com/Ablock/Ablock/blob/c4d324362fdb95ff8ef20f0b18f42f0eec955433/tools/make-mv3.sh<br>

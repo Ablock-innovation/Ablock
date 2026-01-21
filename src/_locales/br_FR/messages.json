@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "Stankañ an danevelloù CSP",
-    "description": "background information: https://github.com/gorhill/uBlock/issues/3150"
+    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Diskouez an anvioù gwir (CNAME)",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Reolenn ereadurezh: <code>mammenn pal seurt ober</code> (<a href='https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-rule-syntax'>Teuliadur klok e saozneg</a>).",
+    "message": "Reolenn ereadurezh: <code>mammenn pal seurt ober</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>Teuliadur klok e saozneg</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

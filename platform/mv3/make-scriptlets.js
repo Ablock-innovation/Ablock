@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { builtinScriptlets } from './js/resources/scriptlets.js';
@@ -51,13 +51,13 @@ function createScriptletCoreCode(worldDetails, resourceEntry) {
     allFunctions.set(resourceEntry.name, resourceEntry.code);
     const dependencies = resourceEntry.dependencies &&
         resourceEntry.dependencies.slice() || [];
-    while ( dependencies.length !== 0 ) {
+    while (dependencies.length !== 0) {
         const token = dependencies.shift();
         const details = resourceDetails.get(token);
-        if ( details === undefined ) { continue; }
-        if ( allFunctions.has(details.name) ) { continue; }
+        if (details === undefined) { continue; }
+        if (allFunctions.has(details.name)) { continue; }
         allFunctions.set(details.name, details.code);
-        if ( Array.isArray(details.dependencies) === false ) { continue; }
+        if (Array.isArray(details.dependencies) === false) { continue; }
         dependencies.push(...details.dependencies);
     }
 }
@@ -72,46 +72,46 @@ export function reset() {
 /******************************************************************************/
 
 export function compile(assetDetails, details) {
-    if ( details.args[0].endsWith('.js') === false ) {
+    if (details.args[0].endsWith('.js') === false) {
         details.args[0] += '.js';
     }
-    if ( resourceAliases.has(details.args[0]) ) {
+    if (resourceAliases.has(details.args[0])) {
         details.args[0] = resourceAliases.get(details.args[0]);
     }
     const scriptletToken = details.args[0];
     const resourceEntry = resourceDetails.get(scriptletToken);
-    if ( resourceEntry === undefined ) { return; }
-    if ( resourceEntry.requiresTrust && details.trustedSource !== true ) {
+    if (resourceEntry === undefined) { return; }
+    if (resourceEntry.requiresTrust && details.trustedSource !== true) {
         console.log(`Rejecting +js(${details.args.join()}): ${assetDetails.id} is not trusted`);
         return;
     }
     const worldDetails = worlds[resourceEntry.world];
     const { scriptletFunctions } = worldDetails;
-    if ( scriptletFunctions.has(resourceEntry.name) === false ) {
+    if (scriptletFunctions.has(resourceEntry.name) === false) {
         scriptletFunctions.set(resourceEntry.name, scriptletFunctions.size);
         createScriptletCoreCode(worldDetails, resourceEntry);
     }
     // Convert args to arg indices
     const arglist = details.args.slice();
     arglist[0] = scriptletFunctions.get(resourceEntry.name);
-    for ( let i = 1; i < arglist.length; i++ ) {
+    for (let i = 1; i < arglist.length; i++) {
         const arg = arglist[i];
-        if ( worldDetails.args.has(arg) === false ) {
+        if (worldDetails.args.has(arg) === false) {
             worldDetails.args.set(arg, worldDetails.args.size);
         }
         arglist[i] = worldDetails.args.get(arg);
     }
     const arglistKey = JSON.stringify(arglist).slice(1, -1);
-    if ( worldDetails.arglists.has(arglistKey) === false ) {
+    if (worldDetails.arglists.has(arglistKey) === false) {
         worldDetails.arglists.set(arglistKey, worldDetails.arglists.size);
     }
     const arglistIndex = worldDetails.arglists.get(arglistKey);
-    if ( details.matches ) {
-        for ( const hn of details.matches ) {
-            if ( hn.includes('/') ) {
+    if (details.matches) {
+        for (const hn of details.matches) {
+            if (hn.includes('/')) {
                 worldDetails.matches.clear();
                 worldDetails.matches.add('*');
-                if ( worldDetails.regexesOrPaths.has(hn) === false ) {
+                if (worldDetails.regexesOrPaths.has(hn) === false) {
                     worldDetails.regexesOrPaths.set(hn, new Set());
                 }
                 worldDetails.regexesOrPaths.get(hn).add(arglistIndex);
@@ -121,14 +121,14 @@ export function compile(assetDetails, details) {
             worldDetails.hasEntities ||= isEntity;
             const isAncestor = hn.endsWith('>>')
             worldDetails.hasAncestors ||= isAncestor;
-            if ( isEntity || isAncestor ) {
+            if (isEntity || isAncestor) {
                 worldDetails.matches.clear();
                 worldDetails.matches.add('*');
             }
-            if ( worldDetails.matches.has('*') === false ) {
+            if (worldDetails.matches.has('*') === false) {
                 worldDetails.matches.add(hn);
             }
-            if ( worldDetails.hostnames.has(hn) === false ) {
+            if (worldDetails.hostnames.has(hn) === false) {
                 worldDetails.hostnames.set(hn, new Set());
             }
             worldDetails.hostnames.get(hn).add(arglistIndex);
@@ -136,16 +136,16 @@ export function compile(assetDetails, details) {
     } else {
         worldDetails.matches.add('*');
     }
-    if ( details.excludeMatches ) {
-        for ( const hn of details.excludeMatches ) {
-            if ( hn.includes('/') ) {
-                if ( worldDetails.regexesOrPaths.has(hn) === false ) {
+    if (details.excludeMatches) {
+        for (const hn of details.excludeMatches) {
+            if (hn.includes('/')) {
+                if (worldDetails.regexesOrPaths.has(hn) === false) {
                     worldDetails.regexesOrPaths.set(hn, new Set());
                 }
                 worldDetails.regexesOrPaths.get(hn).add(~arglistIndex);
                 continue;
             }
-            if ( worldDetails.hostnames.has(hn) === false ) {
+            if (worldDetails.hostnames.has(hn) === false) {
                 worldDetails.hostnames.set(hn, new Set());
             }
             worldDetails.hostnames.get(hn).add(~arglistIndex);
@@ -161,23 +161,23 @@ export async function commit(rulesetId, path, writeFn) {
         { encoding: 'utf8' }
     );
     const stats = {};
-    for ( const world of Object.keys(worlds) ) {
+    for (const world of Object.keys(worlds)) {
         const worldDetails = worlds[world];
         const { scriptletFunctions, allFunctions, args, arglists } = worldDetails;
-        if ( scriptletFunctions.size === 0 ) { continue; }
+        if (scriptletFunctions.size === 0) { continue; }
         const hostnames = Array.from(worldDetails.hostnames).toSorted((a, b) => {
             const d = a[0].length - b[0].length;
-            if ( d !== 0 ) { return d; }
+            if (d !== 0) { return d; }
             return a[0] < b[0] ? -1 : 1;
-        }).map(a => ([ a[0], JSON.stringify(Array.from(a[1]).map(a => JSON.parse(a))).slice(1,-1)]));
+        }).map(a => ([a[0], JSON.stringify(Array.from(a[1]).map(a => JSON.parse(a))).slice(1, -1)]));
         const scriptletFromRegexes = Array.from(worldDetails.regexesOrPaths)
             .filter(a => a[0].startsWith('/') && a[0].endsWith('/'))
             .map(a => {
-                const restr = a[0].slice(1,-1);
+                const restr = a[0].slice(1, -1);
                 return [
-                    literalStrFromRegex(restr).slice(0,8),
+                    literalStrFromRegex(restr).slice(0, 8),
                     restr,
-                    JSON.stringify(Array.from(a[1])).slice(1,-1),
+                    JSON.stringify(Array.from(a[1])).slice(1, -1),
                 ];
             }).flat();
         let content = safeReplace(scriptletTemplate, 'self.$hasEntities$', JSON.stringify(worldDetails.hasEntities));
@@ -221,7 +221,7 @@ export async function commit(rulesetId, path, writeFn) {
 /******************************************************************************/
 
 function init() {
-    for ( const scriptlet of builtinScriptlets ) {
+    for (const scriptlet of builtinScriptlets) {
         const { name, aliases, fn } = scriptlet;
         const entry = {
             name: fn.name,
@@ -231,8 +231,8 @@ function init() {
             requiresTrust: scriptlet.requiresTrust === true,
         };
         resourceDetails.set(name, entry);
-        if ( Array.isArray(aliases) === false ) { continue; }
-        for ( const alias of aliases ) {
+        if (Array.isArray(aliases) === false) { continue; }
+        for (const alias of aliases) {
             resourceAliases.set(alias, name);
         }
     }

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 
 */
 
@@ -39,7 +39,7 @@ function editOutboundObjectFn(
     propChain = '',
     jsonq = '',
 ) {
-    if ( propChain === '' ) { return; }
+    if (propChain === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix(
         `${trusted ? 'trusted-' : ''}edit-outbound-object`,
@@ -47,15 +47,15 @@ function editOutboundObjectFn(
         jsonq
     );
     const jsonp = JSONPath.create(jsonq);
-    if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
+    if (jsonp.valid === false || jsonp.value !== undefined && trusted !== true) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
-    proxyApplyFn(propChain, function(context) {
+    proxyApplyFn(propChain, function (context) {
         const obj = context.reflect();
         const objAfter = jsonp.apply(obj);
-        if ( objAfter === undefined ) { return obj; }
+        if (objAfter === undefined) { return obj; }
         safe.uboLog(logPrefix, 'Edited');
-        if ( safe.logLevel > 1 ) {
+        if (safe.logLevel > 1) {
             safe.uboLog(logPrefix, `After edit:\n${safe.JSON_stringify(objAfter, null, 2)}`);
         }
         return objAfter;
@@ -180,7 +180,7 @@ function editInboundObjectFn(
     argPosRaw = '',
     jsonq = '',
 ) {
-    if ( propChain === '' ) { return; }
+    if (propChain === '') { return; }
     const safe = safeSelf();
     const logPrefix = safe.makeLogPrefix(
         `${trusted ? 'trusted-' : ''}edit-inbound-object`,
@@ -188,18 +188,18 @@ function editInboundObjectFn(
         jsonq
     );
     const jsonp = JSONPath.create(jsonq);
-    if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
+    if (jsonp.valid === false || jsonp.value !== undefined && trusted !== true) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
     const argPos = parseInt(argPosRaw, 10);
-    if ( isNaN(argPos) ) { return; }
+    if (isNaN(argPos)) { return; }
     const getArgPos = args => {
-        if ( Array.isArray(args) === false ) { return; }
-        if ( argPos >= 0 ) {
-            if ( args.length <= argPos ) { return; }
+        if (Array.isArray(args) === false) { return; }
+        if (argPos >= 0) {
+            if (args.length <= argPos) { return; }
             return argPos;
         }
-        if ( args.length < -argPos ) { return; }
+        if (args.length < -argPos) { return; }
         return args.length + argPos;
     };
     const editObj = obj => {
@@ -208,20 +208,20 @@ function editInboundObjectFn(
             clone = safe.JSON_parse(safe.JSON_stringify(obj));
         } catch {
         }
-        if ( typeof clone !== 'object' || clone === null ) { return; }
+        if (typeof clone !== 'object' || clone === null) { return; }
         const objAfter = jsonp.apply(clone);
-        if ( objAfter === undefined ) { return; }
+        if (objAfter === undefined) { return; }
         safe.uboLog(logPrefix, 'Edited');
-        if ( safe.logLevel > 1 ) {
+        if (safe.logLevel > 1) {
             safe.uboLog(logPrefix, `After edit:\n${safe.JSON_stringify(objAfter, null, 2)}`);
         }
         return objAfter;
     };
-    proxyApplyFn(propChain, function(context) {
+    proxyApplyFn(propChain, function (context) {
         const i = getArgPos(context.callArgs);
-        if ( i !== undefined ) {
+        if (i !== undefined) {
             const obj = editObj(context.callArgs[i]);
-            if ( obj ) {
+            if (obj) {
                 context.callArgs[i] = obj;
             }
         }
@@ -309,7 +309,7 @@ function jsonEditXhrResponseFn(trusted, jsonq = '') {
     );
     const xhrInstances = new WeakMap();
     const jsonp = JSONPath.create(jsonq);
-    if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
+    if (jsonp.valid === false || jsonp.value !== undefined && trusted !== true) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
@@ -319,8 +319,8 @@ function jsonEditXhrResponseFn(trusted, jsonq = '') {
             const xhrDetails = { method, url };
             const matched = propNeedles.size === 0 ||
                 matchObjectPropertiesFn(propNeedles, xhrDetails);
-            if ( matched ) {
-                if ( safe.logLevel > 1 && Array.isArray(matched) ) {
+            if (matched) {
+                if (safe.logLevel > 1 && Array.isArray(matched)) {
                     safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
                 }
                 xhrInstances.set(this, xhrDetails);
@@ -330,28 +330,28 @@ function jsonEditXhrResponseFn(trusted, jsonq = '') {
         get response() {
             const innerResponse = super.response;
             const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails === undefined ) { return innerResponse; }
+            if (xhrDetails === undefined) { return innerResponse; }
             const responseLength = typeof innerResponse === 'string'
                 ? innerResponse.length
                 : undefined;
-            if ( xhrDetails.lastResponseLength !== responseLength ) {
+            if (xhrDetails.lastResponseLength !== responseLength) {
                 xhrDetails.response = undefined;
                 xhrDetails.lastResponseLength = responseLength;
             }
-            if ( xhrDetails.response !== undefined ) {
+            if (xhrDetails.response !== undefined) {
                 return xhrDetails.response;
             }
             let obj;
-            if ( typeof innerResponse === 'object' ) {
+            if (typeof innerResponse === 'object') {
                 obj = innerResponse;
-            } else if ( typeof innerResponse === 'string' ) {
+            } else if (typeof innerResponse === 'string') {
                 try { obj = safe.JSON_parse(innerResponse); } catch { }
             }
-            if ( typeof obj !== 'object' || obj === null ) {
+            if (typeof obj !== 'object' || obj === null) {
                 return (xhrDetails.response = innerResponse);
             }
             const objAfter = jsonp.apply(obj);
-            if ( objAfter === undefined ) {
+            if (objAfter === undefined) {
                 return (xhrDetails.response = innerResponse);
             }
             safe.uboLog(logPrefix, 'Edited');
@@ -444,7 +444,7 @@ function jsonEditXhrRequestFn(trusted, jsonq = '') {
     );
     const xhrInstances = new WeakMap();
     const jsonp = JSONPath.create(jsonq);
-    if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
+    if (jsonp.valid === false || jsonp.value !== undefined && trusted !== true) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
@@ -454,8 +454,8 @@ function jsonEditXhrRequestFn(trusted, jsonq = '') {
             const xhrDetails = { method, url };
             const matched = propNeedles.size === 0 ||
                 matchObjectPropertiesFn(propNeedles, xhrDetails);
-            if ( matched ) {
-                if ( safe.logLevel > 1 && Array.isArray(matched) ) {
+            if (matched) {
+                if (safe.logLevel > 1 && Array.isArray(matched)) {
                     safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
                 }
                 xhrInstances.set(this, xhrDetails);
@@ -464,22 +464,22 @@ function jsonEditXhrRequestFn(trusted, jsonq = '') {
         }
         send(body) {
             const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails ) {
+            if (xhrDetails) {
                 body = this.#filterBody(body) || body;
             }
             super.send(body);
         }
         #filterBody(body) {
-            if ( typeof body !== 'string' ) { return; }
+            if (typeof body !== 'string') { return; }
             let data;
             try { data = safe.JSON_parse(body); }
             catch { }
-            if ( data instanceof Object === false ) { return; }
+            if (data instanceof Object === false) { return; }
             const objAfter = jsonp.apply(data);
-            if ( objAfter === undefined ) { return; }
+            if (objAfter === undefined) { return; }
             body = safe.JSON_stringify(objAfter);
             safe.uboLog(logPrefix, 'Edited');
-            if ( safe.logLevel > 1 ) {
+            if (safe.logLevel > 1) {
                 safe.uboLog(logPrefix, `After edit:\n${body}`);
             }
             return body;
@@ -561,28 +561,28 @@ function jsonEditFetchResponseFn(trusted, jsonq = '') {
         jsonq
     );
     const jsonp = JSONPath.create(jsonq);
-    if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
+    if (jsonp.valid === false || jsonp.value !== undefined && trusted !== true) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
     const propNeedles = parsePropertiesToMatchFn(extraArgs.propsToMatch, 'url');
-    proxyApplyFn('fetch', function(context) {
+    proxyApplyFn('fetch', function (context) {
         const args = context.callArgs;
         const fetchPromise = context.reflect();
-        if ( propNeedles.size !== 0 ) {
+        if (propNeedles.size !== 0) {
             const props = collateFetchArgumentsFn(...args);
             const matched = matchObjectPropertiesFn(propNeedles, props);
-            if ( matched === undefined ) { return fetchPromise; }
-            if ( safe.logLevel > 1 ) {
+            if (matched === undefined) { return fetchPromise; }
+            if (safe.logLevel > 1) {
                 safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
             }
         }
         return fetchPromise.then(responseBefore => {
             const response = responseBefore.clone();
             return response.json().then(obj => {
-                if ( typeof obj !== 'object' ) { return responseBefore; }
+                if (typeof obj !== 'object') { return responseBefore; }
                 const objAfter = jsonp.apply(obj);
-                if ( objAfter === undefined ) { return responseBefore; }
+                if (objAfter === undefined) { return responseBefore; }
                 safe.uboLog(logPrefix, 'Edited');
                 const responseAfter = Response.json(objAfter, {
                     status: responseBefore.status,
@@ -683,40 +683,40 @@ function jsonEditFetchRequestFn(trusted, jsonq = '') {
         jsonq
     );
     const jsonp = JSONPath.create(jsonq);
-    if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
+    if (jsonp.valid === false || jsonp.value !== undefined && trusted !== true) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
     const propNeedles = parsePropertiesToMatchFn(extraArgs.propsToMatch, 'url');
     const filterBody = body => {
-        if ( typeof body !== 'string' ) { return; }
+        if (typeof body !== 'string') { return; }
         let data;
         try { data = safe.JSON_parse(body); }
         catch { }
-        if ( data instanceof Object === false ) { return; }
+        if (data instanceof Object === false) { return; }
         const objAfter = jsonp.apply(data);
-        if ( objAfter === undefined ) { return; }
+        if (objAfter === undefined) { return; }
         return safe.JSON_stringify(objAfter);
     }
     const proxyHandler = context => {
         const args = context.callArgs;
-        const [ resource, options ] = args;
+        const [resource, options] = args;
         const bodyBefore = options?.body;
-        if ( Boolean(bodyBefore) === false ) { return context.reflect(); }
+        if (Boolean(bodyBefore) === false) { return context.reflect(); }
         const bodyAfter = filterBody(bodyBefore);
-        if ( bodyAfter === undefined || bodyAfter === bodyBefore ) {
+        if (bodyAfter === undefined || bodyAfter === bodyBefore) {
             return context.reflect();
         }
-        if ( propNeedles.size !== 0 ) {
+        if (propNeedles.size !== 0) {
             const props = collateFetchArgumentsFn(resource, options);
             const matched = matchObjectPropertiesFn(propNeedles, props);
-            if ( matched === undefined ) { return context.reflect(); }
-            if ( safe.logLevel > 1 ) {
+            if (matched === undefined) { return context.reflect(); }
+            if (safe.logLevel > 1) {
                 safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
             }
         }
         safe.uboLog(logPrefix, 'Edited');
-        if ( safe.logLevel > 1 ) {
+        if (safe.logLevel > 1) {
             safe.uboLog(logPrefix, `After edit:\n${bodyAfter}`);
         }
         options.body = bodyAfter;
@@ -798,15 +798,15 @@ function jsonlEditFn(jsonp, text = '') {
     const lineSeparator = /\r?\n/.exec(text)?.[0] || '\n';
     const linesBefore = text.split('\n');
     const linesAfter = [];
-    for ( const lineBefore of linesBefore ) {
+    for (const lineBefore of linesBefore) {
         let obj;
         try { obj = safe.JSON_parse(lineBefore); } catch { }
-        if ( typeof obj !== 'object' || obj === null ) {
+        if (typeof obj !== 'object' || obj === null) {
             linesAfter.push(lineBefore);
             continue;
         }
         const objAfter = jsonp.apply(obj);
-        if ( objAfter === undefined ) {
+        if (objAfter === undefined) {
             linesAfter.push(lineBefore);
             continue;
         }
@@ -833,7 +833,7 @@ function jsonlEditXhrResponseFn(trusted, jsonq = '') {
     );
     const xhrInstances = new WeakMap();
     const jsonp = JSONPath.create(jsonq);
-    if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
+    if (jsonp.valid === false || jsonp.value !== undefined && trusted !== true) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
@@ -843,8 +843,8 @@ function jsonlEditXhrResponseFn(trusted, jsonq = '') {
             const xhrDetails = { method, url };
             const matched = propNeedles.size === 0 ||
                 matchObjectPropertiesFn(propNeedles, xhrDetails);
-            if ( matched ) {
-                if ( safe.logLevel > 1 && Array.isArray(matched) ) {
+            if (matched) {
+                if (safe.logLevel > 1 && Array.isArray(matched)) {
                     safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
                 }
                 xhrInstances.set(this, xhrDetails);
@@ -854,24 +854,24 @@ function jsonlEditXhrResponseFn(trusted, jsonq = '') {
         get response() {
             const innerResponse = super.response;
             const xhrDetails = xhrInstances.get(this);
-            if ( xhrDetails === undefined ) {
+            if (xhrDetails === undefined) {
                 return innerResponse;
             }
             const responseLength = typeof innerResponse === 'string'
                 ? innerResponse.length
                 : undefined;
-            if ( xhrDetails.lastResponseLength !== responseLength ) {
+            if (xhrDetails.lastResponseLength !== responseLength) {
                 xhrDetails.response = undefined;
                 xhrDetails.lastResponseLength = responseLength;
             }
-            if ( xhrDetails.response !== undefined ) {
+            if (xhrDetails.response !== undefined) {
                 return xhrDetails.response;
             }
-            if ( typeof innerResponse !== 'string' ) {
+            if (typeof innerResponse !== 'string') {
                 return (xhrDetails.response = innerResponse);
             }
             const outerResponse = jsonlEditFn(jsonp, innerResponse);
-            if ( outerResponse !== innerResponse ) {
+            if (outerResponse !== innerResponse) {
                 safe.uboLog(logPrefix, 'Pruned');
             }
             return (xhrDetails.response = outerResponse);
@@ -960,33 +960,33 @@ function jsonlEditFetchResponseFn(trusted, jsonq = '') {
         jsonq
     );
     const jsonp = JSONPath.create(jsonq);
-    if ( jsonp.valid === false || jsonp.value !== undefined && trusted !== true ) {
+    if (jsonp.valid === false || jsonp.value !== undefined && trusted !== true) {
         return safe.uboLog(logPrefix, 'Bad JSONPath query');
     }
     const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
     const propNeedles = parsePropertiesToMatchFn(extraArgs.propsToMatch, 'url');
     const logall = jsonq === '';
-    proxyApplyFn('fetch', function(context) {
+    proxyApplyFn('fetch', function (context) {
         const args = context.callArgs;
         const fetchPromise = context.reflect();
-        if ( propNeedles.size !== 0 ) {
+        if (propNeedles.size !== 0) {
             const props = collateFetchArgumentsFn(...args);
             const matched = matchObjectPropertiesFn(propNeedles, props);
-            if ( matched === undefined ) { return fetchPromise; }
-            if ( safe.logLevel > 1 ) {
+            if (matched === undefined) { return fetchPromise; }
+            if (safe.logLevel > 1) {
                 safe.uboLog(logPrefix, `Matched "propsToMatch":\n\t${matched.join('\n\t')}`);
             }
         }
         return fetchPromise.then(responseBefore => {
             const response = responseBefore.clone();
             return response.text().then(textBefore => {
-                if ( typeof textBefore !== 'string' ) { return textBefore; }
-                if ( logall ) {
+                if (typeof textBefore !== 'string') { return textBefore; }
+                if (logall) {
                     safe.uboLog(logPrefix, textBefore);
                     return responseBefore;
                 }
                 const textAfter = jsonlEditFn(jsonp, textBefore);
-                if ( textAfter === textBefore ) { return responseBefore; }
+                if (textAfter === textBefore) { return responseBefore; }
                 safe.uboLog(logPrefix, 'Pruned');
                 const responseAfter = new Response(textAfter, {
                     status: responseBefore.status,

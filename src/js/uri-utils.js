@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import publicSuffixList from '../lib/publicsuffixlist/publicsuffixlist.js';
@@ -25,7 +25,7 @@ import punycode from '../lib/punycode.js';
 /******************************************************************************/
 
 // Originally:
-// https://github.com/gorhill/uBlock/blob/8b5733a58d3acf9fb62815e14699c986bd1c2fdc/src/js/uritools.js
+// https://github.com/Ablock/Ablock/blob/8b5733a58d3acf9fb62815e14699c986bd1c2fdc/src/js/uritools.js
 
 const reHostnameFromCommonURL =
     /^https:\/\/[0-9a-z._-]+[0-9a-z]\//;
@@ -61,7 +61,7 @@ function domainFromHostname(hostname) {
 }
 
 function domainFromURI(uri) {
-    if ( !uri ) { return ''; }
+    if (!uri) { return ''; }
     return domainFromHostname(hostnameFromURI(uri));
 }
 
@@ -71,33 +71,33 @@ function entityFromDomain(domain) {
 }
 
 function entityFromHostname(hostname, domain) {
-    if ( domain === undefined ) {
+    if (domain === undefined) {
         domain = domainFromHostname(hostname);
     }
     const entity = entityFromDomain(domain);
-    if ( entity === '' ) { return ''; }
+    if (entity === '') { return ''; }
     return `${hostname.slice(0, -domain.length)}${entity}`
 }
 
 function hostnameFromURI(uri) {
     let match = reHostnameFromCommonURL.exec(uri);
-    if ( match !== null ) { return match[0].slice(8, -1); }
+    if (match !== null) { return match[0].slice(8, -1); }
     match = reAuthorityFromURI.exec(uri);
-    if ( match === null ) { return ''; }
+    if (match === null) { return ''; }
     const authority = match[1].slice(2);
-    if ( reHostFromNakedAuthority.test(authority) ) {
+    if (reHostFromNakedAuthority.test(authority)) {
         return authority.toLowerCase();
     }
     match = reHostFromAuthority.exec(authority);
-    if ( match === null ) {
+    if (match === null) {
         match = reIPv6FromAuthority.exec(authority);
-        if ( match === null ) { return ''; }
+        if (match === null) { return ''; }
     }
     let hostname = match[1];
-    while ( hostname.endsWith('.') ) {
+    while (hostname.endsWith('.')) {
         hostname = hostname.slice(0, -1);
     }
-    if ( reMustNormalizeHostname.test(hostname) ) {
+    if (reMustNormalizeHostname.test(hostname)) {
         hostname = punycode.toASCII(hostname.toLowerCase());
     }
     return hostname;
@@ -110,7 +110,7 @@ function hostnameFromNetworkURL(url) {
 
 function originFromURI(uri) {
     let match = reHostnameFromCommonURL.exec(uri);
-    if ( match !== null ) { return match[0].slice(0, -1); }
+    if (match !== null) { return match[0].slice(0, -1); }
     match = reOriginFromURI.exec(uri);
     return match !== null ? match[0].toLowerCase() : '';
 }
@@ -123,16 +123,16 @@ function isNetworkURI(uri) {
 
 function toBroaderHostname(hostname) {
     const pos = hostname.indexOf('.');
-    if ( pos !== -1 ) {
+    if (pos !== -1) {
         return hostname.slice(pos + 1);
     }
     return hostname !== '*' && hostname !== '' ? '*' : '';
 }
 
 function toBroaderIPv4Address(ipaddress) {
-    if ( ipaddress === '*' || ipaddress === '' ) { return ''; }
+    if (ipaddress === '*' || ipaddress === '') { return ''; }
     const pos = ipaddress.lastIndexOf('.');
-    if ( pos === -1 ) { return '*'; }
+    if (pos === -1) { return '*'; }
     return ipaddress.slice(0, pos);
 }
 
@@ -141,25 +141,25 @@ function toBroaderIPv6Address(ipaddress) {
 }
 
 function decomposeHostname(hostname, out) {
-    if ( out.length !== 0 && out[0] === hostname ) {
+    if (out.length !== 0 && out[0] === hostname) {
         return out;
     }
     let broadenFn;
-    if ( reHostnameVeryCoarse.test(hostname) === false ) {
-        if ( reIPv4VeryCoarse.test(hostname) ) {
+    if (reHostnameVeryCoarse.test(hostname) === false) {
+        if (reIPv4VeryCoarse.test(hostname)) {
             broadenFn = toBroaderIPv4Address;
-        } else if ( hostname.startsWith('[') ) {
+        } else if (hostname.startsWith('[')) {
             broadenFn = toBroaderIPv6Address;
         }
     }
-    if ( broadenFn === undefined ) {
+    if (broadenFn === undefined) {
         broadenFn = toBroaderHostname;
     }
     out[0] = hostname;
     let i = 1;
-    for (;;) {
+    for (; ;) {
         hostname = broadenFn(hostname);
-        if ( hostname === '' ) { break; }
+        if (hostname === '') { break; }
         out[i++] = hostname;
     }
     out.length = i;

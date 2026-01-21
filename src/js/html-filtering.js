@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { StaticExtFilteringHostnameDB } from './static-ext-filtering-db.js';
@@ -49,9 +49,9 @@ const htmlFilteringEngine = {
 };
 
 const regexFromString = (s, exact = false) => {
-    if ( s === '' ) { return /^/; }
+    if (s === '') { return /^/; }
     const match = /^\/(.+)\/([i]?)$/.exec(s);
-    if ( match !== null ) {
+    if (match !== null) {
         return new RegExp(match[1], match[2] || undefined);
     }
     const reStr = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -70,7 +70,7 @@ class PSelectorHasTextTask {
         this.needle = regexFromString(task[1]);
     }
     transpose(node, output) {
-        if ( this.needle.test(node.textContent) ) {
+        if (this.needle.test(node.textContent)) {
             output.push(node);
         }
     }
@@ -81,7 +81,7 @@ const PSelectorIfTask = class {
         this.pselector = new PSelector(task[1]);
     }
     transpose(node, output) {
-        if ( this.pselector.test(node) === this.target ) {
+        if (this.pselector.test(node) === this.target) {
             output.push(node);
         }
     }
@@ -97,7 +97,7 @@ class PSelectorMinTextLengthTask {
         this.min = task[1];
     }
     transpose(node, output) {
-        if ( node.textContent.length >= this.min ) {
+        if (node.textContent.length >= this.min) {
             output.push(node);
         }
     }
@@ -107,8 +107,8 @@ class PSelectorSpathTask {
     constructor(task) {
         this.spath = task[1];
         this.nth = /^(?:\s*[+~]|:)/.test(this.spath);
-        if ( this.nth ) { return; }
-        if ( /^\s*>/.test(this.spath) ) {
+        if (this.nth) { return; }
+        if (/^\s*>/.test(this.spath)) {
             this.spath = `:scope ${this.spath.trim()}`;
         }
     }
@@ -116,18 +116,18 @@ class PSelectorSpathTask {
         const nodes = this.nth
             ? PSelectorSpathTask.qsa(node, this.spath)
             : node.querySelectorAll(this.spath);
-        for ( const node of nodes ) {
+        for (const node of nodes) {
             output.push(node);
         }
     }
     // Helper method for other operators.
     static qsa(node, selector) {
         const parent = node.parentElement;
-        if ( parent === null ) { return []; }
+        if (parent === null) { return []; }
         let pos = 1;
-        for (;;) {
+        for (; ;) {
             node = node.previousElementSibling;
-            if ( node === null ) { break; }
+            if (node === null) { break; }
             pos += 1;
         }
         return parent.querySelectorAll(
@@ -139,25 +139,25 @@ class PSelectorSpathTask {
 class PSelectorUpwardTask {
     constructor(task) {
         const arg = task[1];
-        if ( typeof arg === 'number' ) {
+        if (typeof arg === 'number') {
             this.i = arg;
         } else {
             this.s = arg;
         }
     }
     transpose(node, output) {
-        if ( this.s !== '' ) {
+        if (this.s !== '') {
             const parent = node.parentElement;
-            if ( parent === null ) { return; }
+            if (parent === null) { return; }
             node = parent.closest(this.s);
-            if ( node === null ) { return; }
+            if (node === null) { return; }
         } else {
             let nth = this.i;
-            for (;;) {
+            for (; ;) {
                 node = node.parentElement;
-                if ( node === null ) { return; }
+                if (node === null) { return; }
                 nth -= 1;
-                if ( nth === 0 ) { break; }
+                if (nth === 0) { break; }
             }
         }
         output.push(node);
@@ -179,9 +179,9 @@ class PSelectorXpathTask {
             null
         );
         let j = xpr.snapshotLength;
-        while ( j-- ) {
+        while (j--) {
             const node = xpr.snapshotItem(j);
-            if ( node.nodeType === 1 ) {
+            if (node.nodeType === 1) {
                 output.push(node);
             }
         }
@@ -193,8 +193,8 @@ class PSelector {
         this.raw = o.raw;
         this.selector = o.selector;
         this.tasks = [];
-        if ( !o.tasks ) { return; }
-        for ( const task of o.tasks ) {
+        if (!o.tasks) { return; }
+        for (const task of o.tasks) {
             const ctor = this.operatorToTaskMap.get(task[0]) || PSelectorVoidTask;
             const pselector = new ctor(task);
             this.tasks.push(pselector);
@@ -202,18 +202,18 @@ class PSelector {
     }
     prime(input) {
         const root = input || docRegister;
-        if ( this.selector === '' ) { return [ root ]; }
-        if ( input !== docRegister && /^ ?[>+~]/.test(this.selector) ) {
+        if (this.selector === '') { return [root]; }
+        if (input !== docRegister && /^ ?[>+~]/.test(this.selector)) {
             return Array.from(PSelectorSpathTask.qsa(input, this.selector));
         }
         return Array.from(root.querySelectorAll(this.selector));
     }
     exec(input) {
         let nodes = this.prime(input);
-        for ( const task of this.tasks ) {
-            if ( nodes.length === 0 ) { break; }
+        for (const task of this.tasks) {
+            if (nodes.length === 0) { break; }
             const transposed = [];
-            for ( const node of nodes ) {
+            for (const node of nodes) {
                 task.transpose(node, transposed);
             }
             nodes = transposed;
@@ -222,32 +222,32 @@ class PSelector {
     }
     test(input) {
         const nodes = this.prime(input);
-        for ( const node of nodes ) {
-            let output = [ node ];
-            for ( const task of this.tasks ) {
+        for (const node of nodes) {
+            let output = [node];
+            for (const task of this.tasks) {
                 const transposed = [];
-                for ( const node of output ) {
+                for (const node of output) {
                     task.transpose(node, transposed);
                 }
                 output = transposed;
-                if ( output.length === 0 ) { break; }
+                if (output.length === 0) { break; }
             }
-            if ( output.length !== 0 ) { return true; }
+            if (output.length !== 0) { return true; }
         }
         return false;
     }
 }
 PSelector.prototype.operatorToTaskMap = new Map([
-    [ 'has', PSelectorIfTask ],
-    [ 'has-text', PSelectorHasTextTask ],
-    [ 'if', PSelectorIfTask ],
-    [ 'if-not', PSelectorIfNotTask ],
-    [ 'min-text-length', PSelectorMinTextLengthTask ],
-    [ 'not', PSelectorIfNotTask ],
-    [ 'nth-ancestor', PSelectorUpwardTask ],
-    [ 'spath', PSelectorSpathTask ],
-    [ 'upward', PSelectorUpwardTask ],
-    [ 'xpath', PSelectorXpathTask ],
+    ['has', PSelectorIfTask],
+    ['has-text', PSelectorHasTextTask],
+    ['if', PSelectorIfTask],
+    ['if-not', PSelectorIfNotTask],
+    ['min-text-length', PSelectorMinTextLengthTask],
+    ['not', PSelectorIfNotTask],
+    ['nth-ancestor', PSelectorUpwardTask],
+    ['spath', PSelectorSpathTask],
+    ['upward', PSelectorUpwardTask],
+    ['xpath', PSelectorXpathTask],
 ]);
 
 function logOne(details, exception, selector) {
@@ -267,17 +267,17 @@ function logOne(details, exception, selector) {
 
 function applyProceduralSelector(details, selector) {
     let pselector = pselectors.get(selector);
-    if ( pselector === undefined ) {
+    if (pselector === undefined) {
         pselector = new PSelector(JSON.parse(selector));
         pselectors.set(selector, pselector);
     }
     const nodes = pselector.exec();
     let modified = false;
-    for ( const node of nodes ) {
+    for (const node of nodes) {
         node.remove();
         modified = true;
     }
-    if ( modified && logger.enabled ) {
+    if (modified && logger.enabled) {
         logOne(details, 0, pselector.raw);
     }
     return modified;
@@ -286,11 +286,11 @@ function applyProceduralSelector(details, selector) {
 function applyCSSSelector(details, selector) {
     const nodes = docRegister.querySelectorAll(selector);
     let modified = false;
-    for ( const node of nodes ) {
+    for (const node of nodes) {
         node.remove();
         modified = true;
     }
-    if ( modified && logger.enabled ) {
+    if (modified && logger.enabled) {
         logOne(details, 0, selector);
     }
     return modified;
@@ -304,7 +304,7 @@ function logError(writer, msg) {
     });
 }
 
-htmlFilteringEngine.reset = function() {
+htmlFilteringEngine.reset = function () {
     filterDB.clear();
     pselectors.clear();
     duplicates.clear();
@@ -312,57 +312,57 @@ htmlFilteringEngine.reset = function() {
     discardedCount = 0;
 };
 
-htmlFilteringEngine.freeze = function() {
+htmlFilteringEngine.freeze = function () {
     duplicates.clear();
     filterDB.collectGarbage();
 };
 
-htmlFilteringEngine.compile = function(parser, writer) {
+htmlFilteringEngine.compile = function (parser, writer) {
     const isException = parser.isException();
     const { raw, compiled } = parser.result;
-    if ( compiled === undefined ) {
+    if (compiled === undefined) {
         return logError(writer, `Invalid HTML filter in {who}: ##${raw}`);
     }
 
     writer.select('HTML_FILTERS');
 
     // Only exception filters are allowed to be global.
-    if ( parser.hasOptions() === false ) {
-        if ( isException ) {
-            writer.push([ 64, '', 1, compiled ]);
+    if (parser.hasOptions() === false) {
+        if (isException) {
+            writer.push([64, '', 1, compiled]);
         }
         return;
     }
 
     const compiledFilters = [];
     let hasOnlyNegated = true;
-    for ( const { hn, not, bad } of parser.getExtFilterDomainIterator() ) {
-        if ( bad ) { continue; }
+    for (const { hn, not, bad } of parser.getExtFilterDomainIterator()) {
+        if (bad) { continue; }
         const prefix = ((isException ? 1 : 0) ^ (not ? 1 : 0)) ? '-' : '+';
-        if ( not === false ) {
+        if (not === false) {
             hasOnlyNegated = false;
         }
-        compiledFilters.push([ 64, hn, `${prefix}${compiled}` ]);
+        compiledFilters.push([64, hn, `${prefix}${compiled}`]);
     }
 
     // Not allowed since it's equivalent to forbidden generic HTML filters
-    if ( isException === false && hasOnlyNegated ) {
+    if (isException === false && hasOnlyNegated) {
         return logError(writer, `Invalid HTML filter in {who}: ##${raw}`);
     }
 
     writer.pushMany(compiledFilters);
 };
 
-htmlFilteringEngine.fromCompiledContent = function(reader) {
+htmlFilteringEngine.fromCompiledContent = function (reader) {
     // Don't bother loading filters if stream filtering is not supported.
-    if ( µb.canFilterResponseData === false ) { return; }
+    if (µb.canFilterResponseData === false) { return; }
 
     reader.select('HTML_FILTERS');
 
-    while ( reader.next() ) {
+    while (reader.next()) {
         acceptedCount += 1;
         const fingerprint = reader.fingerprint();
-        if ( duplicates.has(fingerprint) ) {
+        if (duplicates.has(fingerprint)) {
             discardedCount += 1;
             continue;
         }
@@ -372,7 +372,7 @@ htmlFilteringEngine.fromCompiledContent = function(reader) {
     }
 };
 
-htmlFilteringEngine.retrieve = function(fctxt) {
+htmlFilteringEngine.retrieve = function (fctxt) {
     const all = new Set();
     const hostname = fctxt.getHostname();
     filterDB.retrieveSpecifics(all, hostname);
@@ -380,45 +380,45 @@ htmlFilteringEngine.retrieve = function(fctxt) {
     filterDB.retrieveSpecifics(all, entity);
     filterDB.retrieveSpecificsByRegex(all, hostname, fctxt.url);
     filterDB.retrieveGenerics(all);
-    if ( all.size === 0 ) { return; }
+    if (all.size === 0) { return; }
 
-    // https://github.com/gorhill/uBlock/issues/2835
+    // https://github.com/Ablock/Ablock/issues/2835
     //   Do not filter if the site is under an `allow` rule.
-    if ( µb.userSettings.advancedUserEnabled ) {
-        if ( sessionFirewall.evaluateCellZY(hostname, hostname, '*') === 2 ) { return; }
+    if (µb.userSettings.advancedUserEnabled) {
+        if (sessionFirewall.evaluateCellZY(hostname, hostname, '*') === 2) { return; }
     }
 
     // Split filters in different groups
     const plains = new Set();
     const procedurals = new Set();
-    for ( const s of all ) {
-        if ( s.charCodeAt(0) === 0x2D /* - */ ) { continue; }
+    for (const s of all) {
+        if (s.charCodeAt(0) === 0x2D /* - */) { continue; }
         const selector = s.slice(1);
         const isProcedural = selector.startsWith('{');
-        if ( all.has(`-${selector}`) ) {
+        if (all.has(`-${selector}`)) {
             logOne(fctxt, 1, isProcedural ? JSON.parse(selector).raw : selector);
-        } else if ( isProcedural ) {
+        } else if (isProcedural) {
             procedurals.add(selector);
         } else {
             plains.add(selector);
         }
     }
 
-    if ( plains.size === 0 && procedurals.size === 0 ) { return; }
+    if (plains.size === 0 && procedurals.size === 0) { return; }
 
     return { plains, procedurals };
 };
 
-htmlFilteringEngine.apply = function(doc, details, selectors) {
+htmlFilteringEngine.apply = function (doc, details, selectors) {
     docRegister = doc;
     let modified = false;
-    for ( const selector of selectors.plains ) {
-        if ( applyCSSSelector(details, selector) ) {
+    for (const selector of selectors.plains) {
+        if (applyCSSSelector(details, selector)) {
             modified = true;
         }
     }
-    for ( const selector of selectors.procedurals ) {
-        if ( applyProceduralSelector(details, selector) ) {
+    for (const selector of selectors.procedurals) {
+        if (applyProceduralSelector(details, selector)) {
             modified = true;
         }
     }
@@ -426,11 +426,11 @@ htmlFilteringEngine.apply = function(doc, details, selectors) {
     return modified;
 };
 
-htmlFilteringEngine.toSelfie = function() {
+htmlFilteringEngine.toSelfie = function () {
     return filterDB.toSelfie();
 };
 
-htmlFilteringEngine.fromSelfie = function(selfie) {
+htmlFilteringEngine.fromSelfie = function (selfie) {
     filterDB.fromSelfie(selfie);
     pselectors.clear();
 };

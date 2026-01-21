@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -27,9 +27,9 @@ import { i18n$ } from './i18n.js';
 
 function handleImportFilePicker() {
     const file = this.files[0];
-    if ( file === undefined || file.name === '' ) { return; }
+    if (file === undefined || file.name === '') { return; }
 
-    const reportError = ( ) => {
+    const reportError = () => {
         window.alert(i18n$('aboutRestoreDataError'));
     };
 
@@ -37,21 +37,21 @@ function handleImportFilePicker() {
         'text/plain',
         'application/json',
     ];
-    if ( expectedFileTypes.includes(file.type) === false ) {
+    if (expectedFileTypes.includes(file.type) === false) {
         return reportError();
     }
 
     const filename = file.name;
     const fr = new FileReader();
 
-    fr.onload = function() {
+    fr.onload = function () {
         let userData;
         try {
             userData = JSON.parse(this.result);
-            if ( typeof userData !== 'object' ) {
+            if (typeof userData !== 'object') {
                 throw 'Invalid';
             }
-            if ( typeof userData.userSettings !== 'object' ) {
+            if (typeof userData.userSettings !== 'object') {
                 throw 'Invalid';
             }
             if (
@@ -70,14 +70,14 @@ function handleImportFilePicker() {
         catch {
             userData = undefined;
         }
-        if ( userData === undefined ) {
+        if (userData === undefined) {
             return reportError();
         }
         const time = new Date(userData.timeStamp);
         const msg = i18n$('aboutRestoreDataConfirm')
-                        .replace('{{time}}', time.toLocaleString());
+            .replace('{{time}}', time.toLocaleString());
         const proceed = window.confirm(msg);
-        if ( proceed !== true ) { return; }
+        if (proceed !== true) { return; }
         vAPI.messaging.send('dashboard', {
             what: 'restoreUserData',
             userData,
@@ -113,7 +113,7 @@ async function exportToFile() {
     }
     vAPI.download({
         'url': 'data:text/plain;charset=utf-8,' +
-               encodeURIComponent(JSON.stringify(response.userData, null, '  ')),
+            encodeURIComponent(JSON.stringify(response.userData, null, '  ')),
         'filename': response.localData.lastBackupFile
     });
     onLocalDataReceived(response.localData);
@@ -123,14 +123,14 @@ async function exportToFile() {
 
 function onLocalDataReceived(details) {
     let v, unit;
-    if ( typeof details.storageUsed === 'number' ) {
+    if (typeof details.storageUsed === 'number') {
         v = details.storageUsed;
-        if ( v < 1e3 ) {
+        if (v < 1e3) {
             unit = 'genericBytes';
-        } else if ( v < 1e6 ) {
+        } else if (v < 1e6) {
             v /= 1e3;
             unit = 'KB';
-        } else if ( v < 1e9 ) {
+        } else if (v < 1e9) {
             v /= 1e6;
             unit = 'MB';
         } else {
@@ -159,7 +159,7 @@ function onLocalDataReceived(details) {
     };
 
     const lastBackupFile = details.lastBackupFile || '';
-    if ( lastBackupFile !== '' ) {
+    if (lastBackupFile !== '') {
         const dt = new Date(details.lastBackupTime);
         const text = i18n$('settingsLastBackupPrompt');
         const node = qs$('#settingsLastBackupPrompt');
@@ -168,7 +168,7 @@ function onLocalDataReceived(details) {
     }
 
     const lastRestoreFile = details.lastRestoreFile || '';
-    if ( lastRestoreFile !== '' ) {
+    if (lastRestoreFile !== '') {
         const dt = new Date(details.lastRestoreTime);
         const text = i18n$('settingsLastRestorePrompt');
         const node = qs$('#settingsLastRestorePrompt');
@@ -176,11 +176,11 @@ function onLocalDataReceived(details) {
         node.style.display = '';
     }
 
-    if ( details.cloudStorageSupported === false ) {
+    if (details.cloudStorageSupported === false) {
         dom.attr('[data-setting-name="cloudStorageEnabled"]', 'disabled', '');
     }
 
-    if ( details.privacySettingsSupported === false ) {
+    if (details.privacySettingsSupported === false) {
         dom.attr('[data-setting-name="prefetchingDisabled"]', 'disabled', '');
         dom.attr('[data-setting-name="hyperlinkAuditingDisabled"]', 'disabled', '');
         dom.attr('[data-setting-name="webrtcIPAddressHidden"]', 'disabled', '');
@@ -192,7 +192,7 @@ function onLocalDataReceived(details) {
 function resetUserData() {
     const msg = i18n$('aboutResetDataConfirm');
     const proceed = window.confirm(msg);
-    if ( proceed !== true ) { return; }
+    if (proceed !== true) { return; }
     vAPI.messaging.send('dashboard', {
         what: 'resetUserData',
     });
@@ -218,20 +218,20 @@ function changeUserSettings(name, value) {
     });
 
     // Maybe reflect some changes immediately
-    switch ( name ) {
-    case 'uiTheme':
-        setTheme(value, true);
-        break;
-    case 'uiAccentCustom':
-    case 'uiAccentCustom0':
-        setAccentColor(
-            qs$('[data-setting-name="uiAccentCustom"]').checked,
-            qs$('[data-setting-name="uiAccentCustom0"]').value,
-            true
-        );
-        break;
-    default:
-        break;
+    switch (name) {
+        case 'uiTheme':
+            setTheme(value, true);
+            break;
+        case 'uiAccentCustom':
+        case 'uiAccentCustom0':
+            setAccentColor(
+                qs$('[data-setting-name="uiAccentCustom"]').checked,
+                qs$('[data-setting-name="uiAccentCustom0"]').value,
+                true
+            );
+            break;
+        default:
+            break;
     }
 }
 
@@ -242,14 +242,14 @@ function onValueChanged(ev) {
     const name = dom.attr(input, 'data-setting-name');
     let value = input.value;
     // Maybe sanitize value
-    switch ( name ) {
-    case 'largeMediaSize':
-        value = Math.min(Math.max(Math.floor(parseInt(value, 10) || 0), 0), 1000000);
-        break;
-    default:
-        break;
+    switch (name) {
+        case 'largeMediaSize':
+            value = Math.min(Math.max(Math.floor(parseInt(value, 10) || 0), 0), 1000000);
+            break;
+        default:
+            break;
     }
-    if ( value !== input.value ) {
+    if (value !== input.value) {
         input.value = value;
     }
 
@@ -268,9 +268,9 @@ function onUserSettingsReceived(details) {
         changeUserSettings(name, checkbox.checked);
         synchronizeDOM();
     };
-    for ( const checkbox of checkboxes ) {
+    for (const checkbox of checkboxes) {
         const name = dom.attr(checkbox, 'data-setting-name') || '';
-        if ( details[name] === undefined ) {
+        if (details[name] === undefined) {
             dom.attr(checkbox.closest('.checkbox'), 'disabled', '');
             dom.attr(checkbox, 'disabled', '');
             continue;
@@ -279,18 +279,18 @@ function onUserSettingsReceived(details) {
         dom.on(checkbox, 'change', onchange);
     }
 
-    if ( details.canLeakLocalIPAddresses === true ) {
+    if (details.canLeakLocalIPAddresses === true) {
         qs$('[data-setting-name="webrtcIPAddressHidden"]')
             .closest('div.li')
             .style.display = '';
     }
 
-    qsa$('[data-setting-type="value"]').forEach(function(elem) {
+    qsa$('[data-setting-type="value"]').forEach(function (elem) {
         elem.value = details[dom.attr(elem, 'data-setting-name')];
         dom.on(elem, 'change', onValueChanged);
     });
 
-    dom.on('#export', 'click', ( ) => { exportToFile(); });
+    dom.on('#export', 'click', () => { exportToFile(); });
     dom.on('#import', 'click', startImportFilePicker);
     dom.on('#reset', 'click', resetUserData);
     dom.on('#restoreFilePicker', 'change', handleImportFilePicker);
@@ -300,9 +300,9 @@ function onUserSettingsReceived(details) {
 
 /******************************************************************************/
 
-self.wikilink = 'https://github.com/gorhill/uBlock/wiki/Dashboard:-Settings';
+self.wikilink = 'https://github.com/Ablock/Ablock/wiki/Dashboard:-Settings';
 
-self.hasUnsavedData = function() {
+self.hasUnsavedData = function () {
     return false;
 };
 

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/gorhill/uBlock
+    Home: https://github.com/Ablock/Ablock
 */
 
 import {
@@ -35,12 +35,12 @@ export class ModeEditor {
     }
 
     on() {
-        if ( this.bc !== null ) { return; }
+        if (this.bc !== null) { return; }
         this.bc = new self.BroadcastChannel('uBOL');
         this.bc.onmessage = ev => {
             const message = ev.data;
-            if ( message instanceof Object === false ) { return; }
-            if ( message.filteringModeDetails === undefined ) { return; }
+            if (message instanceof Object === false) { return; }
+            if (message.filteringModeDetails === undefined) { return; }
             // TODO: merge with ongoing edits?
             const text = textFromModes(message.filteringModeDetails);
             this.editor.setEditorText(text, true);
@@ -48,7 +48,7 @@ export class ModeEditor {
     }
 
     off() {
-        if ( this.bc === null ) { return; }
+        if (this.bc === null) { return; }
         this.bc.onmessage = null;
         this.bc = null;
     }
@@ -60,7 +60,7 @@ export class ModeEditor {
 
     async saveEditorText(editor) {
         const { modes } = modesFromText(editor.getEditorText());
-        if ( modes instanceof Object === false ) { return; }
+        if (modes instanceof Object === false) { return; }
         const modesAfter = await sendMessage({ what: 'setFilteringModeDetails', modes });
         const text = textFromModes(modesAfter);
         editor.setEditorText(text);
@@ -71,7 +71,7 @@ export class ModeEditor {
         const { doc } = editor.view.state;
         const text = doc.sliceString(firstLine.from, lastLine.to);
         const { bad } = modesFromText(text, true);
-        if ( Array.isArray(bad) && bad.length !== 0 ) {
+        if (Array.isArray(bad) && bad.length !== 0) {
             self.cm6.lineErrorAdd(editor.view, bad.map(i => i + firstLine.number));
         }
     }

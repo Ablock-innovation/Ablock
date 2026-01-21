@@ -1,6 +1,6 @@
 Blokeatzaile eraginkor bat: Memoria eta PUZ erabileran arina da, eta hala ere beste blokeatzaile ezagun batzuk baino milaka iragazki gehiago kargatu eta ezarri ditzake.
 
-Bere eraginkortasunaren adibide grafikoa: https://github.com/gorhill/uBlock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Bere eraginkortasunaren adibide grafikoa: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Erabilera: Laster-leihoko pizte botoi handia uBlock uneko gunean behin betiko gaitu edo desgaitzeko da. Uneko guneari dagokio soilik, ez da botoi orokor bat.
 
@@ -38,7 +38,7 @@ Doan.
 Lizentzia libreduna (GPLv3)
 Erabiltzaileek erabiltzaileentzat sortua.
 
-Parte-hartzaileak @ Github: https://github.com/gorhill/uBlock/graphs/contributors
+Parte-hartzaileak @ Github: https://github.com/Ablock/Ablock/graphs/contributors
 Parte-hartzaileak @ Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@ Parte-hartzaileak @ Crowdin: https://crowdin.net/project/ublock
 Nahiko berria da bertsio hau, kontua izan honi buruz idaztean.
 
 Proiektuaren aldaketa egunkaria:
-https://github.com/gorhill/uBlock/releases
+https://github.com/Ablock/Ablock/releases
