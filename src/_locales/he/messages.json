@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "חסום דיווחי CSP",
-    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
+    "description": "background information: https://github.com/Ablock-innovation/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "חשוף רשומות DNS מסוג CNAME",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "סינטקס חוק: <code>פעולה סוג יעד מקור</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>תיעוד מלא</a>).",
+    "message": "סינטקס חוק: <code>פעולה סוג יעד מקור</code> (<a href='https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-rule-syntax'>תיעוד מלא</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

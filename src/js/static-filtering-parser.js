@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import * as cssTree from '../lib/csstree/css-tree.js';
@@ -3203,9 +3203,9 @@ export const netOptionTokenDescriptors = new Map([
 
 // Discard new ABP's `-abp-properties` directive until it is
 // implemented (if ever). Unlikely, see:
-// https://github.com/Ablock/Ablock/issues/1752
+// https://github.com/Ablock-innovation/Ablock/issues/1752
 
-// https://github.com/Ablock/Ablock/issues/2624
+// https://github.com/Ablock-innovation/Ablock/issues/2624
 //   Convert Adguard's `-ext-has='...'` into uBO's `:has(...)`.
 
 // https://github.com/uBlockOrigin/uBlock-issues/issues/89
@@ -3278,7 +3278,7 @@ export class ExtSelectorCompiler {
             'part',
             'slotted',
         ]);
-        // https://github.com/Ablock/Ablock/issues/2793
+        // https://github.com/Ablock-innovation/Ablock/issues/2793
         this.normalizedOperators = new Map([
             ['-abp-has', 'has'],
             ['-abp-contains', 'has-text'],
@@ -3343,7 +3343,7 @@ export class ExtSelectorCompiler {
     compile(raw, out, compileOptions = {}) {
         this.asProcedural = compileOptions.asProcedural === true;
 
-        // https://github.com/Ablock/Ablock/issues/952
+        // https://github.com/Ablock-innovation/Ablock/issues/952
         //   Find out whether we are dealing with an Adguard-specific cosmetic
         //   filter, and if so, translate it if supported, or discard it if not
         //   supported.

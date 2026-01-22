@@ -1,6 +1,6 @@
 Efika blokilo: malgranda spuro je memoro kaj ĉefprocesoro, tamen povas ŝarĝi kaj efikigi milojn pli da filtriloj ol aliaj popularaj blokiloj ekzistantaj.
 
-Ilustrita superrigardo de ĝia rendimento: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Ilustrita superrigardo de ĝia rendimento: https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Uzado: La granda ŝaltilo en la ŝpruc-fenestro estas por daŭre malebligi/ebligi uBlock-on por la aktuala retejo. Ĝi aplikas nur al la aktuala retejo; ĝi ne estas universala ŝaltilo.
 
@@ -38,7 +38,7 @@ Libera.
 Malfermitkoda kun publika permesilo (GPLv3)
 Por uzantoj de uzantoj.
 
-Kontribuantoj ĉe GitHub: https://github.com/Ablock/Ablock/graphs/contributors
+Kontribuantoj ĉe GitHub: https://github.com/Ablock-innovation/Ablock/graphs/contributors
 Kontribuantoj ĉe Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@ Kontribuantoj ĉe Crowdin: https://crowdin.net/project/ublock
 Estas sufiĉe frue versio; konsideru tion kiam vi recenzas.
 
 Ŝanĝoprotokolo de la projekto:
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

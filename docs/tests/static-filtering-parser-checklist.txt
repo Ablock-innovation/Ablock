@@ -1,6 +1,6 @@
 ! Title: Static Filtering Parser Checklist
-! Homepage: https://github.com/Ablock/Ablock
-! Licence: https://github.com/Ablock/Ablock/blob/master/LICENSE.txt
+! Homepage: https://github.com/Ablock-innovation/Ablock
+! Licence: https://github.com/Ablock-innovation/Ablock/blob/master/LICENSE.txt
 !
 ! Description:
 ! To verify that the static filtering parser is properly parsing valid and
@@ -106,7 +106,7 @@ $
 *$csp=default-src 'none',ghide
 *$csp=default-src 'none',csp=script-src 'none'
 
-! https://github.com/Ablock/Ablock/issues/2385#issuecomment-494078763
+! https://github.com/Ablock-innovation/Ablock/issues/2385#issuecomment-494078763
 *$~document
 *$~popup
 *$~inline-script

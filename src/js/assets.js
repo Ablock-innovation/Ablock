@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import * as sfp from './static-filtering-parser.js';
@@ -294,7 +294,7 @@ assets.fetch = function (url, options = {}) {
             xhr.abort();
         };
 
-        // https://github.com/Ablock/Ablock/issues/2526
+        // https://github.com/Ablock-innovation/Ablock/issues/2526
         // - Timeout only when there is no progress.
         const onProgressEvent = function (ev) {
             if (ev.loaded === contentLoaded) { return; }
@@ -331,13 +331,13 @@ assets.fetchText = async function (url) {
     const isExternal = reIsExternalPath.test(url);
     let actualUrl = isExternal ? url : vAPI.getURL(url);
 
-    // https://github.com/Ablock/Ablock/issues/2592
+    // https://github.com/Ablock-innovation/Ablock/issues/2592
     //   Force browser cache to be bypassed, but only for resources which have
     //   been fetched more than one hour ago.
     // https://github.com/uBlockOrigin/uBlock-issues/issues/682#issuecomment-515197130
     //   Provide filter list authors a way to completely bypass
     //   the browser cache.
-    // https://github.com/Ablock/Ablock/commit/048bfd251c9b#r37972005
+    // https://github.com/Ablock-innovation/Ablock/commit/048bfd251c9b#r37972005
     //   Use modulo prime numbers to avoid generating the same token at the
     //   same time across different days.
     // Do not bypass browser cache if we are asked to be gentle on remote
@@ -386,7 +386,7 @@ assets.fetchText = async function (url) {
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/3331
+// https://github.com/Ablock-innovation/Ablock/issues/3331
 //   Support the seamless loading of sublists.
 
 assets.fetchFilterList = async function (mainlistURL) {

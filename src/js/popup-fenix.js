@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -58,7 +58,7 @@ const allHostnameRows = [];
 let cachedPopupHash = '';
 let forceReloadFlag = 0;
 
-// https://github.com/Ablock/Ablock/issues/2550
+// https://github.com/Ablock-innovation/Ablock/issues/2550
 // Solution inspired from
 // - https://bugs.chromium.org/p/chromium/issues/detail?id=683314
 // - https://bugzilla.mozilla.org/show_bug.cgi?id=1332714#c17
@@ -704,7 +704,7 @@ dom.on('.dismiss', 'click', () => {
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/2889
+// https://github.com/Ablock-innovation/Ablock/issues/2889
 //   Use tooltip for ARIA purpose.
 
 const renderTooltips = function (selector) {
@@ -1268,7 +1268,7 @@ const setSpecificExpand = function (domain, state, internal = false) {
 dom.on('[data-i18n="popupAnyRulePrompt"]', 'click', ev => {
     // Special display mode: in its own tab/window, with no vertical restraint.
     // Useful to take snapshots of the whole list of domains -- example:
-    //   https://github.com/Ablock/Ablock/issues/736#issuecomment-178879944
+    //   https://github.com/Ablock-innovation/Ablock/issues/736#issuecomment-178879944
     if (ev.shiftKey && ev.ctrlKey) {
         messaging.send('popupPanel', {
             what: 'gotoURL',

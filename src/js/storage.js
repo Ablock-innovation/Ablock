@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /******************************************************************************/
@@ -456,7 +456,7 @@ onBroadcast(msg => {
         return;
     }
 
-    // https://github.com/Ablock/Ablock/issues/747
+    // https://github.com/Ablock-innovation/Ablock/issues/747
     //   Select default filter lists if first-time launch.
     const lists = await io.metadata();
     this.saveSelectedFilterLists(this.autoSelectRegionalFilterLists(lists));
@@ -511,7 +511,7 @@ onBroadcast(msg => {
 
     // Filter lists to import
     if (typeof details.toImport === 'string') {
-        // https://github.com/Ablock/Ablock/issues/1181
+        // https://github.com/Ablock-innovation/Ablock/issues/1181
         //   Try mapping the URL of an imported filter list to the assetKey
         //   of an existing stock list.
         const assetKeyFromURL = url => {
@@ -578,7 +578,7 @@ onBroadcast(msg => {
 /******************************************************************************/
 
 µb.saveUserFilters = function (content) {
-    // https://github.com/Ablock/Ablock/issues/1022
+    // https://github.com/Ablock-innovation/Ablock/issues/1022
     //   Be sure to end with an empty line.
     content = content.trim();
     this.removeCompiledFilterList(this.userFiltersPath);
@@ -668,7 +668,7 @@ onBroadcast(msg => {
 
 µb.createUserFilters = function (details) {
     this.appendUserFilters(details.filters, details);
-    // https://github.com/Ablock/Ablock/issues/1786
+    // https://github.com/Ablock-innovation/Ablock/issues/1786
     if (details.docURL === undefined) { return; }
     cosmeticFilteringEngine.removeFromSelectorCache(
         hostnameFromURI(details.docURL)
@@ -1073,7 +1073,7 @@ onBroadcast(msg => {
 µb.extractFilterListMetadata = function (assetKey, raw) {
     const listEntry = this.availableFilterLists[assetKey];
     if (listEntry === undefined) { return; }
-    // https://github.com/Ablock/Ablock/issues/313
+    // https://github.com/Ablock-innovation/Ablock/issues/313
     // Always try to fetch the name if this is an external filter list.
     if (listEntry.group !== 'custom') { return; }
     const data = io.extractMetadataFromList(raw, ['Title', 'Homepage']);
@@ -1176,7 +1176,7 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/1395
+// https://github.com/Ablock-innovation/Ablock/issues/1395
 //   Added `firstparty` argument: to avoid discarding cosmetic filters when
 //   applying 1st-party filters.
 
@@ -1378,7 +1378,7 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/531
+// https://github.com/Ablock-innovation/Ablock/issues/531
 // Overwrite user settings with admin settings if present.
 //
 // Admin settings match layout of a uBlock backup. Not all data is
@@ -1509,11 +1509,11 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/2344
+// https://github.com/Ablock-innovation/Ablock/issues/2344
 //   Support multiple locales per filter list.
-// https://github.com/Ablock/Ablock/issues/3210
+// https://github.com/Ablock-innovation/Ablock/issues/3210
 //   Support ability to auto-enable a filter list based on user agent.
-// https://github.com/Ablock/Ablock/pull/3860
+// https://github.com/Ablock-innovation/Ablock/pull/3860
 //   Get current language using extensions API (instead of `navigator.language`)
 
 µb.listMatchesEnvironment = function (details) {
@@ -1643,7 +1643,7 @@ onBroadcast(msg => {
             key: details.assetKey,
             cached,
         });
-        // https://github.com/Ablock/Ablock/issues/2585
+        // https://github.com/Ablock-innovation/Ablock/issues/2585
         //   Whenever an asset is overwritten, the current selfie is quite
         //   likely no longer valid.
         this.selfieManager.destroy();
@@ -1663,7 +1663,7 @@ onBroadcast(msg => {
     // Reload all filter lists if needed.
     if (topic === 'after-assets-updated') {
         if (details.assetKeys.length !== 0) {
-            // https://github.com/Ablock/Ablock/pull/2314#issuecomment-278716960
+            // https://github.com/Ablock-innovation/Ablock/pull/2314#issuecomment-278716960
             if (
                 this.hiddenSettings.userResourcesLocation !== 'unset' ||
                 vAPI.webextFlavor.soup.has('devbuild')

@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 // For non-background page
@@ -240,7 +240,7 @@ if (
     - Remove the following code
     - Add code beyond the following code
     Reason:
-    - https://github.com/Ablock/Ablock/pull/3721
+    - https://github.com/Ablock-innovation/Ablock/pull/3721
     - uBO never uses the return value from injected content scripts
 
 **/

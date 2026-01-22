@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import * as s14e from './s14e-serializer.js';
@@ -479,7 +479,7 @@ import µb from './background.js';
             shouldUpdateLists.push(entry.assetKey);
         }
 
-        // https://github.com/Ablock/Ablock/commit/6efd8eb#commitcomment-107523558
+        // https://github.com/Ablock-innovation/Ablock/commit/6efd8eb#commitcomment-107523558
         //   Important: for whatever reason, not using `document_start` causes the
         //   Promise returned by `tabs.executeScript()` to resolve only when the
         //   associated tab is closed.
@@ -570,7 +570,7 @@ import µb from './background.js';
                     permanentSwitches,
                     request.srcHostname
                 );
-                // https://github.com/Ablock/Ablock/issues/188
+                // https://github.com/Ablock-innovation/Ablock/issues/188
                 cosmeticFilteringEngine.removeFromSelectorCache(
                     request.srcHostname,
                     'net'

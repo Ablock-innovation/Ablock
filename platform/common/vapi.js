@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 // For background page, auxiliary pages, and content scripts.
@@ -41,7 +41,7 @@ var vAPI = self.vAPI; // jshint ignore:line
 // https://github.com/chrisaljoudi/uBlock/issues/1528
 //   A XMLDocument can be a valid HTML document.
 
-// https://github.com/Ablock/Ablock/issues/1124
+// https://github.com/Ablock-innovation/Ablock/issues/1124
 //   Looks like `contentType` is on track to be standardized:
 //   https://dom.spec.whatwg.org/#concept-document-content-type
 
@@ -77,7 +77,7 @@ if (
     - Remove the following code
     - Add code beyond the following code
     Reason:
-    - https://github.com/Ablock/Ablock/pull/3721
+    - https://github.com/Ablock-innovation/Ablock/pull/3721
     - uBO never uses the return value from injected content scripts
 
 **/

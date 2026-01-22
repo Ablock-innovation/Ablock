@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /* global CodeMirror, uBlockDashboard */
@@ -239,7 +239,7 @@ self.cloud.onPull = setCloudData;
 
 /******************************************************************************/
 
-self.wikilink = 'https://github.com/Ablock/Ablock/wiki/Dashboard:-Trusted-sites';
+self.wikilink = 'https://github.com/Ablock-innovation/Ablock/wiki/Dashboard:-Trusted-sites';
 
 self.hasUnsavedData = function () {
     return getEditorText().trim() !== cachedWhitelist;

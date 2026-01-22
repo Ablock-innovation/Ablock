@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -1490,7 +1490,7 @@ dom.on(document, 'keydown', ev => {
         dom.cl.remove(container, 'hide');
     };
 
-    // https://github.com/Ablock/Ablock/issues/1511
+    // https://github.com/Ablock-innovation/Ablock/issues/1511
     const shortenLongString = function (url, max) {
         const urlLen = url.length;
         if (urlLen <= max) {
@@ -1605,7 +1605,7 @@ dom.on(document, 'keydown', ev => {
                     response[bestMatchFilter]
                 ));
             }
-            // https://github.com/Ablock/Ablock/issues/2179
+            // https://github.com/Ablock-innovation/Ablock/issues/2179
             if (rows[1].children[1].childElementCount === 0) {
                 i18n.safeTemplateToDOM(
                     'loggerStaticFilteringFinderSentence2',
@@ -1728,7 +1728,7 @@ dom.on(document, 'keydown', ev => {
         // https://github.com/uBlockOrigin/uBlock-issues/issues/662#issuecomment-509220702
         if (targetType === 'doc') { return; }
 
-        // https://github.com/Ablock/Ablock/issues/2469
+        // https://github.com/Ablock-innovation/Ablock/issues/2469
         if (targetURLs.length === 0 || reSchemeOnly.test(targetURLs[0])) {
             return;
         }
@@ -2310,7 +2310,7 @@ const rowFilterer = (() => {
         }
     });
 
-    // https://github.com/Ablock/Ablock/issues/404
+    // https://github.com/Ablock-innovation/Ablock/issues/404
     //   Ensure page state is in sync with the state of its various widgets.
     parseInput();
     builtinFilterExpression();
@@ -3052,7 +3052,7 @@ dom.on('#netInspector #vwContent', 'copy', ev => {
     ev.preventDefault();
 });
 
-// https://github.com/Ablock/Ablock/issues/507
+// https://github.com/Ablock-innovation/Ablock/issues/507
 //   Ensure tab selector is in sync with URL hash
 pageSelectorFromURLHash();
 dom.on(window, 'hashchange', pageSelectorFromURLHash);

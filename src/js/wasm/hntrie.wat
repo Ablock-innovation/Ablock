@@ -15,7 +15,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see {http://www.gnu.org/licenses/}.
 ;;
-;; Home: https://github.com/Ablock/Ablock
+;; Home: https://github.com/Ablock-innovation/Ablock
 ;; File: hntrie.wat
 ;; Description: WebAssembly code used by src/js/hntrie.js
 ;; How to compile: See README.md in this directory.

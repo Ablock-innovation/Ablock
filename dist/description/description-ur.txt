@@ -1,7 +1,7 @@
 ایک زبردست اشتہارات کو روکنے والا سافٹویئر. کم میموری اور cpu استعمال کرتا ہے مگر کام بہترین کرتا ہے.
 
 اس کا بہترین اور پراثر کام کرنے کی تصاویر:
-https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 ہدایات: بڑا آن/ آف کا بٹن دبا کر آپ موجودہ ویب سائٹ پر uBlock کو فعال یا غیر فعال کر سکتے ہیں. یہ بٹن صرف موجودہ ویب سائٹ کے لئے ہے، باقی ویب سائٹس کو اس سے کوئی فرق نہیں پڑے گا.
 
@@ -40,7 +40,7 @@ Without the preset lists of filters, this extension is nothing. So if ever you r
 عوام کے لیے، عوام کا بنایا ہوا.
 
 معاونین کی فہرست Github پر دیکھیں:
-https://github.com/Ablock/Ablock/graphs/contributors
+https://github.com/Ablock-innovation/Ablock/graphs/contributors
 مترجمین کی فہرست Crowdin پر دیکھیں:
 https://crowdin.net/project/ublock
 
@@ -49,4 +49,4 @@ https://crowdin.net/project/ublock
 It's quite an early version, keep this in mind when you review.
 
 پراجیکٹ میں ترقیاتی کام کا ریکارڈ:
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

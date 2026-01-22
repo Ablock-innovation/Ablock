@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import { StaticExtFilteringHostnameDB } from './static-ext-filtering-db.js';
@@ -159,7 +159,7 @@ export class ScriptletFilteringEngine {
             return;
         }
 
-        // https://github.com/Ablock/Ablock/issues/3375
+        // https://github.com/Ablock-innovation/Ablock/issues/3375
         //   Ignore instances of exception filter with negated hostnames,
         //   because there is no way to create an exception to an exception.
 

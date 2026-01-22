@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import { dom } from './dom.js';
@@ -125,7 +125,7 @@ self.uBlockDashboard.patchCodeMirrorEditor = (function () {
         grabFocusTimer.on(1);
     };
 
-    // https://github.com/Ablock/Ablock/issues/3646
+    // https://github.com/Ablock-innovation/Ablock/issues/3646
     const patchSelectAll = function (cm, details) {
         var vp = cm.getViewport();
         if (details.ranges.length !== 1) { return; }

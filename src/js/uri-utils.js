@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import publicSuffixList from '../lib/publicsuffixlist/publicsuffixlist.js';
@@ -25,7 +25,7 @@ import punycode from '../lib/punycode.js';
 /******************************************************************************/
 
 // Originally:
-// https://github.com/Ablock/Ablock/blob/8b5733a58d3acf9fb62815e14699c986bd1c2fdc/src/js/uritools.js
+// https://github.com/Ablock-innovation/Ablock/blob/8b5733a58d3acf9fb62815e14699c986bd1c2fdc/src/js/uritools.js
 
 const reHostnameFromCommonURL =
     /^https:\/\/[0-9a-z._-]+[0-9a-z]\//;

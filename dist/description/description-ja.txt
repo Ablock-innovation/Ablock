@@ -1,6 +1,6 @@
 効率的なブロッカー: メモリーとCPUに優しいため、人気のある他のブロッカーと比べて何千も多くのフィルターを使用することができます。
 
-他ソフトとの比較: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+他ソフトとの比較: https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 使用法: ポップアップに表示される大きな電源ボタンで、現在のサイトのuBlockの有効/無効を切り替えます。 変更は現在のサイトへのみ適用されます。他のサイトとの共通ボタンではありません。
 
@@ -38,7 +38,7 @@
 パブリックライセンス(GPLv3)のオープンソース
 ユーザーによって作られた、ユーザーのための物。
 
-貢献者 @ Github: https://github.com/Ablock/Ablock/graphs/contributors
+貢献者 @ Github: https://github.com/Ablock-innovation/Ablock/graphs/contributors
 貢献者 @ Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@
 これは割と初期のバージョンですので、それを念頭にレビューをお願いします。
 
 プロジェクト変更ログ：
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

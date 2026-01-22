@@ -18,7 +18,7 @@ A Block
 
 | Browser   | Install from ... | Status |
 | :-------: | ---------------- | ------ |
-| <img src="https://github.com/user-attachments/assets/b0136512-56a5-4856-8c50-4971c957a24f" alt="Get A Block for Firefox"> | <a href="https://addons.mozilla.org/addon/ablock/">Firefox Add-ons</a> | [A Block works best on Firefox](https://github.com/Ablock/Ablock/wiki/A-Block-works-best-on-Firefox) |
+| <img src="https://github.com/user-attachments/assets/b0136512-56a5-4856-8c50-4971c957a24f" alt="Get A Block for Firefox"> | <a href="https://addons.mozilla.org/addon/ablock/">Firefox Add-ons</a> | [A Block works best on Firefox](https://github.com/Ablock-innovation/Ablock/wiki/A-Block-works-best-on-Firefox) |
 
 
 ABlock is a CPU and memory-efficient [wide-spectrum content blocker][Blocking] for Chromium and Firefox. It blocks ads, trackers, coin miners, popups, annoying anti-blockers, malware sites, etc., by default using [EasyList][EasyList], [EasyPrivacy][EasyPrivacy], [Peter Lowe's Blocklist][Peter Lowe's Blocklist], [Online Malicious URL Blocklist][Malicious Blocklist], and A Block [filter lists][A Block Filters]. There are many other lists available to block even more. Hosts files are also supported. A Block uses EasyList filter syntax and [extends][Extended Syntax] syntax to work with custom rules and filters.
@@ -49,12 +49,12 @@ Ads, "unintrusive" or not, are just the visible portion of privacy-invading mean
     </thead>
     <tbody>
         <tr>
-            <td>The <a href="https://github.com/Ablock/Ablock/wiki/Quick-guide:-popup-user-interface">simple popup user interface</a> for an install-it-and-forget-it type of installation that is configured optimally by default.</td>
-            <td>The <a href="https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-quick-guide">advanced popup user interface</a> includes a point-and-click firewall that is configurable on a per-site basis.</td>
+            <td>The <a href="https://github.com/Ablock-innovation/Ablock/wiki/Quick-guide:-popup-user-interface">simple popup user interface</a> for an install-it-and-forget-it type of installation that is configured optimally by default.</td>
+            <td>The <a href="https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-quick-guide">advanced popup user interface</a> includes a point-and-click firewall that is configurable on a per-site basis.</td>
         </tr>
         <tr>
-            <td align="center" valign="top"><a href="https://github.com/Ablock/Ablock/wiki/Quick-guide:-popup-user-interface"><img src="https://github.com/user-attachments/assets/f7588d3c-43eb-42d4-9994-4b6f433a030c"/></a></td>
-            <td align="center" valign="top"><a href="https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-quick-guide"><img src="https://github.com/user-attachments/assets/ac3e8665-5061-415a-a100-4225f9f12c5b"/></a></td>
+            <td align="center" valign="top"><a href="https://github.com/Ablock-innovation/Ablock/wiki/Quick-guide:-popup-user-interface"><img src="https://github.com/user-attachments/assets/f7588d3c-43eb-42d4-9994-4b6f433a030c"/></a></td>
+            <td align="center" valign="top"><a href="https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-quick-guide"><img src="https://github.com/user-attachments/assets/ac3e8665-5061-415a-a100-4225f9f12c5b"/></a></td>
         </tr>
     </tbody>
 </table>
@@ -124,19 +124,19 @@ If you ever want to contribute something, think about the people working hard to
 
 <!---------------------------------[ Internal ]---------------------------------->
 
-[Manual Installation]: https://github.com/Ablock/Ablock/tree/master/dist#install
-[Extended Syntax]: https://github.com/Ablock/Ablock/wiki/Static-filter-syntax#extended-syntax
-[Privacy Policy]: https://github.com/Ablock/Ablock/wiki/Privacy-policy
-[A Block Filters]: https://github.com/Ablock/uAssets/tree/master/filters
-[Permissions]: https://github.com/Ablock/Ablock/wiki/Permissions
-[Commit Rate]: https://github.com/Ablock/Ablock/commits/master
-[Works Best]: https://github.com/Ablock/Ablock/wiki/A-Block-works-best-on-Firefox
-[Deployment]: https://github.com/Ablock/Ablock/wiki/Deploying-A-Block
-[Blocking]: https://github.com/Ablock/Ablock/wiki/Blocking-mode
-[Releases]: https://github.com/Ablock/Ablock/releases
-[Issues]: https://github.com/Ablock/Ablock-issues/issues
-[Beta]: https://github.com/Ablock/Ablock/blob/master/dist/README.md#for-beta-version
-[Wiki]: https://github.com/Ablock/Ablock/wiki
+[Manual Installation]: https://github.com/Ablock-innovation/Ablock/tree/master/dist#install
+[Extended Syntax]: https://github.com/Ablock-innovation/Ablock/wiki/Static-filter-syntax#extended-syntax
+[Privacy Policy]: https://github.com/Ablock-innovation/Ablock/wiki/Privacy-policy
+[A Block Filters]: https://github.com/Ablock-innovation/uAssets/tree/master/filters
+[Permissions]: https://github.com/Ablock-innovation/Ablock/wiki/Permissions
+[Commit Rate]: https://github.com/Ablock-innovation/Ablock/commits/master
+[Works Best]: https://github.com/Ablock-innovation/Ablock/wiki/A-Block-works-best-on-Firefox
+[Deployment]: https://github.com/Ablock-innovation/Ablock/wiki/Deploying-A-Block
+[Blocking]: https://github.com/Ablock-innovation/Ablock/wiki/Blocking-mode
+[Releases]: https://github.com/Ablock-innovation/Ablock/releases
+[Issues]: https://github.com/Ablock-innovation/Ablock-issues/issues
+[Beta]: https://github.com/Ablock-innovation/Ablock/blob/master/dist/README.md#for-beta-version
+[Wiki]: https://github.com/Ablock-innovation/Ablock/wiki
 
 <!----------------------------------[ Badges ]--------------------------------->
 

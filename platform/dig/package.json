@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ablock/Ablock.git"
+    "url": "git+https://github.com/Ablock-innovation/Ablock.git"
   },
   "author": "Raymond Hill",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/Ablock/Ablock/issues"
+    "url": "https://github.com/Ablock-innovation/Ablock/issues"
   },
-  "homepage": "https://github.com/Ablock/Ablock#readme",
+  "homepage": "https://github.com/Ablock-innovation/Ablock#readme",
   "engines": {
     "node": ">=14.0.0",
     "npm": ">=6.14.4"

@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": " CSP रिपोर्ट्स को ब्लॉक करें ",
-    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
+    "description": "background information: https://github.com/Ablock-innovation/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "विहित नाम अनलॉक करें",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "सिंटेक्स नियम: <code>सोर्स डेस्टिनेशन टाइप एक्शन</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'> पूरी डॉक्यूमेंटेशन</a>).",
+    "message": "सिंटेक्स नियम: <code>सोर्स डेस्टिनेशन टाइप एक्शन</code> (<a href='https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-rule-syntax'> पूरी डॉक्यूमेंटेशन</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

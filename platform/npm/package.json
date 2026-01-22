@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ablock/Ablock.git"
+    "url": "git+https://github.com/Ablock-innovation/Ablock.git"
   },
   "keywords": [
     "uBlock",
@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/uBlockOrigin/uBlock-issues/issues"
   },
-  "homepage": "https://github.com/Ablock/Ablock#readme",
+  "homepage": "https://github.com/Ablock-innovation/Ablock#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=6.14.4"

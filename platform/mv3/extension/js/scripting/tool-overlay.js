@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 (function uBOLOverlay() {
@@ -195,7 +195,7 @@
                 ? elem.getBoundingClientRect()
                 : { height: 0, left: 0, top: 0, width: 0 };
 
-            // https://github.com/Ablock/Ablock/issues/1024
+            // https://github.com/Ablock-innovation/Ablock/issues/1024
             // Try not returning an empty bounding rect.
             if (rect.width !== 0 && rect.height !== 0) {
                 return rect;

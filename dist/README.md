@@ -2,7 +2,7 @@
 
 ## Chromium
 
-1. Download and unzip `ublock0.chromium.zip` ([latest release desirable](https://github.com/Ablock/Ablock/releases)).
+1. Download and unzip `ublock0.chromium.zip` ([latest release desirable](https://github.com/Ablock-innovation/Ablock/releases)).
 2. Rename the unzipped directory to `ublock`.
    - When you update manually, replace the **content** of the `ublock` folder with the **content** of the latest zipped version. This ensures all extension settings are preserved.
    - As long as the extension loads from the same folder path as it was originally installed, your settings will be kept.
@@ -27,13 +27,13 @@ Compatible with Firefox 52 and beyond.
 
 This method only works if you set `xpinstall.signatures.required` to `false` in `about:config`.<sup>[see "Add-on signing in Firefox"](https://support.mozilla.org/en-US/kb/add-on-signing-in-firefox)</sup>
 
-1. Download `ublock0.firefox.xpi` ([latest release desirable](https://github.com/Ablock/Ablock/releases)).
+1. Download `ublock0.firefox.xpi` ([latest release desirable](https://github.com/Ablock-innovation/Ablock/releases)).
    - Right-click and choose _"Save As..."_.
 2. Drag and drop the downloaded `ublock0.firefox.xpi` into Firefox.
 
 ### For Beta Version
 
-- Click on `ublock0.firefox.signed.xpi` ([latest release desirable](https://github.com/Ablock/Ablock/releases)).
+- Click on `ublock0.firefox.signed.xpi` ([latest release desirable](https://github.com/Ablock-innovation/Ablock/releases)).
 
 ### Location of uBO Settings
 
@@ -47,7 +47,7 @@ When you uninstall the extension, Firefox deletes this file, and all your settin
 
 Compatible with Firefox 24-56, [Pale Moon](https://www.palemoon.org/), and [SeaMonkey](https://www.seamonkey-project.org/).
 
-1. Download `ublock0.firefox-legacy.xpi` ([latest release desirable](https://github.com/Ablock/Ablock-for-firefox-legacy/releases)).
+1. Download `ublock0.firefox-legacy.xpi` ([latest release desirable](https://github.com/Ablock-innovation/Ablock-for-firefox-legacy/releases)).
    - Right-click and select "Save Link As..."
 2. Drag and drop the downloaded `ublock0.firefox-legacy.xpi` into Firefox.
 
@@ -66,9 +66,9 @@ Your uBlock Origin settings are preserved even after uninstalling the addon.
 
 ## Build Instructions (for Developers)
 
-1. Clone the [uBlock repository](https://github.com/Ablock/Ablock):
+1. Clone the [uBlock repository](https://github.com/Ablock-innovation/Ablock):
    ```bash
-   git clone https://github.com/Ablock/Ablock.git
+   git clone https://github.com/Ablock-innovation/Ablock.git
    ```
 2. Set the path to uBlock:
    ```bash

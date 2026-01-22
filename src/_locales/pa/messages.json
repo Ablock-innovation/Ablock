@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "CSP ਰਿਪੋਰਟਾਂ ਉੱਤੇ ਪਾਬੰਦੀ",
-    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
+    "description": "background information: https://github.com/Ablock-innovation/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Uncloak canonical names",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Rule syntax: <code>source destination type action</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>full documentation</a>).",
+    "message": "Rule syntax: <code>source destination type action</code> (<a href='https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-rule-syntax'>full documentation</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

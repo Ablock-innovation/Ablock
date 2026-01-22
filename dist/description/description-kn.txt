@@ -1,6 +1,6 @@
 ಒಂದು ದಕ್ಷ ನಿರ್ಬಂಧಕ: ಮಿತವಾದ ಮೆಮೊರಿ ಹಾಗೂ ಸಿಪಿಯೂ ಹೆಜ್ಜೆಗುರುತು ಇದ್ದರೂ, ಇತರ ಜನಪ್ರಿಯ ನಿರ್ಬಂಧಕಗಳಿಗಿಂತ ಸಾವಿರಾರು ಹೆಚ್ಚು ಶೋಧಕಗಳನ್ನು ಹಾಕಿ ಮತ್ತು ಜಾರಿಗೆ ತರಬಲ್ಲದು.
 
-ಇದರ ದಕ್ಷತೆಯ ಸಚಿತ್ರ ಪಕ್ಷಿನೋಟ: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+ಇದರ ದಕ್ಷತೆಯ ಸಚಿತ್ರ ಪಕ್ಷಿನೋಟ: https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 ಬಳಕೆ: ಪಾಪ್ಅಪ್ ದೊಡ್ಡ ವಿದ್ಯುತ್ ಬಟನ್ ಶಾಶ್ವತವಾಗಿ / ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಬಹುದು ಪ್ರಸ್ತುತ ವೆಬ್ ಸೈಟ್ uBlock ಸಕ್ರಿಯಗೊಳಿಸಲು ಹೊಂದಿದೆ. ಇದು ಜಾಗತಿಕ ವಿದ್ಯುತ್ ಬಟನ್ ಅಲ್ಲ, ಪ್ರಸ್ತುತ ಜಾಲತಾಣಕ್ಕೆ ಮಾತ್ರ ಅನ್ವಯಿಸುತ್ತದೆ.
 
@@ -39,7 +39,7 @@
 ಸಾರ್ವಜನಿಕ ಪರವಾನಗಿ ಮುಕ್ತ ಆಕರ (ಜಿ. ಪಿ. ಎಲ್. ವಿ೩)
 ಬಳಕೆದಾರರಿಂದ ಬಳಕೆದಾರರಿಗಾಗಿ.
 
-ನೀಡುಗರು @ ಗಿಟ್ಹಬ್: https://github.com/Ablock/Ablock/graphs/contributors
+ನೀಡುಗರು @ ಗಿಟ್ಹಬ್: https://github.com/Ablock-innovation/Ablock/graphs/contributors
 ನೀಡುಗರು @ ಕ್ರೌಡ್ಇನ್: https://crowdin.net/project/ublock
 
 ***
@@ -47,4 +47,4 @@
 ಇದು ಸಾಕಷ್ಟು ಆರಂಭಿಕ ಆವೃತ್ತಿ, ನೀವು ಪರಿಶೀಲಿಸುವಾಗ ಇದನ್ನು ಮನಸ್ಸಿನಲ್ಲಿ ಇರಿಸಿಕೊಳ್ಳಿ.
 
 ಪ್ರಾಜೆಕ್ಟ್ ಬದಲಾವಣೆಗಳ ಲಾಗ್ :
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

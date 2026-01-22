@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /******************************************************************************/
@@ -70,7 +70,7 @@ const NetFilteringResultCache = class {
         return this;
     }
 
-    // https://github.com/Ablock/Ablock/issues/3619
+    // https://github.com/Ablock-innovation/Ablock/issues/3619
     //   Don't collapse redirected resources
     rememberResult(fctxt, result) {
         if (fctxt.tabId <= 0) { return; }
@@ -372,7 +372,7 @@ const PageStore = class {
         return entry;
     }
 
-    // https://github.com/Ablock/Ablock/issues/3201
+    // https://github.com/Ablock-innovation/Ablock/issues/3201
     //   The context is used to determine whether we report behavior change
     //   to the logger.
 
@@ -631,7 +631,7 @@ const PageStore = class {
         return frameStore.shouldApplyGenericCosmeticFilters(this.tabId);
     }
 
-    // https://github.com/Ablock/Ablock/issues/2105
+    // https://github.com/Ablock-innovation/Ablock/issues/2105
     //   Be sure to always include the current page's hostname -- it might not
     //   be present when the page itself is pulled from the browser's
     //   short-term memory cache.
@@ -672,7 +672,7 @@ const PageStore = class {
         });
     }
 
-    // https://github.com/Ablock/Ablock/issues/2053
+    // https://github.com/Ablock-innovation/Ablock/issues/2053
     //   There is no way around using journaling to ensure we deal properly with
     //   potentially out of order navigation events vs. network request events.
     journalAddRequest(fctxt, result) {
@@ -870,7 +870,7 @@ const PageStore = class {
 
         // Modifier(s)?
         // A modifier is an action which transform the original network request.
-        // https://github.com/Ablock/Ablock/issues/949
+        // https://github.com/Ablock-innovation/Ablock/issues/949
         //   Redirect blocked request?
         // https://github.com/uBlockOrigin/uBlock-issues/issues/760
         //   Redirect non-blocked request?

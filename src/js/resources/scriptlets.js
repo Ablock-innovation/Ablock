@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 
 */
 
@@ -1184,7 +1184,7 @@ builtinScriptlets.push({
     name: 'window.name-defuser.js',
     fn: windowNameDefuser,
 });
-// https://github.com/Ablock/Ablock/issues/1228
+// https://github.com/Ablock-innovation/Ablock/issues/1228
 function windowNameDefuser() {
     if (window === window.top) {
         window.name = '';
@@ -1851,8 +1851,8 @@ function multiup() {
  * stage of a document.
  * 
  * See commit messages for usage:
- * - https://github.com/Ablock/Ablock/commit/99ce027fd702
- * - https://github.com/Ablock/Ablock/commit/41876336db48
+ * - https://github.com/Ablock-innovation/Ablock/commit/99ce027fd702
+ * - https://github.com/Ablock-innovation/Ablock/commit/41876336db48
  * 
  **/
 

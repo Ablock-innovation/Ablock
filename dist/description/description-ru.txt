@@ -1,6 +1,6 @@
 Эффективный блокировщик: не нагружает процессор и оперативную память, поддерживает больше фильтров, чем другие популярные блокировщики.
 
-Иллюстрированный обзор его эффективности: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Иллюстрированный обзор его эффективности: https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Использование: Большая кнопка питания в выпадающем окне служит для выключения/включения uBlock для текущего сайта. Это не глобальная кнопка, она применяется только для текущего сайта.
 
@@ -38,7 +38,7 @@
 Открытый исходный код, публичная лицензия (GPLv3).
 Для пользователей от пользователей.
 
-Участники на Github: https://github.com/Ablock/Ablock/graphs/contributors
+Участники на Github: https://github.com/Ablock-innovation/Ablock/graphs/contributors
 Участники на Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@
 Это ещё очень ранняя версия, имейте это в виду, оценивая программу.
 
 Список изменений:
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

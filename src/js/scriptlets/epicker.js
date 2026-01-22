@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 (async () => {
@@ -65,7 +65,7 @@
             ? elem.getBoundingClientRect()
             : { height: 0, left: 0, top: 0, width: 0 };
 
-        // https://github.com/Ablock/Ablock/issues/1024
+        // https://github.com/Ablock-innovation/Ablock/issues/1024
         // Try not returning an empty bounding rect.
         if (rect.width !== 0 && rect.height !== 0) {
             return rect;
@@ -190,7 +190,7 @@
 
     /******************************************************************************/
 
-    // https://github.com/Ablock/Ablock/issues/1897
+    // https://github.com/Ablock-innovation/Ablock/issues/1897
     // Ignore `data:` URI, they can't be handled by an HTTP observer.
 
     const backgroundImageURLFromElement = function (elem) {
@@ -205,7 +205,7 @@
 
     /******************************************************************************/
 
-    // https://github.com/Ablock/Ablock/issues/1725#issuecomment-226479197
+    // https://github.com/Ablock-innovation/Ablock/issues/1725#issuecomment-226479197
     //   Limit returned string to 1024 characters.
     //   Also, return only URLs which will be seen by an HTTP observer.
     // https://github.com/uBlockOrigin/uBlock-issues/issues/2260
@@ -386,7 +386,7 @@
 
     // Extract the best possible cosmetic filter, i.e. as specific as possible.
 
-    // https://github.com/Ablock/Ablock/issues/1725
+    // https://github.com/Ablock-innovation/Ablock/issues/1725
     //   Also take into account the `src` attribute for `img` elements -- and limit
     //   the value to the 1024 first characters.
 
@@ -420,7 +420,7 @@
         const tagName = CSS.escape(elem.localName);
 
         // Use attributes if still no selector found.
-        // https://github.com/Ablock/Ablock/issues/1901
+        // https://github.com/Ablock-innovation/Ablock/issues/1901
         //   Trim attribute value, this may help in case of malformed HTML.
         //
         // https://github.com/uBlockOrigin/uBlock-issues/issues/1923
@@ -537,7 +537,7 @@
             x = undefined;
         }
 
-        // https://github.com/Ablock/Ablock/issues/1545
+        // https://github.com/Ablock-innovation/Ablock/issues/1545
         //   Network filter candidates from all other elements found at [x,y].
         // https://www.reddit.com/r/uBlockOrigin/comments/qmjk36/
         //   Extract network candidates first.
@@ -554,7 +554,7 @@
         }
 
         // Cosmetic filter candidates from ancestors.
-        // https://github.com/Ablock/Ablock/issues/2519
+        // https://github.com/Ablock-innovation/Ablock/issues/2519
         // https://github.com/uBlockOrigin/uBlock-issues/issues/17
         //   Prepend `body` if full selector is ambiguous.
         let elem = first;
@@ -572,7 +572,7 @@
             }
         }
 
-        // https://github.com/Ablock/Ablock/commit/ebaa8a8bb28aef043a68c99965fe6c128a3fe5e4#commitcomment-63818019
+        // https://github.com/Ablock-innovation/Ablock/commit/ebaa8a8bb28aef043a68c99965fe6c128a3fe5e4#commitcomment-63818019
         //   If still no best candidate, just use whatever is available in network
         //   filter candidates -- which may have been previously skipped in favor
         //   of cosmetic filters.
@@ -717,7 +717,7 @@
         //   Test filter using comma-separated list to better detect invalid CSS
         //   selectors.
         //
-        // https://github.com/Ablock/Ablock/issues/2515
+        // https://github.com/Ablock-innovation/Ablock/issues/2515
         //   Remove trailing pseudo-element when querying.
         const fromPlainCosmeticFilter = function (raw) {
             let elems;
@@ -737,10 +737,10 @@
             return out;
         };
 
-        // https://github.com/Ablock/Ablock/issues/1772
+        // https://github.com/Ablock-innovation/Ablock/issues/1772
         //   Handle procedural cosmetic filters.
         //
-        // https://github.com/Ablock/Ablock/issues/2515
+        // https://github.com/Ablock-innovation/Ablock/issues/2515
         //   Remove trailing pseudo-element when querying.
         const fromCompiledCosmeticFilter = function (raw) {
             if (noCosmeticFiltering) { return; }
@@ -1235,7 +1235,7 @@
         vAPI.domFilterer instanceof Object === false ||
         vAPI.noSpecificCosmeticFiltering === true;
 
-    // https://github.com/Ablock/Ablock/issues/1529
+    // https://github.com/Ablock-innovation/Ablock/issues/1529
     //   In addition to inline styles, harden the element picker styles by using
     //   dedicated CSS rules.
     const pickerCSSStyle = [
@@ -1349,7 +1349,7 @@
     - Remove the following code
     - Add code beyond the following code
     Reason:
-    - https://github.com/Ablock/Ablock/pull/3721
+    - https://github.com/Ablock-innovation/Ablock/pull/3721
     - uBO never uses the return value from injected content scripts
 
 **/

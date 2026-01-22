@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /*******************************************************************************
@@ -40,7 +40,7 @@
   just a matter of reading/comparing these integers, and further using them as
   indices in the array as a way to move around in the trie.
 
-  [1] To solve <https://github.com/Ablock/Ablock/issues/3193>
+  [1] To solve <https://github.com/Ablock-innovation/Ablock/issues/3193>
 
   Since this trie is specialized for matching hostnames, the stored
   strings are reversed internally, because of hostname comparison logic:
@@ -62,12 +62,12 @@
   ------------------------------------------------------------------------------
 
   1st iteration:
-    - https://github.com/Ablock/Ablock/blob/ff58107dac3a32607f8113e39ed5015584506813/src/js/hntrie.js
+    - https://github.com/Ablock-innovation/Ablock/blob/ff58107dac3a32607f8113e39ed5015584506813/src/js/hntrie.js
     - Suitable for small to medium set of hostnames
     - One buffer per trie
 
   2nd iteration: goal was to make matches() method wasm-able
-    - https://github.com/Ablock/Ablock/blob/c3b0fd31f64bd7ffecdd282fb1208fe07aac3eb0/src/js/hntrie.js
+    - https://github.com/Ablock-innovation/Ablock/blob/c3b0fd31f64bd7ffecdd282fb1208fe07aac3eb0/src/js/hntrie.js
     - Suitable for small to medium set of hostnames
     - Distinct tries all share same buffer:
       - Reduced memory footprint

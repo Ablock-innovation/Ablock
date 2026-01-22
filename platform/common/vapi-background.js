@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 // For background page
@@ -170,7 +170,7 @@ if (webext.storage.local.getBytesInUse instanceof Function) {
 // https://github.com/gorhill/uMatrix/issues/234
 // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/privacy/network
 
-// https://github.com/Ablock/Ablock/issues/2048
+// https://github.com/Ablock-innovation/Ablock/issues/2048
 //   Do not mess up with existing settings if not assigning them stricter
 //   values.
 
@@ -615,7 +615,7 @@ vAPI.Tabs = class {
         // Ignore uninteresting update events
         const { status = '', title = '', url = '' } = changeInfo;
         if (status === '' && title === '' && url === '') { return; }
-        // https://github.com/Ablock/Ablock/issues/3073
+        // https://github.com/Ablock-innovation/Ablock/issues/3073
         //   Fall back to `tab.url` when `changeInfo.url` is not set.
         if (url === '') {
             changeInfo.url = tab && tab.url;
@@ -1151,11 +1151,11 @@ vAPI.messaging = {
 /******************************************************************************/
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/3474
-// https://github.com/Ablock/Ablock/issues/2823
+// https://github.com/Ablock-innovation/Ablock/issues/3474
+// https://github.com/Ablock-innovation/Ablock/issues/2823
 //   Foil ability of web pages to identify uBO through
 //   its web accessible resources.
-// https://github.com/Ablock/Ablock/issues/3497
+// https://github.com/Ablock-innovation/Ablock/issues/3497
 //   Prevent web pages from interfering with uBO's element picker
 // https://github.com/uBlockOrigin/uBlock-issues/issues/550
 //   Support using a new secret for every network request.
@@ -1445,16 +1445,16 @@ vAPI.commands = browser.commands;
 /******************************************************************************/
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/531
+// https://github.com/Ablock-innovation/Ablock/issues/531
 //   Storage area dedicated to admin settings. Read-only.
 
-// https://github.com/Ablock/Ablock/commit/43a5ed735b95a575a9339b6e71a1fcb27a99663b#commitcomment-13965030
+// https://github.com/Ablock-innovation/Ablock/commit/43a5ed735b95a575a9339b6e71a1fcb27a99663b#commitcomment-13965030
 // Not all Chromium-based browsers support managed storage. Merely testing or
 // exception handling in this case does NOT work: I don't know why. The
 // extension on Opera ends up in a non-sensical state, whereas vAPI become
 // undefined out of nowhere. So only solution left is to test explicitly for
 // Opera.
-// https://github.com/Ablock/Ablock/issues/900
+// https://github.com/Ablock-innovation/Ablock/issues/900
 // Also, UC Browser: http://www.upsieutoc.com/image/WXuH
 
 // https://github.com/uBlockOrigin/uAssets/discussions/16939
@@ -1590,7 +1590,7 @@ vAPI.cloud = (() => {
     const chunkCountPerFetch = 16; // Must be a power of 2
     const maxChunkCountPerItem = Math.floor(MAX_ITEMS * 0.75) & ~(chunkCountPerFetch - 1);
 
-    // https://github.com/Ablock/Ablock/issues/3006
+    // https://github.com/Ablock-innovation/Ablock/issues/3006
     //   For Firefox, we will use a lower ratio to allow for more overhead for
     //   the infrastructure. Unfortunately this leads to less usable space for
     //   actual data, but all of this is provided for free by browser vendors,

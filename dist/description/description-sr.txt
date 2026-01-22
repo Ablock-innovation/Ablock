@@ -1,6 +1,6 @@
 Ефикасан блокатор: ниски процесорски и меморијски захтеви а може учитати и применити хиљаде филтера више него остали популарни блокатори.
 
-Илустровани преглед његове ефикасности: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Илустровани преглед његове ефикасности: https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Употреба: Велико дугме у искачућем прозору служи за трајно омогућавање/онемогућавање uBlock-а на тренутном веб сајту. То се односи само на тренутни веб сајт, није дугме за опште за искључивање.
 
@@ -38,7 +38,7 @@
 Отвореног кода са јавном лиценцом (GPLv3)
 За кориснике од корисника.
 
-Сарадници @ Github: https://github.com/Ablock/Ablock/graphs/contributors
+Сарадници @ Github: https://github.com/Ablock-innovation/Ablock/graphs/contributors
 Сарадници @ Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@
 Ово је рана верзија, имајте то на уму када будете оцењивали.
 
 Евиденција промена:
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

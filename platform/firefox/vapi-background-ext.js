@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import {
@@ -42,7 +42,7 @@ const skipDNS = proxyInfo =>
 /******************************************************************************/
 
 // Related issues:
-// - https://github.com/Ablock/Ablock/issues/1327
+// - https://github.com/Ablock-innovation/Ablock/issues/1327
 // - https://github.com/uBlockOrigin/uBlock-issues/issues/128
 // - https://bugzilla.mozilla.org/show_bug.cgi?id=1503721
 

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /*******************************************************************************
@@ -99,7 +99,7 @@
 
 // Abort execution if our global vAPI object does not exist.
 //   https://github.com/chrisaljoudi/uBlock/issues/456
-//   https://github.com/Ablock/Ablock/issues/2029
+//   https://github.com/Ablock-innovation/Ablock/issues/2029
 
 // >>>>>>>> start of HUGE-IF-BLOCK
 if (typeof vAPI === 'object' && !vAPI.contentScript) {
@@ -187,7 +187,7 @@ if (typeof vAPI === 'object' && !vAPI.contentScript) {
     
     */
 
-    // https://github.com/Ablock/Ablock/issues/2147
+    // https://github.com/Ablock-innovation/Ablock/issues/2147
 
     vAPI.SafeAnimationFrame = class {
         constructor(callback) {
@@ -695,7 +695,7 @@ if (typeof vAPI === 'object' && !vAPI.contentScript) {
         };
 
         // https://github.com/chrisaljoudi/uBlock/issues/399
-        // https://github.com/Ablock/Ablock/issues/2848
+        // https://github.com/Ablock-innovation/Ablock/issues/2848
         //   Use a user stylesheet to collapse placeholders.
         const getCollapseToken = () => {
             if (collapseToken === undefined) {
@@ -822,7 +822,7 @@ if (typeof vAPI === 'object' && !vAPI.contentScript) {
             attributeFilter: ['src']
         };
 
-        // https://github.com/Ablock/Ablock/issues/162
+        // https://github.com/Ablock-innovation/Ablock/issues/162
         //   Be prepared to deal with possible change of src attribute.
         const addIFrame = function (iframe, dontObserve) {
             if (dontObserve !== true) {
@@ -997,7 +997,7 @@ if (typeof vAPI === 'object' && !vAPI.contentScript) {
         // filtering engine, and in return we will obtain only the relevant
         // CSS selectors.
 
-        // https://github.com/Ablock/Ablock/issues/672
+        // https://github.com/Ablock-innovation/Ablock/issues/672
         // http://www.w3.org/TR/2014/REC-html5-20141028/infrastructure.html#space-separated-tokens
         // http://jsperf.com/enumerate-classes/6
 
@@ -1205,7 +1205,7 @@ if (typeof vAPI === 'object' && !vAPI.contentScript) {
     {
         const onDomReady = () => {
             // This can happen on Firefox. For instance:
-            // https://github.com/Ablock/Ablock/issues/1893
+            // https://github.com/Ablock-innovation/Ablock/issues/1893
             if (window.location === null) { return; }
             if (self.vAPI instanceof Object === false) { return; }
 

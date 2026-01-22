@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "Blokiraj CSP izvješća",
-    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
+    "description": "background information: https://github.com/Ablock-innovation/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Prikaži kanonske nazive",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Pravila sintakse: <code>akcija tipa izvornog odredišta</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>sva dokumentacija</a>).",
+    "message": "Pravila sintakse: <code>akcija tipa izvornog odredišta</code> (<a href='https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-rule-syntax'>sva dokumentacija</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

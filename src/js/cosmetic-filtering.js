@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /******************************************************************************/
@@ -160,7 +160,7 @@ const hashFromStr = (type, s) => {
     return hash & 0xFFFFFF;
 };
 
-// https://github.com/Ablock/Ablock/issues/1668
+// https://github.com/Ablock-innovation/Ablock/issues/1668
 //   The key must be literal: unescape escaped CSS before extracting key.
 //   It's an uncommon case, so it's best to unescape only when needed.
 

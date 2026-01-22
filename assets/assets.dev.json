@@ -80,7 +80,7 @@
 			"https://ublockorigin.pages.dev/filters/"
 		],
 		"supportURL": "https://github.com/uBlockOrigin/uAssets",
-		"instructionURL": "https://github.com/Ablock/Ablock/wiki/Badware-risks"
+		"instructionURL": "https://github.com/Ablock-innovation/Ablock/wiki/Badware-risks"
 	},
 	"ublock-privacy": {
 		"content": "filters",

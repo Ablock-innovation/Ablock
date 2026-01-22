@@ -1,6 +1,6 @@
 Արդյունավետ արգելափակիչ. չի ծանրաբեռնում մշակիչը և օպերատիվ հիշողությունը, միևնույն ժամանակ աջակցում է հազարներով ավելի շատ զտիչիեր,  քան այլ հանրաճանաչ արգելափակիչները։
 
-Դրա արդյունավետության պատկերազարդ ակնարկ՝ https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Դրա արդյունավետության պատկերազարդ ակնարկ՝ https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Օգտագործումը. ելնող լուսամուտի հոսանքի մեծ կոճակը ծառայում է ընթացիկ կայքի համար uBlock-ն անջատելու/միացնելու համար։ Դա ընդհանուր հոսանքի կոճակ չէ, այլ վերաբերում է միայն ընթացիկ կայքին։
 
@@ -38,10 +38,10 @@
 Բաց ելակետային կոդ հրապարակավ թույլատրագրով (GPLv3)։
 Օգտվողներին օգտվողների կողմից։
 
-Աջակցողները Github-ում՝ https://github.com/Ablock/Ablock/graphs/contributors
+Աջակցողները Github-ում՝ https://github.com/Ablock-innovation/Ablock/graphs/contributors
 Աջակցողները Crowdin-ում՝ https://crowdin.net/project/ublock
 
 ***
 
 Փոփոխությունների մատյան՝
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

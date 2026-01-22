@@ -1,6 +1,6 @@
 Kizuizi kinachofaa: nyepesi kwenye kumbukumbu na nyayo za CPU, na bado inawezapakia na kuamrisha maelfu ya vichujio kuliko vizuizi vingine.
 
-Kielelezo cha ufanisi wake: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+Kielelezo cha ufanisi wake: https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 Utumiaji: Kitufe kikubwa cha nishati kinalemaza/kuwezesha kabisa uBlock kwenye tovuti ya sasa. Inatekelezeka kwenye tovutio ya sasa pekee, si kitufe cha kila mahali.
 
@@ -38,7 +38,7 @@ Huru
 Programu huria yenye leseni ya umma (GPLv3)
 Na watumiaji kwa watumiaji
 
-Wachangiaji @ Github: https://github.com/Ablock/Ablock/graphs/contributors
+Wachangiaji @ Github: https://github.com/Ablock-innovation/Ablock/graphs/contributors
 Wachangiaji @ Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@ Wachangiaji @ Crowdin: https://crowdin.net/project/ublock
 It's quite an early version, keep this in mind when you review.
 
 Batli ya mabadiliko ya mradi:
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

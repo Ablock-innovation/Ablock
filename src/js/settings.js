@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import { dom, qs$, qsa$ } from './dom.js';
@@ -300,7 +300,7 @@ function onUserSettingsReceived(details) {
 
 /******************************************************************************/
 
-self.wikilink = 'https://github.com/Ablock/Ablock/wiki/Dashboard:-Settings';
+self.wikilink = 'https://github.com/Ablock-innovation/Ablock/wiki/Dashboard:-Settings';
 
 self.hasUnsavedData = function () {
     return false;

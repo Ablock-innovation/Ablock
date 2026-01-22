@@ -1,6 +1,6 @@
 რეკლამების შედეგიანი შემზღუდავი: მეხსიერებისა და პროცესორის შემსუბუქებული მოხმარება, რეკლამების სხვა შემზღუდავებთან შედარებით, ათასობით მეტი ფილტრის გამოყენების პირობებშიც კი.
 
-შედეგიანობის მიმოხილვა იხილეთ ბმულზე: https://github.com/Ablock/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
+შედეგიანობის მიმოხილვა იხილეთ ბმულზე: https://github.com/Ablock-innovation/Ablock/wiki/uBlock-vs.-ABP:-efficiency-compared
 
 გამოყენება: ჩართვის დიდი ღილაკით, ჩამოშლილ მენიუში, შესაძლებელია uBlock-ის ჩართვა/გამორთვა მიმდინარე ვებსაიტზე. ეს ღილაკი მოქმედებს მხოლოდ არსებულ საიტზე და არ გამოიყენება ზოგადად ჩართვა/გამორთვისთვის.
 
@@ -38,7 +38,7 @@
 ღია წყაროს მქონე საჯარო ლიცენზიით (GPLv3)
 მომხმარებლების მიერ, მომხმარებლებისთვის.
 
-წვლილის შემტანები @ Github: https://github.com/Ablock/Ablock/graphs/contributors
+წვლილის შემტანები @ Github: https://github.com/Ablock-innovation/Ablock/graphs/contributors
 წვლილის შემტანები @ Crowdin: https://crowdin.net/project/ublock
 
 ***
@@ -46,4 +46,4 @@
 It's quite an early version, keep this in mind when you review.
 
 ცვლილებების ჩამონათვალი:
-https://github.com/Ablock/Ablock/releases
+https://github.com/Ablock-innovation/Ablock/releases

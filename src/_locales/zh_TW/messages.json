@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "封鎖內容安全策略報告",
-    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
+    "description": "background information: https://github.com/Ablock-innovation/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "揭露網域「正規名稱」",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "規則語法：<code>來源主機名稱 目標主機名稱 連線請求類型 操作</code>（<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>完整說明</a>）。",
+    "message": "規則語法：<code>來源主機名稱 目標主機名稱 連線請求類型 操作</code>（<a href='https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-rule-syntax'>完整說明</a>）。",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

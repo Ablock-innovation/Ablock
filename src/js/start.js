@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import './vapi-common.js';
@@ -383,7 +383,7 @@ const createDefaultProps = () => {
     try {
         ubolog(`Start sequence of loading storage-based data ${Date.now() - vAPI.T0} ms after launch`);
 
-        // https://github.com/Ablock/Ablock/issues/531
+        // https://github.com/Ablock-innovation/Ablock/issues/531
         await µb.restoreAdminSettings();
         ubolog(`Admin settings ready ${Date.now() - vAPI.T0} ms after launch`);
 

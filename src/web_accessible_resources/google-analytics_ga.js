@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 (function () {
@@ -51,7 +51,7 @@
             } catch (ex) {
             }
         }
-        // https://github.com/Ablock/Ablock/issues/2162
+        // https://github.com/Ablock-innovation/Ablock/issues/2162
         if (a[0] === '_set' && a[1] === 'hitCallback' && typeof a[2] === 'function') {
             a[2]();
         }

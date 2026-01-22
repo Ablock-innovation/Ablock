@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import { StaticExtFilteringHostnameDB } from './static-ext-filtering-db.js';
@@ -92,7 +92,7 @@ httpheaderFilteringEngine.compile = function (parser, writer) {
         return;
     }
 
-    // https://github.com/Ablock/Ablock/issues/3375
+    // https://github.com/Ablock-innovation/Ablock/issues/3375
     //   Ignore instances of exception filter with negated hostnames,
     //   because there is no way to create an exception to an exception.
 
@@ -138,7 +138,7 @@ httpheaderFilteringEngine.apply = function (fctxt, headers) {
     filterDB.retrieveGenerics(all);
     if (all.size === 0) { return; }
 
-    // https://github.com/Ablock/Ablock/issues/2835
+    // https://github.com/Ablock-innovation/Ablock/issues/2835
     //   Do not filter response headers if the site is under an `allow` rule.
     if (µb.userSettings.advancedUserEnabled) {
         if (sessionFirewall.evaluateCellZY(hostname, hostname, '*') === 2) { return; }

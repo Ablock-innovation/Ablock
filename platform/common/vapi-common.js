@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 // For background page or non-background pages
@@ -220,7 +220,7 @@ vAPI.getURL = browser.runtime.getURL;
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/3057
+// https://github.com/Ablock-innovation/Ablock/issues/3057
 // - webNavigation.onCreatedNavigationTarget become broken on Firefox when we
 //   try to make the popup panel close itself using the original
 //   `window.open('', '_self').close()`. 
@@ -232,7 +232,7 @@ vAPI.closePopup = function () {
     }
 
     // TODO: try to figure why this was used instead of a plain window.close().
-    // https://github.com/Ablock/Ablock/commit/b301ac031e0c2e9a99cb6f8953319d44e22f33d2#diff-bc664f26b9c453e0d43a9379e8135c6a
+    // https://github.com/Ablock-innovation/Ablock/commit/b301ac031e0c2e9a99cb6f8953319d44e22f33d2#diff-bc664f26b9c453e0d43a9379e8135c6a
     window.open('', '_self').close();
 };
 
@@ -287,7 +287,7 @@ vAPI.localStorage = {
     - Remove the following code
     - Add code beyond the following code
     Reason:
-    - https://github.com/Ablock/Ablock/pull/3721
+    - https://github.com/Ablock-innovation/Ablock/pull/3721
     - uBO never uses the return value from injected content scripts
 
 **/

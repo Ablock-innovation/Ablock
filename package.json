@@ -1,5 +1,5 @@
 {
-  "name": "uBlock",
+  "name": "Ablock",
   "version": "1.0.0",
   "description": "npm dev tools",
   "type": "module",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ablock/Ablock.git"
+    "url": "git+https://github.com/Ablock-innovation-innovation/Ablock.git"
   },
-  "author": "Raymond Hill",
-  "license": "GPLv3",
+  "author": "Ahmad",
+  "license": "GPLv3",htpps
   "bugs": {
-    "url": "https://github.com/Ablock/Ablock/issues"
+    "url": "https://github.com/Ablock-innovation/Ablock/issues"
   },
-  "homepage": "https://github.com/Ablock/Ablock#readme",
+  "homepage": "https://github.com/Ablock-innovation/Ablock#readme",
   "engines": {
     "node": ">=22",
     "npm": ">=11"

@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "Blochează rapoartele CSP",
-    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
+    "description": "background information: https://github.com/Ablock-innovation/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Dezvăluie numele canonice",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Sintaxa pentru regulă: <code>sursă destinație tip acțiune</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>documentație</a>).",
+    "message": "Sintaxa pentru regulă: <code>sursă destinație tip acțiune</code> (<a href='https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-rule-syntax'>documentație</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

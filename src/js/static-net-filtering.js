@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import * as sfp from './static-filtering-parser.js';
@@ -847,7 +847,7 @@ class FilterPatternPlain {
         );
         details.pattern.push(s);
         details.regex.push(restrFromPlainPattern(s));
-        // https://github.com/Ablock/Ablock/issues/3037
+        // https://github.com/Ablock-innovation/Ablock/issues/3037
         //   Make sure the logger reflects accurately internal match, taking
         //   into account MAX_TOKEN_LENGTH.
         if (/^[0-9a-z%]{1,6}$/i.exec(s.slice(filterData[idata + 3])) !== null) {
@@ -3141,7 +3141,7 @@ registerFilterClass(FilterMessage);
 /******************************************************************************/
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/2630
+// https://github.com/Ablock-innovation/Ablock/issues/2630
 // Slice input URL into a list of safe-integer token values, instead of a list
 // of substrings. The assumption is that with dealing only with numeric
 // values, less underlying memory allocations, and also as a consequence
@@ -3798,7 +3798,7 @@ class FilterCompiler {
         // Negated network types? Toggle on all network type bits.
         // Negated non-network types can only toggle themselves.
         //
-        // https://github.com/Ablock/Ablock/issues/2385
+        // https://github.com/Ablock-innovation/Ablock/issues/2385
         //   Toggle on all network types if:
         //   - at least one network type is negated; or
         //   - no network type is present -- i.e. all network types are
@@ -3824,7 +3824,7 @@ class FilterCompiler {
             }
         }
 
-        // https://github.com/Ablock/Ablock/issues/2283
+        // https://github.com/Ablock-innovation/Ablock/issues/2283
         //   Abort if type is only for unsupported types, otherwise
         //   toggle off `unsupported` bit.
         if (this.typeBits & unsupportedTypeBit) {
@@ -3902,7 +3902,7 @@ class FilterCompiler {
         }
     }
 
-    // https://github.com/Ablock/Ablock/issues/2781
+    // https://github.com/Ablock-innovation/Ablock/issues/2781
     //   For efficiency purpose, try to extract a token from a regex-based
     //   filter.
     // https://github.com/uBlockOrigin/uBlock-issues/issues/1145#issuecomment-657036902
@@ -5319,11 +5319,11 @@ StaticNetFilteringEngine.prototype.realmMatchString = function (
 
 // Specialized handler
 
-// https://github.com/Ablock/Ablock/issues/1477
+// https://github.com/Ablock-innovation/Ablock/issues/1477
 //   Special case: blocking-generichide filter ALWAYS exists, it is implicit --
 //   thus we always first check for exception filters, then for important block
 //   filter if and only if there was a hit on an exception filter.
-// https://github.com/Ablock/Ablock/issues/2103
+// https://github.com/Ablock-innovation/Ablock/issues/2103
 //   User may want to override `generichide` exception filters.
 // https://www.reddit.com/r/uBlockOrigin/comments/d6vxzj/
 //   Add support for `specifichide`.

@@ -8,7 +8,7 @@
 // https://github.com/codemirror/CodeMirror/blob/3e1bb5fff682f8f6cbfaef0e56c61d62403d4798/addon/search/search.js
 //
 // And has been modified over time to better suit uBO's usage and coding style:
-// https://github.com/Ablock/Ablock/commits/master/src/js/codemirror/search.js
+// https://github.com/Ablock-innovation/Ablock/commits/master/src/js/codemirror/search.js
 //
 // The original copyright notice is reproduced below:
 

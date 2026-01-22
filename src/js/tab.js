@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import {
@@ -83,8 +83,8 @@ import µb from './background.js';
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/99
-// https://github.com/Ablock/Ablock/issues/991
+// https://github.com/Ablock-innovation/Ablock/issues/99
+// https://github.com/Ablock-innovation/Ablock/issues/991
 // 
 // popup:
 //   Test/close target URL
@@ -106,12 +106,12 @@ import µb from './background.js';
 // d: close target
 
 const onPopupUpdated = (() => {
-    // https://github.com/Ablock/Ablock/commit/1d448b85b2931412508aa01bf899e0b6f0033626#commitcomment-14944764
+    // https://github.com/Ablock-innovation/Ablock/commit/1d448b85b2931412508aa01bf899e0b6f0033626#commitcomment-14944764
     //   See if two URLs are different, disregarding scheme -- because the
     //   scheme can be unilaterally changed by the browser.
-    // https://github.com/Ablock/Ablock/issues/1378
+    // https://github.com/Ablock-innovation/Ablock/issues/1378
     //   Maybe no link element was clicked.
-    // https://github.com/Ablock/Ablock/issues/3287
+    // https://github.com/Ablock-innovation/Ablock/issues/3287
     //   Do not bail out if the target URL has no hostname.
     const areDifferentURLs = function (a, b) {
         if (b === '') { return true; }
@@ -149,7 +149,7 @@ const onPopupUpdated = (() => {
             .setURL(targetURL)
             .setType('popup');
 
-        // https://github.com/Ablock/Ablock/issues/1735
+        // https://github.com/Ablock-innovation/Ablock/issues/1735
         //   Do not bail out on `data:` URI, they are commonly used for popups.
         // https://github.com/uBlockOrigin/uAssets/issues/255
         //   Do not bail out on `about:blank`: an `about:blank` popup can be
@@ -161,13 +161,13 @@ const onPopupUpdated = (() => {
 
         // Dynamic filtering makes sense only when we have a valid opener
         // hostname.
-        // https://github.com/Ablock/Ablock/commit/1d448b85b2931412508aa01bf899e0b6f0033626#commitcomment-14944764
+        // https://github.com/Ablock-innovation/Ablock/commit/1d448b85b2931412508aa01bf899e0b6f0033626#commitcomment-14944764
         //   Ignore bad target URL. On Firefox, an `about:blank` tab may be
         //   opened for a new tab before it is filled in with the real target
         //   URL.
         if (fctxt.getTabHostname() !== '' && targetURL !== 'about:blank') {
             // Check per-site switch first
-            // https://github.com/Ablock/Ablock/issues/3060
+            // https://github.com/Ablock-innovation/Ablock/issues/3060
             // - The no-popups switch must apply only to popups, not to
             //   popunders.
             if (
@@ -185,7 +185,7 @@ const onPopupUpdated = (() => {
                 return 1;
             }
 
-            // https://github.com/Ablock/Ablock/issues/581
+            // https://github.com/Ablock-innovation/Ablock/issues/581
             //   Take into account popup-specific rules in dynamic URL
             //   filtering, OR generic allow rules.
             let result = sessionURLFiltering.evaluateZ(
@@ -201,7 +201,7 @@ const onPopupUpdated = (() => {
                 return result;
             }
 
-            // https://github.com/Ablock/Ablock/issues/581
+            // https://github.com/Ablock-innovation/Ablock/issues/581
             //   Take into account `allow` rules in dynamic filtering: `block`
             //   rules are ignored, as block rules are not meant to block
             //   specific types like `popup` (just like with static filters).
@@ -248,10 +248,10 @@ const onPopupUpdated = (() => {
         const end = beg + matches[0].length;
         const pos = popunderURL.indexOf(popunderHostname);
         if (pos === -1) { return 0; }
-        // https://github.com/Ablock/Ablock/issues/1471
+        // https://github.com/Ablock-innovation/Ablock/issues/1471
         //   We test whether the opener hostname as at least one character
         //   within matched portion of URL.
-        // https://github.com/Ablock/Ablock/issues/1903
+        // https://github.com/Ablock-innovation/Ablock/issues/1903
         //   Ignore filters which cause a match before the start of the
         //   hostname in the URL.
         return beg >= pos && beg < pos + popunderHostname.length && end > pos
@@ -274,7 +274,7 @@ const onPopupUpdated = (() => {
         );
         if (result === 1) { return result; }
 
-        // https://github.com/Ablock/Ablock/issues/1010#issuecomment-186824878
+        // https://github.com/Ablock-innovation/Ablock/issues/1010#issuecomment-186824878
         //   Check the opener tab as if it were the newly opened tab: if there
         //   is a hit against a popup filter, and if the matching filter is not
         //   a broad one, we will consider the opener tab to be a popunder tab.
@@ -292,7 +292,7 @@ const onPopupUpdated = (() => {
         );
         if (result !== 0) { return result; }
 
-        // https://github.com/Ablock/Ablock/issues/1598
+        // https://github.com/Ablock-innovation/Ablock/issues/1598
         //   Try to find a match against origin part of the opener URL.
         popunderURL = originFromURI(popunderURL);
         if (popunderURL === '') { return 0; }
@@ -337,11 +337,11 @@ const onPopupUpdated = (() => {
         let targetURL = tabContext.rawURL;
         if (targetURL === '') { return; }
 
-        // https://github.com/Ablock/Ablock/issues/341
+        // https://github.com/Ablock-innovation/Ablock/issues/341
         //   Allow popups if uBlock is turned off in opener's context.
         if (µb.getNetFilteringSwitch(rootOpenerURL) === false) { return; }
 
-        // https://github.com/Ablock/Ablock/issues/1538
+        // https://github.com/Ablock-innovation/Ablock/issues/1538
         if (
             µb.getNetFilteringSwitch(
                 µb.normalizeTabURL(openerTabId, rootOpenerURL)
@@ -360,7 +360,7 @@ const onPopupUpdated = (() => {
         // Popup test.
         let popupType = 'popup',
             result = 0;
-        // https://github.com/Ablock/Ablock/issues/2919
+        // https://github.com/Ablock-innovation/Ablock/issues/2919
         //   If the target tab matches a clicked link, assume it's legit.
         // https://github.com/uBlockOrigin/uBlock-issues/issues/1912
         //   If the target also matches the last clicked link, assume it's
@@ -381,7 +381,7 @@ const onPopupUpdated = (() => {
         }
 
         // Log only for when there was a hit against an actual filter (allow or block).
-        // https://github.com/Ablock/Ablock/issues/2776
+        // https://github.com/Ablock-innovation/Ablock/issues/2776
         if (logger.enabled) {
             fctxt.setRealm('network').setType(popupType);
             if (popupType === 'popup') {
@@ -535,7 +535,7 @@ housekeep itself.
             ) {
                 continue;
             }
-            // https://github.com/Ablock/Ablock/issues/3129
+            // https://github.com/Ablock-innovation/Ablock/issues/3129
             //   If the trigger is a change in the opener's URL, mark the entry
             //   as candidate for popunder filtering.
             if (targetTabId === candidate.opener.tabId) {
@@ -638,7 +638,7 @@ housekeep itself.
         this.onGCBarrier = false;
     };
 
-    // https://github.com/Ablock/Ablock/issues/248
+    // https://github.com/Ablock-innovation/Ablock/issues/248
     // Stack entries have to be committed to stick. Non-committed stack
     // entries are removed after a set delay.
     TabContext.prototype.onCommit = function () {
@@ -649,7 +649,7 @@ housekeep itself.
         while (i--) {
             if (this.stack[i].committed) { break; }
         }
-        // https://github.com/Ablock/Ablock/issues/300
+        // https://github.com/Ablock-innovation/Ablock/issues/300
         // If no committed entry was found, fall back on the bottom-most one
         // as being the committed one by default.
         if (i === -1 && this.stack.length !== 0) {
@@ -796,7 +796,7 @@ housekeep itself.
         return tabContexts.get(vAPI.noTabId);
     };
 
-    // https://github.com/Ablock/Ablock/issues/1735
+    // https://github.com/Ablock-innovation/Ablock/issues/1735
     //   Filter for popups if actually committing.
     const commit = function (tabId, url) {
         let entry = tabContexts.get(tabId);

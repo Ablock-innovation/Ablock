@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /******************************************************************************/
@@ -70,7 +70,7 @@
     // filtering engine, and in return we will obtain only the relevant
     // CSS selectors.
 
-    // https://github.com/Ablock/Ablock/issues/672
+    // https://github.com/Ablock-innovation/Ablock/issues/672
     // http://www.w3.org/TR/2014/REC-html5-20141028/infrastructure.html#space-separated-tokens
     // http://jsperf.com/enumerate-classes/6
 

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import * as sfp from './static-filtering-parser.js';
@@ -78,7 +78,7 @@ const initWorker = function () {
     const onListLoaded = function (details) {
         const entry = entries.get(details.assetKey);
 
-        // https://github.com/Ablock/Ablock/issues/536
+        // https://github.com/Ablock-innovation/Ablock/issues/536
         // Use assetKey when there is no filter list title.
 
         worker.postMessage({

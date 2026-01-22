@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /******************************************************************************/
@@ -253,7 +253,7 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
     retrieve(request) {
         const { hostname } = request;
 
-        // https://github.com/Ablock/Ablock/issues/2835
+        // https://github.com/Ablock-innovation/Ablock/issues/2835
         // Do not inject scriptlets if the site is under an `allow` rule.
         if (µb.userSettings.advancedUserEnabled) {
             if (sessionFirewall.evaluateCellZY(hostname, hostname, '*') === 2) {

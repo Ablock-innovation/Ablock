@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "Блокиране на CSP отчетите",
-    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
+    "description": "background information: https://github.com/Ablock-innovation/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "Разкриване на каноничните имена",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "Синтаксис на правилото: <code>източник цел тип действие</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'>пълна документация</a>).",
+    "message": "Синтаксис на правилото: <code>източник цел тип действие</code> (<a href='https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-rule-syntax'>пълна документация</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

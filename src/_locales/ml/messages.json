@@ -352,7 +352,7 @@
     "description": ""
   },
   "settingsAdvancedUserPrompt": {
-    "message": "ഞാന്‍ ഒരു അഡ്വാന്‍സ്ഡ് യൂസര്‍ ആണ് (<a href='https://github.com/Ablock/Ablock/wiki/Advanced-user-features'> വായിക്കേണ്ടത്</a>)",
+    "message": "ഞാന്‍ ഒരു അഡ്വാന്‍സ്ഡ് യൂസര്‍ ആണ് (<a href='https://github.com/Ablock-innovation/Ablock/wiki/Advanced-user-features'> വായിക്കേണ്ടത്</a>)",
     "description": "Checkbox to let user access advanced, technical features"
   },
   "settingsPrefetchingDisabledPrompt": {
@@ -393,7 +393,7 @@
   },
   "settingsNoCSPReportsPrompt": {
     "message": "സി‌എസ്‌പി റിപ്പോർട്ടുകൾ തടയുക",
-    "description": "background information: https://github.com/Ablock/Ablock/issues/3150"
+    "description": "background information: https://github.com/Ablock-innovation/Ablock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
     "message": "കാനോനിക്കൽ പേരുകൾ അൺലോക്ക് ചെയ്യുക",
@@ -608,7 +608,7 @@
     "description": "English: List of your dynamic filtering rules."
   },
   "rulesFormatHint": {
-    "message": "നിയമത്തിന്‍റെ സിന്‍റ്റാക്സ്‌: <code> സോര്‍സ് ഡെസ്റ്റിനേഷന്‍ ടൈപ്പ് ആക്ഷന്‍</code> (<a href='https://github.com/Ablock/Ablock/wiki/Dynamic-filtering:-rule-syntax'> മുഴുനീള പ്രമാണം</a>).",
+    "message": "നിയമത്തിന്‍റെ സിന്‍റ്റാക്സ്‌: <code> സോര്‍സ് ഡെസ്റ്റിനേഷന്‍ ടൈപ്പ് ആക്ഷന്‍</code> (<a href='https://github.com/Ablock-innovation/Ablock/wiki/Dynamic-filtering:-rule-syntax'> മുഴുനീള പ്രമാണം</a>).",
     "description": "English: dynamic rule syntax and full documentation."
   },
   "rulesSort": {

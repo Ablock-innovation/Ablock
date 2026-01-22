@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 import { dom, qs$ } from './dom.js';
@@ -99,7 +99,7 @@ if (typeof details.to === 'string' && details.to.length !== 0) {
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/691
+// https://github.com/Ablock-innovation/Ablock/issues/691
 //   Parse URL to extract as much useful information as possible. This is
 //   useful to assist the user in deciding whether to navigate to the web page.
 (() => {

@@ -294,7 +294,7 @@ mergeView.options.revertChunk = function (
     from, fromStart, fromEnd,
     to, toStart, toEnd
 ) {
-    // https://github.com/Ablock/Ablock/issues/3611
+    // https://github.com/Ablock-innovation/Ablock/issues/3611
     if (dom.attr(dom.body, 'dir') === 'rtl') {
         let tmp = from; from = to; to = tmp;
         tmp = fromStart; fromStart = toStart; toStart = tmp;
@@ -641,7 +641,7 @@ self.cloud.onPull = function (data, append) {
 
 /******************************************************************************/
 
-self.wikilink = 'https://github.com/Ablock/Ablock/wiki/Dashboard:-My-rules';
+self.wikilink = 'https://github.com/Ablock-innovation/Ablock/wiki/Dashboard:-My-rules';
 
 self.hasUnsavedData = function () {
     return mergeView.editor().isClean(cleanEditToken) === false;

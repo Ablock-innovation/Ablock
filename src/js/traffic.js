@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 /******************************************************************************/
@@ -245,7 +245,7 @@ function onBeforeRootFrameRequest(fctxt) {
 // https://github.com/chrisaljoudi/uBlock/issues/1128
 //   Do not block if the match begins after the hostname,
 //   except when the filter is specifically of type `other`.
-// https://github.com/Ablock/Ablock/issues/490
+// https://github.com/Ablock-innovation/Ablock/issues/490
 //   Removing this for the time being, will need a new, dedicated type.
 // https://github.com/uBlockOrigin/uBlock-issues/issues/1501
 //   Support explicit exception filters.
@@ -330,7 +330,7 @@ function shouldStrictBlock(fctxt, loggerEnabled) {
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/3208
+// https://github.com/Ablock-innovation/Ablock/issues/3208
 //   Mind case insensitivity.
 // https://github.com/uBlockOrigin/uBlock-issues/issues/1147
 //   Do not strict-block if the filter pattern does not contain at least one
@@ -368,7 +368,7 @@ function onBeforeBehindTheSceneRequest(fctxt) {
     const pageStore = µb.pageStoreFromTabId(fctxt.tabId);
     if (pageStore === null) { return; }
 
-    // https://github.com/Ablock/Ablock/issues/3150
+    // https://github.com/Ablock-innovation/Ablock/issues/3150
     //   Ability to globally block CSP reports MUST also apply to
     //   behind-the-scene network requests.
 
@@ -523,7 +523,7 @@ function onHeadersReceived(details) {
 
     const mime = mimeFromHeaders(responseHeaders);
 
-    // https://github.com/Ablock/Ablock/issues/2813
+    // https://github.com/Ablock-innovation/Ablock/issues/2813
     //   Disable the blocking of large media elements if the document is itself
     //   a media element: the resource was not prevented from loading so no
     //   point to further block large media elements for the current document.
@@ -965,7 +965,7 @@ const bodyFilterer = (() => {
                 }
             }
 
-            // https://github.com/Ablock/Ablock/issues/3478
+            // https://github.com/Ablock-innovation/Ablock/issues/3478
             const statusCode = details.statusCode || 0;
             if (statusCode === 0) { return; }
 
@@ -1038,7 +1038,7 @@ function injectCSP(fctxt, pageStore, responseHeaders) {
         }
     }
 
-    // https://github.com/Ablock/Ablock/issues/1539
+    // https://github.com/Ablock-innovation/Ablock/issues/1539
     // - Use a CSP to also forbid inline fonts if remote fonts are blocked.
     fctxt.type = 'inline-font';
     if (pageStore.filterRequest(fctxt) === 1) {
@@ -1166,9 +1166,9 @@ function injectPP(fctxt, pageStore, responseHeaders) {
 
 /******************************************************************************/
 
-// https://github.com/Ablock/Ablock/issues/1163
+// https://github.com/Ablock-innovation/Ablock/issues/1163
 //   "Block elements by size".
-// https://github.com/Ablock/Ablock/issues/1390#issuecomment-187310719
+// https://github.com/Ablock-innovation/Ablock/issues/1390#issuecomment-187310719
 //   Do not foil when the media element is fetched from the browser
 //   cache. This works only when the webext API supports the `fromCache`
 //   property (Firefox).

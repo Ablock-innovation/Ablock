@@ -16,14 +16,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
-// https://github.com/Ablock/Ablock/issues/533#issuecomment-164292868
+// https://github.com/Ablock-innovation/Ablock/issues/533#issuecomment-164292868
 // If WebRTC is supported, there won't be an exception if we
 // try to instantiate a peer connection object.
 
-// https://github.com/Ablock/Ablock/issues/533#issuecomment-168097594
+// https://github.com/Ablock-innovation/Ablock/issues/533#issuecomment-168097594
 // Because Chromium leaks WebRTC connections after they have been closed
 // and forgotten, we need to test for WebRTC support inside an iframe, this
 // way the closed and forgottetn WebRTC connections are properly garbage

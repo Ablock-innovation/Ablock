@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see {http://www.gnu.org/licenses/}.
 
-    Home: https://github.com/Ablock/Ablock
+    Home: https://github.com/Ablock-innovation/Ablock
 */
 
 (function () {
@@ -71,7 +71,7 @@
     // https://github.com/uBlockOrigin/uAssets/issues/2107
     ga.loaded = true;
     w[gaName] = ga;
-    // https://github.com/Ablock/Ablock/issues/3075
+    // https://github.com/Ablock-innovation/Ablock/issues/3075
     const dl = w.dataLayer;
     if (dl instanceof Object) {
         if (dl.hide instanceof Object && typeof dl.hide.end === 'function') {
